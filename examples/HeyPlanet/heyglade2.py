@@ -1,12 +1,16 @@
 #!/usr/bin/env python
-from Kiwi import Views, mainquit
+from Kiwi2 import Views
+from Kiwi2.initgtk import gtk, quit_if_last
 
-widgets = [ "the_label" ]
+widgets = ["the_label"]
 app = Views.GladeView(gladefile="hey", 
-                      delete_handler=mainquit, 
+                      delete_handler=quit_if_last, 
                       widgets=widgets)
 
-print app.the_label         # the_label, a widget defined in glade, is 
-app.the_label.set_bold()    # now an instance variable of the view
-app.show_and_loop()
-
+# the_label, a widget defined in glade, is 
+text = app.the_label.get_text()
+# now an instance variable of the view
+app.the_label.set_markup('<b>%s</b>' % text)
+app.the_label.set_use_markup(True)
+app.show()
+gtk.main()

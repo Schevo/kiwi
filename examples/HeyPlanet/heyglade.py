@@ -1,6 +1,7 @@
 #!/usr/bin/env python
-from Kiwi2 import Views, gtk
+from Kiwi2 import Views
+from Kiwi2.initgtk import gtk, quit_if_last
 
-app = Views.GladeView(gladefile="hey", delete_handler=gtk.main_quit)
-app.show_and_loop()
-
+app = Views.GladeView(gladefile="hey", delete_handler=quit_if_last)
+app.show()
+gtk.main()
