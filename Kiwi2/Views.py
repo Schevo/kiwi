@@ -78,7 +78,7 @@ def image_path_resolver(filename):
         msg ="imagepath should be a list or tuple, found %s"
         raise ValueError(msg % type(imagepath))
 
-    if os.sep in filename or not imagepath:
+    if not imagepath:
         if os.path.isfile(filename):
             return filename
         else:
