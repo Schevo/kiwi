@@ -37,6 +37,11 @@ class WidgetProxyMixin(object):
     def __init__(self, data_type=str, model_attribute=None,
                  default_value=None):
         self._default_value = default_value
+        if default_value is None:
+            self._default_value_set = False
+        else:
+            self._default_value_set = True            
+        
         self.set_data_type(data_type)
         self.set_model_attribute(model_attribute)
         
@@ -56,7 +61,9 @@ class WidgetProxyMixin(object):
     def read(self):
         """Get the content of the widget.
 
-        The type of the return value matches the data-type property
+        The type of the return value matches the data-type property.
+
+        This returns None if the user input a invalid value
         """
         
     def do_get_property(self, pspec):
@@ -99,8 +106,7 @@ class WidgetProxyMixin(object):
         else:
             self._data_type = data_type
 
-        # if we don't have a default value, get one from the default table
-        if self._default_value is None:
+        if not self._default_value_set:
             self._default_value = datatypes.default_values[self._data_type]
 
     def get_model_attribute(self):
@@ -111,6 +117,13 @@ class WidgetProxyMixin(object):
 
     def get_default_value(self):
         return self._default_value
+
+    def set_default_value(self, value):
+        if not isinstance(value, self._data_type):
+            raise TypeError("The default value should be of type %s, found "
+                            "%s" % (self._data_type, type(value)))
+        self._default_value = value
+        self._default_value_set = True
     
     def str2type(self, data):
         """Convert a string to our data type.

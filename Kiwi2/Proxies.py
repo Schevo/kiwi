@@ -608,7 +608,10 @@ class Proxy:
             self._attr_map[attribute] = widget
 
     def _on_widget__content_changed(self, widget):
-        self._update_model(widget, widget.read())
+        data = widget.read()
+        # only update the model if the data is correct
+        if data is not None:
+            self._update_model(widget, data)
 
     def _update_model(self, widget, value):
         if self.model is None:

@@ -1,3 +1,26 @@
+2005-03-24  Lorenzo Gil Sanchez  <lgs@sicem.biz>
+
+	* Kiwi2/Widgets/Entry.py: inform the user if he made a mistake while
+	typing a entry by setting the background of the entry and adding a
+	tooltip with a message explaining the error
+
+	* Kiwi2/Widgets/datatypes.py (str2int, str2float): custom converter
+	functions that raise exceptions with nice messages if they find
+	errors in the data the user enters
+
+	* Kiwi2/Widgets/WidgetProxy.py: 
+	(WidgetProxyMixin.set_default_value): allow to set a custom default
+	value
+	(WidgetProxyMixin.__init__): added a flag to know if the user set
+	a default value different that the default value associated with the
+	data type
+
+	* Kiwi2/utils.py (merge_colors): function to merge the background of
+	a widget between two different colors
+
+	* Kiwi2/Proxies.py (Proxy._on_widget__content_changed): only update
+	the model if the data is correct
+
 2005-03-24 Gustavo Rahal <gustavo@async.com.br>
 
 	* Kiwi2/Widgets/CheckButton.py: bool data-type is an object not a string

@@ -1,5 +1,8 @@
 from datetime import date
 
+class ValidationError(Exception):
+    pass
+
 # by default locale uses the C locale but our date conversions use the user
 # locale so we need to set the locale to that one
 import locale
@@ -27,10 +30,13 @@ def set_date_format(format):
 def str2date(value):
     "Convert a string to a date"
     global date_format
-    dateinfo = time.strptime(value, date_format)
-    year, month, day = dateinfo[0:3]
-    return date(year, month, day)
-
+    try:
+        dateinfo = time.strptime(value, date_format)
+        year, month, day = dateinfo[0:3]
+        return date(year, month, day)
+    except ValueError:
+        raise ValidationError("This field requires a date")
+    
 def date2str(value):
     "Convert a date to a string"
     global date_format
@@ -44,6 +50,20 @@ def str2bool(value, default_value=True):
         return False
     else:
         return default_value
+
+def str2int(value):
+    "Convert a string to an integer"
+    try:
+        return int(value)
+    except ValueError:
+        raise ValidationError("This field requires an integer number")
+
+def str2float(value):
+    "Convert a string to a float"
+    try:
+        return float(value)
+    except ValueError:
+        raise ValidationError("This field requires a number")
     
 supported_types = (str, int, float, bool, date)
 
@@ -61,8 +81,8 @@ converters = {
         },
     FROM_STR: {
         str: lambda v: v,
-        int: int,
-        float: float,
+        int: str2int,
+        float: str2float,
         bool: str2bool,
         date: str2date,
         }
