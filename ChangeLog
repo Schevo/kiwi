@@ -1,5 +1,14 @@
 2005-02-17  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
+	* examples/HeyPlanet/heygazpacho3.py: copy of heygazpacho3.py using
+	Gazpachoview
+
+	* examples/HeyPlanet/heygazpacho2.py: copy of heyglade2.py using
+	GazpachoView
+
+	* examples/HeyPlanet/heygazpacho.py: copy of heyglade.py using
+	GazpachoView
+
 	* Kiwi2/initgtk.py (quit_if_last): mainquit is deprecated, did you know
 	that?
 
