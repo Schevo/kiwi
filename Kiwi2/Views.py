@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# 
+#
 # Kiwi: a Framework and Enhanced Widgets for Python
 #
 # Copyright (C) 2001-2004 Async Open Source
