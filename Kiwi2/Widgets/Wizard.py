@@ -1,7 +1,7 @@
 # -*- coding: iso-8859-1 -*-
 
-from Kiwi2.Delegates import Delegate, SlaveDelegate
 from Kiwi2.initgtk import gtk, quit_if_last
+from Kiwi2.Delegates import Delegate
 
 class WizardStep:
     """ This class must be inherited by the steps """
