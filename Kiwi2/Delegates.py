@@ -136,12 +136,7 @@ class KiwiListDelegate(SlaveDelegate):
 
         self.list.show()
 
-        scroll = gtk.ScrolledWindow()
-        scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        scroll.add(self.list)
-        scroll.show()
-
-        SlaveDelegate.__init__(self, scroll)
+        SlaveDelegate.__init__(self, self.list)
 
     def __nonzero__(self):
         return 1

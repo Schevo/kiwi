@@ -1,5 +1,9 @@
 2005-02-28  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
+	* Kiwi2/Delegates.py (KiwiListDelegate.__init__): don't need a 
+	scroll window anymore since that functionality is already in the
+	KiwiList.
+
 	* examples/News/news3.py: don't use KiwiListDelegate anymore but just
 	a simple SlaveDelegate. Also fix the small bug about the color
 
