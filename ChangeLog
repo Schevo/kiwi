@@ -1,6 +1,13 @@
 2005-03-10  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
-	* Kiwi2/Widgets/List.py (List): 
+	* Kiwi2/utils.py (get_foreground): fix the call to gdk_color_to_string
+
+	* Kiwi2/Views.py (SlaveView.__init__): if we don't have a toplevel
+	try to get it from the toplevel_name attribute
+
+	* Kiwi2/Widgets/List.py (List): fixed several minor bugs discovered
+	by writing a simple test
+
 	* Kiwi2/Views.py (SlaveView): use Johan gsignal and gproperty functions
 	to make	the code more readable
 

@@ -102,6 +102,10 @@ class Column:
         """
         # XXX: filter function?
         if attribute is not None:
+            if ' ' in attribute:
+                msg = ("The attribute can not contain spaces, otherwise I can"
+                       " not find the value in the instances: %s" % attribute)
+                raise AttributeError, msg
             self.attribute = attribute
         if title is not None:
             self.title = title
@@ -279,8 +283,12 @@ class List(gtk.ScrolledWindow):
         # create a popup menu for showing or hiding columns
         self._popup = gtk.Menu()
 
+        # allow to specify only one column
+        if isinstance(column_definitions, Column):
+            column_definitions = [column_definitions]
+
         # when setting the column definition the columns are created
-        self.set_column_definitions(list(column_definitions))
+        self.set_column_definitions(column_definitions)
 
         # by default we are unordered. This index points to the column
         # definition of the column that dictates the order, in case there is
@@ -318,39 +326,6 @@ class List(gtk.ScrolledWindow):
         # fine grain setup
         self._setup_columns()
         
-    def _setup_columns(self):
-        autosize = True
-        for i, column in enumerate(self._column_definitions):
-            treeview_column = self.treeview.get_column(i)
-            treeview_column.connect("clicked", self._on_column__clicked, i)
-            if column.width is not None:
-                treeview_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
-                treeview_column.set_fixed_width(column.width)
-                autosize = False
-            if column.tooltip is not None:
-                widget = self.__get_column_button(treeview_column)
-                if widget is not None:
-                    self._tooltips.set_tip(widget, column.tooltip)
-                    
-#%s where I expected a GtkButton""" % (column.tooltip, i, col))
-            #if column.decimal_separator:
-            ## XXX: This is a hack. I now see we need to keep the data model
-            ## in the CList too, but it's too late to add this. Anyway,
-            ## call ensure to make sure the translator exists.
-                #column.ensure_decimal_translator()
-                #clist._fix_decimal_separator(i, column.decimal_translator)
-
-        # typelist here may be none. It's okay; justify_columns will try
-        # and use the specified justifications and if not present will
-        # not touch the column. When typelist is not set,
-        # add_instance/add_list have a chance to fix up the remaining
-        # justification by looking at the first instance's data.
-#        self._justify_columns(columns, typelist)
-
-        self._autosize = autosize
-
-        #clist.enable_column_select()
-
     # Columns handling
     def _has_enough_type_information(self):
         """True if all the columns has a type set.
@@ -385,7 +360,7 @@ class List(gtk.ScrolledWindow):
         """Create the treeview columns"""
         for i, col in enumerate(self._column_definitions):
             self._create_column(col, i)
-            
+
     def _create_column(self, col_definition, col_index):
         treeview_column = gtk.TreeViewColumn()
 
@@ -395,20 +370,15 @@ class List(gtk.ScrolledWindow):
         label.show()
         treeview_column.set_widget(label)
 
-        renderer =self._create_best_renderer_for_type(col_definition.data_type,
-                                                      col_index)
-        treeview_column.pack_start(renderer)
-        treeview_column.set_cell_data_func(renderer, self._set_cell_data,
-                                           col_definition.attribute)
-        self.treeview.append_column(treeview_column)
-        treeview_column.set_visible(col_definition.visible)
         treeview_column.set_resizable(True)
         treeview_column.set_clickable(True)
         treeview_column.set_reorderable(True)
-        
+        self.treeview.append_column(treeview_column)
+
         # add a menuitem in the popup
         menuitem = gtk.CheckMenuItem(col_definition.title)
-        menuitem.set_active(col_definition.visible)
+        # we store the menuitem in the column so we can change its value later
+        treeview_column.set_data('menuitem', menuitem)
         menuitem.connect("activate", self._on_menuitem__activate,
                          treeview_column)
         menuitem.show()
@@ -418,6 +388,54 @@ class List(gtk.ScrolledWindow):
         button = self.__get_column_button(treeview_column)
         button.connect('button-press-event',
                        self._on_header__button_press_event)
+
+    def _setup_columns(self):
+        autosize = True
+        for i, column in enumerate(self._column_definitions):
+            treeview_column = self.treeview.get_column(i)
+            self._setup_column(column, i, treeview_column)
+            if column.width is not None:
+                autosize = False
+
+        self._autosize = autosize
+
+        #clist.enable_column_select()
+
+    def _setup_column(self, col_definition, col_index, treeview_column):
+
+        renderer =self._create_best_renderer_for_type(col_definition.data_type,
+                                                      col_index)
+        treeview_column.pack_start(renderer)
+        treeview_column.set_cell_data_func(renderer, self._set_cell_data,
+                                           col_definition.attribute)
+        treeview_column.set_visible(col_definition.visible)
+        menuitem = treeview_column.get_data('menuitem')
+        menuitem.set_active(col_definition.visible)
+
+        treeview_column.connect("clicked", self._on_column__clicked, col_index)
+        if col_definition.width is not None:
+            treeview_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
+            treeview_column.set_fixed_width(col_definition.width)
+        if col_definition.tooltip is not None:
+            widget = self.__get_column_button(treeview_column)
+            if widget is not None:
+                self._tooltips.set_tip(widget, col_definition.tooltip)
+                    
+#%s where I expected a GtkButton""" % (column.tooltip, i, col))
+            #if column.decimal_separator:
+            ## XXX: This is a hack. I now see we need to keep the data model
+            ## in the CList too, but it's too late to add this. Anyway,
+            ## call ensure to make sure the translator exists.
+                #column.ensure_decimal_translator()
+                #clist._fix_decimal_separator(i, column.decimal_translator)
+
+        # typelist here may be none. It's okay; justify_columns will try
+        # and use the specified justifications and if not present will
+        # not touch the column. When typelist is not set,
+        # add_instance/add_list have a chance to fix up the remaining
+        # justification by looking at the first instance's data.
+#        self._justify_columns(columns, typelist)
+
             
     def _create_best_renderer_for_type(self, data_type, column_index):
         """Create the best CellRenderer for a given type.
@@ -738,8 +756,9 @@ eview that needs to
             raise ValueError, "value should be a string of a list of columns"
 
         self._clear_columns()
+        self._create_columns()
         if self._has_enough_type_information():
-            self._create_columns()
+            self._setup()
         
     def do_get_property(self, pspec):
         if pspec.name == 'column-definitions':
@@ -758,6 +777,12 @@ eview that needs to
         - instance: the instance to be added (according to the columns spec)
         - select: whether or not the new item should appear selected.
         """
+
+        if not self._has_enough_type_information():
+            self._get_types(instance)
+            self._create_columns()
+            self._setup()
+
         # Freeze and save original selection mode to avoid blinking
         self.treeview.freeze_notify()
         old_mode = self.get_selection_mode()

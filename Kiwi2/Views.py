@@ -222,6 +222,9 @@ class SlaveView(gobject.GObject):
         if self.gladefile is not None:
             self._init_glade_adaptor()
 
+        if self.toplevel_name is not None and self.toplevel is None:
+            self.toplevel = getattr(self, self.toplevel_name, None)
+        
         if not self.toplevel:
             raise TypeError, \
                 ("A View requires an instance variable called toplevel "

@@ -90,7 +90,7 @@ def get_foreground(widget, state=gtk.STATE_NORMAL):
     """Return the foreground color of the widget as a string"""    
     style = widget.get_style()
     color = style.fg[state]
-    return self.gdk_color_to_string(color)
+    return gdk_color_to_string(color)
 
 def set_background(widget, color, state=gtk.STATE_NORMAL):
     """Set the background color of a widget:
