@@ -859,6 +859,9 @@ eview that needs to
 
     def update_instance(self, new_instance):
         iter = self._get_iter_from_instance(new_instance)
+        if iter is None: 
+            msg = "The instance %s is not in the list so I can not update it"
+            raise ValueError, msg % new_instance
         self.model.row_changed(self.model.get_path(iter), iter)
         
     def set_column_visibility(self, column_index, visibility):
