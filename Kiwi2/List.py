@@ -281,7 +281,7 @@ class List(gtk.ScrolledWindow):
         # by default we are unordered. This index points to the column
         # definition of the column that dictates the order, in case there is
         # any
-        self._sort_column_definition = -1
+        self._sort_column_definition_index = -1
 
         if self._has_enough_type_information():
             self._setup()

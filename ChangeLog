@@ -1,5 +1,7 @@
 2005-03-07  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
+	* Kiwi2/List.py (List.__init__): fix a typo
+
 	* examples/Faren/faren3.py: this one uses a GladeDelegate
 
 	* examples/Faren/faren2.py: second version of Faren example
