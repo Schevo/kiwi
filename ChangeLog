@@ -1,5 +1,9 @@
 2005-03-30  Gustavo Rahal <gustavo@async.com.br>
 
+	* doc/Makefile: generates epydoc api
+
+2005-03-30  Gustavo Rahal <gustavo@async.com.br>
+
 	* Kiwi2/Widgets/Label.py: added support for bold, italic and size
 	attributes for labels
 	* tests/test_Label.py: added a test case for Labels
