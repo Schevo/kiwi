@@ -209,7 +209,7 @@ class SlaveView(gobject.GObject):
         self.toplevel = toplevel or self.toplevel
         self.widgets = widgets or self.widgets or []
         
-        for reserved in ["win", "widgets", "toplevel", "gladefile",
+        for reserved in ["widgets", "toplevel", "gladefile",
                          "gladename", "tree", "model", "controller"]:
             # XXX: take into account widget constructor?
             if reserved in self.widgets:
@@ -535,7 +535,7 @@ class BaseView(SlaveView):
         self.toplevel.connect_after("key_press_event", keypress_handler)
 
     #
-    # Proxying for self.win
+    # Proxying for self.toplevel
     #
     def set_transient_for(self, view):
         """Makes the view a transient for another view; this is commonly done
