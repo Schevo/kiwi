@@ -1,5 +1,10 @@
 2005-02-28  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
+	* Kiwi2/List.py: renamed KiwiList to List
+	* Kiwi2/Delegates.py (ListDelegate.__init__): 
+	* examples/News/news3.py: 
+	* examples/News/news2.py: 
+
 	* Kiwi2/Delegates.py (KiwiListDelegate.__init__): don't need a 
 	scroll window anymore since that functionality is already in the
 	KiwiList.

@@ -26,7 +26,7 @@
 
 from Kiwi2 import ValueUnset
 from Kiwi2.Views import SlaveView, GladeView, GladeSlaveView, BaseView
-from Kiwi2.List import KiwiList
+from Kiwi2.List import List
 from Kiwi2.initgtk import gtk
 from Kiwi2.accessors import kgetattr
 from Controllers import BaseController
@@ -76,36 +76,36 @@ class GladeDelegate(GladeView, BaseController):
                            widgets)
         BaseController.__init__(self, view=self)
 
-class KiwiListDelegate(SlaveDelegate):
-    """A View that builds a KiwiList around a specification for a class,
+class ListDelegate(SlaveDelegate):
+    """A View that builds a List around a specification for a class,
     and fills it with a list of instances for that class. It also provides
     an easy way to save and restore the column status (hidden/sorted/width)
     to allow persisting user settings.
 
-    The KiwiListDelegate defines one public attribute: list, which is the
-    KiwiList widget it holds.
+    The ListDelegate defines one public attribute: list, which is the
+    List widget it holds.
     """
     def __init__(self, columns, instance_list=None, mode=gtk.SELECTION_BROWSE):
-        """Creates a new KiwiListDelegate. Parameters:
+        """Creates a new ListDelegate. Parameters:
             - columns specifies a list of Column instances, one for each column
-            in the KiwiList. The Column defines how that particular column is
+            in the List. The Column defines how that particular column is
             to be displayed.
 
             If no Column has the `sorted' attribute set, we assume a normal,
-            unsorted KiwiList is to be built; otherwise, a SortedKiwiList is
+            unsorted List is to be built; otherwise, a SortedList is
             created.  This has impact over the add_instance() method - for
-            normal KiwiLists, append() is called; for SortedKiwiList,
+            normal Lists, append() is called; for SortedList,
             insert_sorted().
             
             - instance_list offers a list of instances to be inserted into
-            the list. If no list is provided, the KiwiList will be initialized
+            the list. If no list is provided, the List will be initialized
             empty, and the columns won't be autosized or aligned by type; the
             first add_list() is called, these will be set up appropriately.
             
             - mode is the selection mode the list is set to (defaulting nicely
             to SELECTION_BROWSE)
         """
-        self.list = KiwiList(columns, instance_list, mode)
+        self.list = List(columns, instance_list, mode)
 
         # Set up pixmaps for creation of clist
         #title_pixmaps = {}

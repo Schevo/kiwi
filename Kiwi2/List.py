@@ -30,7 +30,7 @@ from Kiwi2.initgtk import gtk, gobject
 MANY_ROWS = 1000
 
 class Column:
-    """Specifies a column in a KiwiList"""
+    """Specifies a column in a List"""
     # put default values as class variables
     attribute = None
     title = None
@@ -61,7 +61,7 @@ class Column:
                  decimal_separator = None
                  ):
         """Creates a new Column, which describes how a column in a
-        KiwiList should be rendered.
+        List should be rendered.
         - attribute: a string with the name of the instance attribute the
         column represents
         - title: the title of the column, defaulting to the capitalized form
@@ -72,7 +72,7 @@ class Column:
         - justify: one of gtk.JUSTIFY_LEFT, gtk.JUSTIFY_RIGHT or
         gtk.JUSTIFY_CENTER or None. If None, the justification will be
         determined by the type of the attribute value of the first
-        instance to be inserted in the KiwiList (integers and floats
+        instance to be inserted in the List (integers and floats
         will be right-aligned).
         - format: a format string to be applied to the attribute value upon
         insertion in the list
@@ -169,7 +169,7 @@ class Column:
         del dict['attribute']
         return "<%s %s: %s>" % (self.__class__.__name__, attr, dict)
 
-class KiwiList(gtk.ScrolledWindow):
+class List(gtk.ScrolledWindow):
     """An enhanced version of GtkTreeView, which provides pythonic wrappers
     for accessing rows, and optional facilities for column sorting (with
     types) and column selection."""
@@ -255,7 +255,7 @@ class KiwiList(gtk.ScrolledWindow):
 #        self.__setup_popup_button()
 
     def _setup(self):
-        """Post initialize the KiwiList. This should be called everytime
+        """Post initialize the List. This should be called everytime
         a critical component is changed (like a column definition).
         """
         # are we sorted?
@@ -705,7 +705,7 @@ class KiwiList(gtk.ScrolledWindow):
         self.treeview.thaw_notify()
         return ret
 
-gobject.type_register(KiwiList)
+gobject.type_register(List)
 
 if __name__ == '__main__':
     win = gtk.Window()
@@ -731,7 +731,7 @@ if __name__ == '__main__':
             Person('Lorenzo', 26, 'Granada', True)
         )
 
-    l = KiwiList(columns, data)
+    l = List(columns, data)
 
     # add an extra person
     l.add_instance(Person('Nando', 29, 'Santos', False))

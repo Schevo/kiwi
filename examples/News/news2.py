@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-from Kiwi2 import Delegates, List
+from Kiwi2 import Delegates
+from Kiwi2.List import List, Column
 from Kiwi2.initgtk import gtk
 
 class NewsItem:
@@ -25,10 +26,11 @@ news = [
 
 # Specify the columns: one for each attribute of NewsItem, the URL
 # column invisible by default
-my_columns = [ List.Column("title", sorted=True), 
-               List.Column("author"), 
-               List.Column("url", title="URL", visible=False) ]
+my_columns = [ Column("title", sorted=True), 
+               Column("author"), 
+               Column("url", title="URL", visible=False) ]
 
-slave = Delegates.KiwiListDelegate(my_columns, news)
+kiwilist = List(my_columns, news)
+slave = Delegates.SlaveDelegate(toplevel=kiwilist)
 slave.show_all()
 gtk.main()

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import os
-from Kiwi2 import Delegates, List
+from Kiwi2 import Delegates
+from Kiwi2.List import List, Column
 from Kiwi2.initgtk import gtk, quit_if_last
 class NewsItem:
     def __init__(self, title, author, url):
@@ -21,11 +22,10 @@ news = [
           "http://www.pigdog.org/auto/viva_la_musica/link/2678.html")
 ]
 
-my_columns = [ List.Column("title", sorted=True, 
-                           tooltip="Title of article"), 
-               List.Column("author", tooltip="Author of article"), 
-               List.Column("url", title="Address", visible=False, 
-                           tooltip="Address of article") ]
+my_columns = [ Column("title", sorted=True, tooltip="Title of article"), 
+               Column("author", tooltip="Author of article"), 
+               Column("url", title="Address", visible=False, 
+                      tooltip="Address of article") ]
 
 class Shell(Delegates.GladeDelegate):
     widgets = ["ok", "cancel", "header", "footer", "title"]
@@ -40,7 +40,7 @@ class Shell(Delegates.GladeDelegate):
         self.set_foreground(self.title, "blue")
 
         # Create the delegate and set it up
-        kiwilist = List.KiwiList(my_columns, news)
+        kiwilist = List(my_columns, news)
         kiwilist.connect('selection-change', self.news_selected)
         kiwilist.connect('double-click', self.double_click)
         slave = Delegates.SlaveDelegate(toplevel=kiwilist)
