@@ -35,7 +35,6 @@ class SpinButton(gtk.SpinButton, WidgetProxyMixin):
         # since the default data_type is str we need to set it to int or float for spinbuttons
         WidgetProxyMixin.__init__(self, data_type=int)
         gtk.SpinButton.__init__(self)
-        #self._data_value = ''
     
     def set_data_type(self, data_type):
         old_datatype = self._data_type

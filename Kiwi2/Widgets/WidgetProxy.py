@@ -84,7 +84,6 @@ class WidgetProxyMixin(object):
             raise AttributeError("Invalid property name: %s" % pspec.name)
 
     def do_set_property(self, pspec, value):
-        print "do_set_property", pspec, type(value)
         prop_name = pspec.name.replace("-", "_")
         try:
             getattr(self, "set_%s" % prop_name)(value)
