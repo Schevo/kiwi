@@ -45,7 +45,7 @@ class Label(gtk.Label, WidgetProxyMixin):
 
     def set_bold(self, value):
         if value:
-            self.set_markup("<b>%s</b>", self.get_text())
+            self.set_markup("<b>%s</b>" % self.get_text())
         else:
             self.set_markup(self.get_text())
 
