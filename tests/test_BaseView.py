@@ -5,6 +5,7 @@ from utils import refresh_gui
 from Kiwi2.Views import BaseView
 from Kiwi2.Controllers import BaseController
 from Kiwi2.initgtk import gtk
+from Kiwi2 import utils
 from gtk import keysyms
 
 from unittest import TestCase, TestSuite, makeSuite, TextTestRunner
@@ -14,7 +15,7 @@ class FooView(BaseView):
     widgets = [ "vbox", "label" ]
     def __init__(self):
         self.build_ui()
-        BaseView.__init__(self)
+        BaseView.__init__(self, toplevel_name='win')
 
     def build_ui(self):
         self.win = gtk.Window()
@@ -54,10 +55,10 @@ class Bar(BaseView, BaseController):
         self.win = gtk.Window()
         self.label = gtk.Label("foobar!")
         self.win.add(self.label)
-        BaseView.__init__(self)
+        BaseView.__init__(self, toplevel=self.win)
         BaseController.__init__(self, view=self)
-        self.view.set_foreground(self.label, "#CC99FF")
-        self.view.set_background(self.win, "#001100")
+        utils.set_foreground(self.label, "#CC99FF")
+        utils.set_background(self.win, "#001100")
 
     def run(self, parent):
         self.show_all(parent)
@@ -118,9 +119,9 @@ class BaseViewTest(TestCase):
         self.foo.view.button.clicked()
         self.foo.bar.run(self.foo.view)
         refresh_gui(self.delay)
-        color = self.foo.bar.view.get_background(self.foo.bar.win)
+        color = utils.get_background(self.foo.bar.win)
         self.assertEqual(color, "#001100")
-        color = self.foo.bar.view.get_foreground(self.foo.bar.label)
+        color = utils.get_foreground(self.foo.bar.label)
         self.assertEqual(color, "#CC99FF")
 
 

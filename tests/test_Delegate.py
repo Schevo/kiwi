@@ -41,7 +41,8 @@ class Foo(X,Y,Delegates.Delegate):
         v.add(self.bar)
         self.win.add(v)
         self.x = self.y = "NOOO"
-        Delegates.Delegate.__init__(self, delete_handler=quit_if_last)
+        Delegates.Delegate.__init__(self, toplevel=self.win,
+                                    delete_handler=quit_if_last)
 
     def on_foo__clicked(self, *args):
         self.x = "FOO in Foo"
