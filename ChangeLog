@@ -1,5 +1,10 @@
 2005-03-23  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
+	* Kiwi2/Widgets/datatypes.py: added a date type and functions to
+	set a data from a string a viceversa
+
+	* tests/test_datatypes.py: added some tests for the datetypes
+
 	* tests/test_Action.py: 
 	* tests/test_BaseView.py: 
 	* tests/test_CheckButton.py: 
