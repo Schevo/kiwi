@@ -1,3 +1,10 @@
+2005-02-16  Lorenzo Gil Sanchez  <lgs@sicem.biz>
+
+	* Kiwi2/initgtk.py: don't load main_quit, it's deprecated
+	(quit_if_last): add this function to be used as a delete-event handler
+	so the user can open and close windows without worrying about when
+	to call gtk.mainquit
+
 2005-02-11  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
 	* Kiwi2/__init__.py (standard_widgets): fixed a bug about not importing

@@ -40,7 +40,7 @@ import gtk
 
 from gtk import gtk_version
 from gtk import pygtk_version
-from gtk import main_quit, main
+from gtk import mainquit, main
 
 _non_interactive = [ 
     gtk.Label, 
@@ -73,3 +73,13 @@ except ImportError:
     gtk.glade = None
 
 _non_interactive = tuple(_non_interactive)
+
+
+# one big difference between Kiwi1 and Kiwi2 is
+# that we are just using one gtk mainloop
+
+def quit_if_last(*args):
+    toplevels = gtk.window_list_toplevels()
+    # check if this window is the last one
+    if len(toplevels) == 1:
+        gtk.mainquit()
