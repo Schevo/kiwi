@@ -23,7 +23,7 @@
 
 
 from Kiwi2.accessors import kgetattr
-from Kiwi2 import ValueUnset
+from Kiwi2 import ValueUnset, str2bool, str2enum, str2type
 from Kiwi2.initgtk import gtk, gobject
 
 # Minimum number of rows where we show busy cursor when sorting numeric columns
@@ -92,12 +92,9 @@ class Column:
         # XXX: filter function?
         if attribute is not None:
             self.attribute = attribute
-        if not self.attribute:
-            raise AttributeError, "Must supply an attribute"
         if title is not None:
-            # XXX: this should *not* be stored as a typeobject or it ruins pickle
             self.title = title
-        elif self.title is None:
+        elif self.title is None and attribute is not None:
             self.title = self.attribute.capitalize()
         if data_type is not None:
             self.data_type = data_type
@@ -169,6 +166,51 @@ class Column:
         del dict['attribute']
         return "<%s %s: %s>" % (self.__class__.__name__, attr, dict)
 
+    def __str__(self):
+        attr = self.attribute or ''
+        title = self.title or ''
+        if self.data_type is None:
+            data_type = ''
+        else:
+            data_type = self.data_type.__name__
+        visible = str(self.visible)
+        if self.justify is None:
+            justify = ''
+        else:
+            justify = self.justify.value_nick
+        format = self.format or ''
+        tooltip = self.tooltip or ''
+        width = self.width and int(self.width) or ''
+        sorted = str(self.sorted)
+        order = self.order.value_nick
+        return "%s|%s|%s|%s|%s|%s|%s|%s|%s|%s" % \
+               (attr, title, data_type, visible, justify,
+                format, tooltip, width, sorted, order)
+    
+    def set_from_string(self, data_string):
+        fields = data_string.split('|')
+        if len(fields) != 10:
+            msg = 'every column should have 10 fields: %s' % col
+            raise ValueError, msg
+
+        # the attribute is mandatory
+        if not fields[0]:
+            return False
+
+        self.attribute = fields[0] or None
+        self.title = fields[1] or None
+        self.data_type = str2type(fields[2], default_type=None)
+        self.visible = str2bool(fields[3], default_value=True)
+        self.justify = str2enum(fields[4], gtk.JUSTIFY_LEFT)
+        self.format = fields[5]
+        self.tooltip = fields[6]
+        self.width = (fields[7] and int(fields[7])) or None
+        self.sorted = str2bool(fields[8], default_value=False)
+        self.order = str2enum(fields[9], gtk.SORT_ASCENDING) \
+                     or gtk.SORT_ASCENDING
+
+        return True
+    
 class List(gtk.ScrolledWindow):
     """An enhanced version of GtkTreeView, which provides pythonic wrappers
     for accessing rows, and optional facilities for column sorting (with
@@ -177,8 +219,30 @@ class List(gtk.ScrolledWindow):
         'selection-change' : (gobject.SIGNAL_RUN_LAST, None, ()),
         'double-click' : (gobject.SIGNAL_RUN_LAST, None, (object,)),
         }
+
+    __gproperties__ = {
+        # this property is used to serialize the columns of a List. The format
+        # is a big string with '^' as the column separator and '|' as the field
+        # separator
+        # Each column has the following fields:
+        #  - attribute: name of the model attribute this column shows
+        #  - title: the title that shows in the column header. Default to ''
+        #  - data_type: one of 'str', 'int', 'float', 'date'. Default to str
+        #  - visible: if this column is visible or not. Default to True
+        #  - justify: one of 'left', 'center', 'right'. Default to 'left'
+        #  - tooltip: the tooltip on the column header. Deafult to ''
+        #  - format: string format for numeric types. Deafult to ''
+        #  - width: the number of pixels for the widget. Default to 0, which
+        #    means autosize
+        #  - sorted: if the data is sorted by this column. Default to False
+        #  - order: one of 'ascending', 'descending' or ''. Default to ''
+        'column-definitions' : (str, 'ColumnDefinitions',
+                                'A string with the columns definitions',
+                                '',
+                                gobject.PARAM_READWRITE)
+        }
     
-    def __init__(self, column_definitions,
+    def __init__(self, column_definitions=[],
                  instance_list=None,
                  mode=gtk.SELECTION_BROWSE):
         """Create a new Kiwi TreeView.
@@ -188,15 +252,13 @@ class List(gtk.ScrolledWindow):
         # of it doesn't make sense. This button is used to display the popup
         # menu
         self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
-        
-        self._column_definitions = list(column_definitions)
 
         self.model = gtk.ListStore(object)
         self.model.set_sort_func(0, self._sort_function)
         self.treeview = gtk.TreeView(self.model)
         self.treeview.show()
         self.add(self.treeview)
-        
+
         self.treeview.set_rules_hint(True)
 
         # these tooltips are used for the columns
@@ -213,32 +275,16 @@ class List(gtk.ScrolledWindow):
         # create a popup menu for showing or hiding columns
         self._popup = gtk.Menu()
 
-        # get type information and crete the columns
-        
-        self._has_types_information = True
-        # check if all the columns has the data_type set
-        for col in self._column_definitions:
-            if col.data_type is None:
-                self._has_types_information = False
-                break
-            
-        # if not, try to guess the data_types from the first instance
-        if not self._has_types_information:
-            if instance_list is not None:
-                instance_list = tuple(instance_list)
-                self._get_types(instance_list[0])
-                self._has_types_information = True
-
-        if self._has_types_information:
-            self._create_columns()
-
+        # when setting the column definition the columns are created
+        self.set_column_definitions(list(column_definitions))
 
         # by default we are unordered. This index points to the column
         # definition of the column that dictates the order, in case there is
         # any
         self._sort_column_definition = -1
-        
-        self._setup()
+
+        if self._has_enough_type_information():
+            self._setup()
 
         if instance_list is not None:
             self.treeview.freeze_notify()
@@ -302,6 +348,15 @@ class List(gtk.ScrolledWindow):
         #clist.enable_column_select()
 
     # Columns handling
+    def _has_enough_type_information(self):
+        """True if all the columns has a type set.
+        This is used to know if we can create the treeview columns.
+        """
+        for c in self._column_definitions:
+            if c.data_type is None:
+                return False
+        return True
+        
     def _get_types(self, instance):
         """Iterates through columns, using the type attribute when found or
         the type of the associated attribute from the sample instance provided.
@@ -325,36 +380,40 @@ class List(gtk.ScrolledWindow):
     def _create_columns(self):
         """Create the treeview columns"""
         for i, col in enumerate(self._column_definitions):
-            treeview_column = gtk.TreeViewColumn()
-
-            # we need to set our own widget because otherwise
-            # __get_column_button won't work
-            label = gtk.Label(col.title)
-            label.show()
-            treeview_column.set_widget(label)
+            self._create_column(col, i)
             
-            renderer = self._create_best_renderer_for_type(col.data_type, i)
-            treeview_column.pack_start(renderer)
-            treeview_column.set_cell_data_func(renderer, self._set_cell_data,
-                                               col.attribute)
-            self.treeview.append_column(treeview_column)
-            treeview_column.set_visible(col.visible)
-            treeview_column.set_resizable(True)
-            treeview_column.set_clickable(True)
-            treeview_column.set_reorderable(True)
+    def _create_column(self, col_definition, col_index):
+        treeview_column = gtk.TreeViewColumn()
 
-            # add a menuitem in the popup
-            menuitem = gtk.CheckMenuItem(col.title)
-            menuitem.set_active(col.visible)
-            menuitem.connect("activate", self._on_menuitem__activate,
-                             treeview_column)
-            menuitem.show()
-            self._popup.append(menuitem)
+        # we need to set our own widget because otherwise
+        # __get_column_button won't work
+        label = gtk.Label(col_definition.title)
+        label.show()
+        treeview_column.set_widget(label)
 
-            # setup the button to show the popup menu
-            button = self.__get_column_button(treeview_column)
-            button.connect('button-press-event',
-                           self._on_header__button_press_event)
+        renderer =self._create_best_renderer_for_type(col_definition.data_type,
+                                                      col_index)
+        treeview_column.pack_start(renderer)
+        treeview_column.set_cell_data_func(renderer, self._set_cell_data,
+                                           col_definition.attribute)
+        self.treeview.append_column(treeview_column)
+        treeview_column.set_visible(col_definition.visible)
+        treeview_column.set_resizable(True)
+        treeview_column.set_clickable(True)
+        treeview_column.set_reorderable(True)
+        
+        # add a menuitem in the popup
+        menuitem = gtk.CheckMenuItem(col_definition.title)
+        menuitem.set_active(col_definition.visible)
+        menuitem.connect("activate", self._on_menuitem__activate,
+                         treeview_column)
+        menuitem.show()
+        self._popup.append(menuitem)
+
+        # setup the button to show the popup menu
+        button = self.__get_column_button(treeview_column)
+        button.connect('button-press-event',
+                       self._on_header__button_press_event)
             
     def _create_best_renderer_for_type(self, data_type, column_index):
         """Create the best CellRenderer for a given type.
@@ -384,7 +443,16 @@ class List(gtk.ScrolledWindow):
 
     def _set_cell_data(self, column, cellrenderer, model, iter,
                        model_attribute):
-        """This method is called for every cell in the treeview that needs to
+        """This method is called for every cell in the tre        
+        module = xml_node.getAttribute(tags.XML_TAG_LIB)
+        if not module in self._modules.keys():
+            module_name = xml_node.getAttribute(tags.XML_TAG_LIB)
+            module = __import__(module_name, globals(), locals())
+            
+            if hasattr(module, 'gazpacho_prefix'):
+                prefix = getattr(module, 'gazpacho_prefix')
+                self._modules[prefix.lower()] = module
+eview that needs to
         be renderer. No need to say it has to be *fast*
         """
         renderer_prop = cellrenderer.get_data('renderer-property')
@@ -420,7 +488,15 @@ class List(gtk.ScrolledWindow):
         value = not renderer.get_active()
         model_attribute = self._column_definitions[column_index].attribute
         setattr(instance, model_attribute, value)
-        
+
+    def _clear_columns(self):
+        while self.treeview.get_columns():
+            self.treeview.remove_column(self.treeview.get_column(0))
+
+        # we also need to clear the popup
+        for child in self._popup.get_children():
+            self._popup.remove(child)
+    
     # selection methods
     def _find_iter_from_data(self, instance):
         data_iter = self.model.get_iter_first()
@@ -441,7 +517,16 @@ class List(gtk.ScrolledWindow):
         for i, c in enumerate(self._column_definitions):
             if c.sorted:
                 return i
-        return -1
+        return -1        
+        module = xml_node.getAttribute(tags.XML_TAG_LIB)
+        if not module in self._modules.keys():
+            module_name = xml_node.getAttribute(tags.XML_TAG_LIB)
+            module = __import__(module_name, globals(), locals())
+            
+            if hasattr(module, 'gazpacho_prefix'):
+                prefix = getattr(module, 'gazpacho_prefix')
+                self._modules[prefix.lower()] = module
+
 
     def _sort_function(self, model, iter1, iter2):
         obj1 = model.get_value(iter1, 0)
@@ -465,7 +550,16 @@ class List(gtk.ScrolledWindow):
         self._sort_column_definition_index = column_index
         cd = self._column_definitions[column_index]
 
-        # maybe it's the first time this column is ordered
+        # maybe it's the first time this column is ordere        
+        module = xml_node.getAttribute(tags.XML_TAG_LIB)
+        if not module in self._modules.keys():
+            module_name = xml_node.getAttribute(tags.XML_TAG_LIB)
+            module = __import__(module_name, globals(), locals())
+            
+            if hasattr(module, 'gazpacho_prefix'):
+                prefix = getattr(module, 'gazpacho_prefix')
+                self._modules[prefix.lower()] = module
+
         if cd.order is None:
             cd.order = gtk.SORT_DESCENDING
 
@@ -515,10 +609,18 @@ class List(gtk.ScrolledWindow):
     def __len__(self):
         return len(self.model)
 
+    def __nonzero__(self):
+        return True
+    
     def _load(self, instance_list):
         if not instance_list: # do nothing if empty list or None provided
             return
 
+        if not self._has_enough_type_information():
+            self._get_types(instance_list[0])
+            self._create_columns()
+            self._setup()
+            
         for instance in instance_list:
             self.model.append((instance,))
             
@@ -597,10 +699,56 @@ class List(gtk.ScrolledWindow):
             self.__popup_window.move(x + old_alloc.x, y + old_alloc.y)
         
     # end of the popup button hack
-    
+
     #
     # Public API
     #
+    def get_column_definitions(self):
+        return self._column_definitions_string
+
+    def set_column_definitions(self, value):
+        """This function can be called in two different ways:
+         - value is a string with the column definitions in a special format
+           (see column-definitions property at the beginning of this class)
+
+         - value is a list/tuple of Column objects
+        """
+        if isinstance(value, basestring):
+            self._column_definitions_string = value
+            self._column_definitions = []            
+            for col in value.split('^'):
+                if not col:
+                    continue
+                c = Column()
+                success = c.set_from_string(col)
+                if success:
+                    self._column_definitions.append(c)
+                
+        elif isinstance(value, (list, tuple)):
+            self._column_definitions = value
+            cols = []
+            for col in value:
+                cols.append(str(col))
+            self._column_definitions_string = '^'.join(cols)
+        else:
+            raise ValueError, "value should be a string of a list of columns"
+
+        self._clear_columns()
+        if self._has_enough_type_information():
+            self._create_columns()
+        
+    def do_get_property(self, pspec):
+        if pspec.name == 'column-definitions':
+            return self.get_column_definitions()
+        else:
+            raise AttributeError, 'Unknown property %s' % pspec.name
+
+    def do_set_property(self, pspec, value):
+        if pspec.name == 'column-definitions':
+            self.set_column_definitions(value)
+        else:
+            raise AttributeError, 'Unknown property %s' % pspec.name
+    
     def add_instance(self, instance, select=False):
         """Adds an instance to the list.
         - instance: the instance to be added (according to the columns spec)

@@ -1,3 +1,12 @@
+2005-03-02  Lorenzo Gil Sanchez  <lgs@sicem.biz>
+
+	* Kiwi2/List.py: several changes to make the Columns serializable and
+	so we can use List from Gazpacho
+
+	* Kiwi2/__init__.py (ValueUnset): put this class at the beginning to
+	avoid import problems
+	(str2bool, str2enum, str2type): utility functions
+
 2005-02-28  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
 	* Kiwi2/List.py: renamed KiwiList to List
