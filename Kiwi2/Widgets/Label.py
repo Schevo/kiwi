@@ -24,7 +24,7 @@
 
 from Kiwi2.initgtk import gtk, gobject
 from Kiwi2.Widgets.WidgetProxy import WidgetProxyMixin, implementsIProxy
-from Kiwi2.utils import gsignal, gproperty
+from Kiwi2.utils import gsignal, gproperty, set_foreground
 
 class Label(gtk.Label, WidgetProxyMixin):
     implementsIProxy()
@@ -48,5 +48,8 @@ class Label(gtk.Label, WidgetProxyMixin):
             self.set_markup("<b>%s</b>" % self.get_text())
         else:
             self.set_markup(self.get_text())
+
+    def set_color(self, color):
+       set_foreground(self, color) 
 
 gobject.type_register(Label)

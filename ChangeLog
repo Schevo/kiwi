@@ -1,3 +1,8 @@
+2001-11-27  Daniel Saran R. da Cunha  <daniel@async.com.br>
+
+	* Kiwi2/Widgets/Label.py (Label.set_color): method to change label's
+	color
+
 2005-03-23  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
 	* gazpacho-plugin/kiwi2.py (DataTypeAdaptor.create_editor): add support
