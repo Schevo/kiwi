@@ -89,6 +89,8 @@
         <!-- These properties are buggie in GTK+ 2.4 -->
         <property id="column-span-column" disabled="True" />
         <property id="row-span-column" disabled="True" />
+
+        <property id="text-column" disabled="True" />
       </properties>
     </glade-widget-class>
 

@@ -1,5 +1,8 @@
 2005-03-22  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
+	* gazpacho-plugin/kiwi2.xml: disable text-column which is not useful
+	in ComboBoxEntry
+
 	* Kiwi2/Widgets/ComboBox.py (ComboProxyMixin.prefill): allow 
 	prefill with the empty list
 
