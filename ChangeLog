@@ -1,3 +1,9 @@
+2005-03-22 Gustavo Rahal <gustavo@async.com.br>
+
+	* Kiwi2/Widgets/CheckButton.py: added Checkbutton kiwi widget
+	* Kiwi2/Widgets/__init__.py: support for Checkbutton
+	* kiwi2.xml: added checkbutton to gazpacho-plugin
+
 2005-03-22  Johan Dahlin  <jdahlin@async.com.br>
 
 	* Kiwi2/Widgets/ComboBox.py
