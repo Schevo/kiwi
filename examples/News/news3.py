@@ -1,0 +1,82 @@
+#!/usr/bin/env python
+import os
+from Kiwi2 import Delegates, List
+from Kiwi2.initgtk import gtk, quit_if_last
+class NewsItem:
+    def __init__(self, title, author, url):
+        self.title, self.author, self.url = title, author, url
+
+# Friendly Pigdog.org news
+news = [
+ NewsItem("Smallpox Vaccinations for EVERYONE", "JRoyale",
+          "http://www.pigdog.org/auto/Power_Corrupts/link/2700.html"),
+ NewsItem("Is that uranium in your pocket or are you just happy to see me?",
+          "Baron Earl",
+          "http://www.pigdog.org/auto/bad_people/link/2699.html"),
+ NewsItem("Cut 'n Paste", "Baron Earl",
+          "http://www.pigdog.org/auto/ArtFux/link/2690.html"),
+ NewsItem("A Slippery Exit", "Reverend CyberSatan",
+          "http://www.pigdog.org/auto/TheCorporateFuck/link/2683.html"),
+ NewsItem("Those Crazy Dutch Have Resurrected Elvis", "Miss Conduct",
+          "http://www.pigdog.org/auto/viva_la_musica/link/2678.html")
+]
+
+my_columns = [ List.Column("title", sorted=True, 
+                           tooltip="Title of article"), 
+               List.Column("author", tooltip="Author of article"), 
+               List.Column("url", title="Address", visible=False, 
+                           tooltip="Address of article") ]
+
+class Shell(Delegates.GladeDelegate):
+    widgets = ["ok", "cancel", "header", "footer", "title"]
+    def __init__(self):
+        Delegates.GladeDelegate.__init__(self, "news_shell", 
+                                         delete_handler=quit_if_last)
+
+        # paint header and footer; they are eventboxes that hold a
+        # label and buttonbox respectively
+        self.set_background(self.header,"white") 
+        self.set_background(self.footer,"#A0A0A0") 
+#        self.title.set_color("blue") 
+
+        # Create the delegate and set it up
+        slave = Delegates.KiwiListDelegate(my_columns, news, 
+                                           handler=self.news_selected)
+        self.attach_slave("placeholder", slave)
+        slave.show_all()
+        slave.focus_toplevel() # Must be done after attach
+        
+        self.slave = slave
+    
+    def news_selected(self, treeselection, *args):
+        # only one item can be selected in mode SELECTION_BROWSE
+        model, iter = treeselection.get_selected()
+        if iter is not None:
+            item = self.slave[iter]
+        print "%s %s %s\n" % (item.title, item.author, item.url)
+
+    def on_ok__clicked(self, *args):
+        item = self.slave.get_selected()[0]
+        self.retval = item.url
+        self.emit('result', item.url)
+        self.hide_and_quit()
+
+    def on_cancel__clicked(self, *args):
+        self.hide_and_quit()
+
+url = None
+shell = Shell()
+shell.show()
+def get_url(view, result):
+    global url
+    url = result
+    
+shell.connect('result', get_url)
+
+gtk.main()
+
+if url is not None:
+    # Try to run BROWSER (or lynx) on the URL returned
+    browser = os.environ.get("BROWSER", "lynx")
+    os.system("%s %s" % (browser, url))
+    
