@@ -92,7 +92,7 @@ class OptionMenuProxy(MultiWidgetProxy):
         for item in menu.get_children():
             data = item.get_data("_kiwi_data") 
             valid.append(data)
-        raise ValueError, """Couldn't set value `%s' for widget %s
+        raise ValueError("""Couldn't set value `%s' for widget %s
 Valid values: %s\n
 (Hint: this can happen if you are using an OptionMenu with some items
 created in glade but doing a prefill() afterwards. If you are using
@@ -101,7 +101,7 @@ won't work as expected.
 
 Note also that you can *not* use an empty string or 0 (zero) to indicate
 you want the default selection; None is the *only* value that the Proxy
-interprets as "unset" or "use default".)""" % (value, self.name, valid)
+interprets as "unset" or "use default".)""" % (value, self.name, valid))
 
     def read(self, item=None):
         menu = self.widget.get_menu()

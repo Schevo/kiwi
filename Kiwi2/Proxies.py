@@ -143,10 +143,10 @@ class OldVirtualProxy:
               the default in the new optionmenu list.
         """
         if not isinstance(attr_name, basestring):
-            msg = "Expected the attribute name (a string), got %s instead"
-            raise TypeError, msg % attr_name
+            raise TypeError("Expected the attribute name (a string), "
+                            "got %s instead" % attr_name)
         if not hasattr(self, "_attr_map"):
-            raise ValueError, "Don't call this before Proxy.__init__()"
+            raise ValueError("Don't call this before Proxy.__init__()")
         optionmenu = self._attr_map[attr_name]
         optionmenu.setup()
         data = optionmenu.read()
@@ -174,8 +174,8 @@ class OldVirtualProxy:
               button label.
         """
         if hasattr(self, "_attr_map"):
-            raise AssertionError, ("group_radiobuttons() must be called "
-                                   "before the constructor for *Proxy")
+            raise AssertionError("group_radiobuttons() must be called "
+                                 "before the constructor for *Proxy")
         if isinstance(group, (list, tuple)):
             tmp = {}
             for widget_name in group:
@@ -183,8 +183,8 @@ class OldVirtualProxy:
                 tmp[widget_name] = ValueUnset
             group = tmp
         elif not isinstance(group, dict):
-            msg = "group must be a Dictionary or Sequence, found %s"
-            raise TypeError, msg % type(group)
+            raise TypeError("group must be a Dictionary or Sequence, "
+                            "found %s" % type(group))
         # Finally initialize radiogroups. This is done here because it
         # has to be done before __init__(), and I'm not sure if doing it
         # in the class declaration is without its risks
@@ -193,14 +193,14 @@ class OldVirtualProxy:
 
     def set_datetime(self, widget_names):
         if hasattr(self, "_attr_map"):
-            raise AssertionError, ("set_datetime() must be called before "
-                                   "the constructor for the base Proxy class")
+            raise AssertionError("set_datetime() must be called before "
+                                 "the constructor for the base Proxy class")
         if isinstance(widget_names, basestring):
             widget_names = [widget_names]
         elif not isinstance(widget_names, (tuple, list)):
-           raise TypeError, ("widget_names parameter to set_datetime "
-                             "should be a string or a list of strings, "
-                             "found '%s'" % (widget_names))
+           raise TypeError("widget_names parameter to set_datetime "
+                           "should be a string or a list of strings, "
+                           "found '%s'" % (widget_names))
         self._pre_datetime = getattr(self, "_pre_datetime", [])
         self._pre_datetime.extend(widget_names)
 
@@ -224,16 +224,16 @@ class OldVirtualProxy:
         if isinstance(widget_names, basestring):
             widget_names = [widget_names]
         elif not isinstance(widget_names, (tuple, list)):
-            raise TypeError, ("widget_names parameter to set_format should "
-                             "be a string or a list of strings, found %r" 
-                              % (widget_names))
+            raise TypeError("widget_names parameter to set_format should "
+                            "be a string or a list of strings, found %r" 
+                            % (widget_names))
         if not isinstance(format, basestring):
-            raise TypeError, ("format parameter to set_format should "
-                              "be a string, found %r" % (format))
+            raise TypeError("format parameter to set_format should "
+                            "be a string, found %r" % (format))
         # Check if setup_widgets has run
         if hasattr(self, "_attr_map"):
-            raise AssertionError, ("set_format() must be called before "
-                                   "the constructor for *Proxy")
+            raise AssertionError("set_format() must be called before "
+                                 "the constructor for *Proxy")
         self._pre_formats = getattr(self, "_pre_formats", {})
         # process list of names
         # XXX: we could be smarter about format strings and their
@@ -247,7 +247,7 @@ class OldVirtualProxy:
         (.) to another character.
         """
         if not isinstance(char, basestring) or len(char) != 1:
-            raise ValueError, "Must be a single char, got %s" % char
+            raise ValueError("Must be a single char, got %s" % char)
         self._decimal_separator = char
         self._decimal_translator = string.maketrans(".%s" % char, 
                                                     "%s." % char)
@@ -263,14 +263,14 @@ class OldVirtualProxy:
         """
         # XXX: only realy makes sense for Editables
         if hasattr(self, "_attr_map"):
-            raise AssertionError, ("set_format() must be called before "
-                                   "the constructor for the base Proxy class")
+            raise AssertionError("set_format() must be called before "
+                                 "the constructor for the base Proxy class")
         if isinstance(widget_names, basestring):
             widget_names = [widget_names]
         elif not isinstance(widget_names, (tuple, list)):
-           raise TypeError, ("widget_names parameter to set_format "
-                             "should be a string or a list of strings, "
-                             "found '%s'""" % (widget_names))
+           raise TypeError("widget_names parameter to set_format "
+                           "should be a string or a list of strings, "
+                           "found '%s'""" % (widget_names))
         self._pre_numeric = getattr(self, "_pre_numeric", [])
         # process list of names
         self._pre_numeric.extend(widget_names)
@@ -294,16 +294,16 @@ class OldVirtualProxy:
             name = widgets[i]
             if name[0] == ":":
                 if name[0:2] == "::":
-                    raise SyntaxError, ("Specify attributes with a single "
-                                        "colon before the name; multiple "
-                                        "colons are not allowed.")
+                    raise SyntaxError("Specify attributes with a single "
+                                      "colon before the name; multiple "
+                                      "colons are not allowed.")
                 name = name[1:]
                 widget_name = name
                 if string.find(widget_name, '.') != -1:
                     widget_name = string.replace(name, ".","_")
                 if widget_name in widgets:
-                    raise ValueError, ("widgets list for %s already contains "
-                                       "a %r widget" % (self, widget_name))
+                    raise ValueError("widgets list for %s already contains "
+                                     "a %r widget" % (self, widget_name))
                 attrs.append(name)   
                 widgets[i] = widget_name
 
@@ -347,8 +347,8 @@ class OldVirtualProxy:
                 try:
                     wpklass = standard_widgets[widget.__class__]
                 except KeyError:
-                    raise TypeError, "No proxy widget defined for %r %s\n" \
-                        % (attr_name, widget)
+                    raise TypeError("No proxy widget defined for %r %s\n"
+                                    % (attr_name, widget))
                 widgetproxy = wpklass(self, widget, attr_name)
 
             # XXX: move these out when Widget() is implemented
@@ -381,17 +381,17 @@ class OldVirtualProxy:
     def _check_radiobutton(self, widget_name):
         radiogroups = getattr(self, "_radiogroups", None)
         if not radiogroups:
-            raise AttributeError, ("No radiobutton groups have been "
-                                   "defined. You *must* group *all* "
-                                   "radiobuttons using group_radiobuttons() "
-                                   "before calling __init__()")
+            raise AttributeError("No radiobutton groups have been "
+                                 "defined. You *must* group *all* "
+                                 "radiobuttons using group_radiobuttons() "
+                                 "before calling __init__()")
         # build list of all grouped radiobuttons
         radiobuttons = []
         for group in radiogroups.keys():
             radiobuttons.extend(radiogroups[group].keys())
         if widget_name not in radiobuttons:
-            raise AttributeError, \
-                "Radiobutton '%s' is not a part of any group" % widget_name
+            raise AttributeError("Radiobutton '%s' is not " 
+                                 "a part of any group" % widget_name)
 
     # Utility methods used by callbacks and setup methods
 
@@ -406,8 +406,8 @@ class OldVirtualProxy:
         #
         # XXX: this will need to be changed for composition
         if not hasattr(self, name):
-            raise ValueError, "The widget %s doesn't belong to %s" % \
-                              (repr(name), self)
+            raise ValueError("The widget %s doesn't belong to %s" %
+                             (repr(name), self))
         return getattr(self, name)
 
 
@@ -497,18 +497,18 @@ class Proxy:
                 return
             value = kgetattr(self.model, attribute, ValueUnset)
             if value is ValueUnset:
-                raise ValueError, "Tried to update %s to unset value" % \
-                      attribute
+                raise ValueError("Tried to update %s to unset value" %
+                                 attribute)
 
         widget = self._attr_map.get(attribute, None)
 
         if widget is None:
-            raise AttributeError, ("Called update for `%s', which isn't "
-                                   "attached to the proxy %s. Valid "
-                                   "attributes are: %s (you may have "
-                                   "forgetten to add `:' to the name in "
-                                   "the widgets list)" 
-                                   % (attribute, self, self._attr_map.keys()))
+            raise AttributeError("Called update for `%s', which isn't "
+                                 "attached to the proxy %s. Valid "
+                                 "attributes are: %s (you may have "
+                                 "forgetten to add `:' to the name in "
+                                 "the widgets list)" 
+                                 % (attribute, self, self._attr_map.keys()))
 
         if block:
             block_widget(widget)
@@ -534,7 +534,7 @@ class Proxy:
             if value is ValueUnset:
                 value = kgetattr(self.model, attribute, ValueUnset)
                 if value is ValueUnset:
-                    raise ValueError, "model value for %s was unset" % name
+                    raise ValueError("model value for %s was unset" % name)
             func(attribute, value)
         else:
             self.update(attribute, value, block=True)
@@ -557,8 +557,8 @@ class Proxy:
             assert self.model.__class__
             if not relax_type and type(new_model) != type(self.model) and \
                 not isinstance(new_model, self.model.__class__):
-                raise TypeError, "New model has wrong type %s, expected %s" \
-                                 % (type(new_model), type(self.model))
+                raise TypeError("New model has wrong type %s, expected %s"
+                                % (type(new_model), type(self.model)))
 
         self.model = new_model
 
@@ -580,8 +580,8 @@ class Proxy:
         for widget_name in widgets:
             widget = getattr(self.view, widget_name, None)
             if widget is None:
-                msg = "The widget %s was not found in the view %s"
-                raise AttributeError, msg % (widget_name, self.view)
+                raise AttributeError("The widget %s was not "
+                                     "found in the view %s" % (widget_name, self.view))
             
             if not isinstance(widget, WidgetProxyMixin):
                 continue
@@ -612,8 +612,8 @@ class Proxy:
 
         attr_name = widget.get_property('model-attribute')
         if not attr_name:
-            raise AssertionError, \
-                "The model-attribute is empty for widgett %s" % widget.name
+            raise AssertionError("The model-attribute is empty "
+                                 "for widgett %s" % widget.name)
 
 #        if widgetproxy.converted:
 #            value = widgetproxy.read_converted(value)
@@ -680,7 +680,7 @@ class Proxy:
                    "should call Model.__init__() (and "
                    "Persistent.__setstate__() of course) to reinitialize "
                    "things properly.)")
-            raise TypeError, msg % ( model, self )
+            raise TypeError(msg % (model, self))
 
     def _unregister_proxy_in_model(self):
         if self.model and hasattr(self.model, "unregister_proxy"):

@@ -34,7 +34,7 @@ class CheckButtonProxy(WidgetProxy):
             value = False
         if value not in (True, False):
             msg = "bad value %s for widget %s:\nexpected integer/boolean"
-            raise TypeError, msg % (repr(value), self.name)
+            raise TypeError(msg % (repr(value), self.name))
         self._block_handlers()
         # set_active does *not* emit any signal, which is why we need to
         # call toggled() right after it.

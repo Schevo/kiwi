@@ -116,13 +116,13 @@ except ImportError:
             pass
 
         def __getitem__(self, k):
-            raise KeyError, "DummyObject"
+            raise KeyError("DummyObject")
 
         def __delitem__(self, k):
-            raise KeyError, "DummyObject"
+            raise KeyError("DummyObject")
 
         def get(self, *args):
-            raise KeyError, "DummyObject"
+            raise KeyError("DummyObject")
     
     weakref=WeakRef()
     _kgetattr_cache = weakref
@@ -329,7 +329,7 @@ def kgetattr(model,
             elif icode == LAMBDA_ACCESS:
                 obj = data1()
             else:
-                raise AssertionError, "Unknown tuple type in _kgetattr_cache"
+                raise AssertionError("Unknown tuple type in _kgetattr_cache")
 
         # 2.4. Value wasn't found, return default or raise ValueError
         except AttributeError:
@@ -479,7 +479,7 @@ def ksetattr(model,
     elif icode == LAMBDA_ACCESS:
         data1(value)
     else:
-        raise AssertionError, "Unknown tuple type in _ksetattr_cache"
+        raise AssertionError("Unknown tuple type in _ksetattr_cache")
     
 def enable_attr_cache():
     """Enables the use of the kgetattr cache when using Python

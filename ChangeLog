@@ -1,3 +1,20 @@
+2005-03-22  Johan Dahlin  <johan@async.com.br>
+
+	* Kiwi2/Controllers.py:
+	* Kiwi2/Delegates.py:
+	* Kiwi2/Proxies.py:
+	* Kiwi2/Views.py:
+	* Kiwi2/WidgetProxies/Base.py:
+	* Kiwi2/WidgetProxies/CheckButton.py:
+	* Kiwi2/WidgetProxies/Entry.py:
+	* Kiwi2/WidgetProxies/OptionMenu.py:
+	* Kiwi2/Widgets/List.py:
+	* Kiwi2/Widgets/WidgetProxy.py:
+	* Kiwi2/accessors.py:
+	* Kiwi2/initgtk.py:
+	
+	Convert exceptions to use raise(x) instead of raise, x
+
 2005-03-22  Johan Dahlin  <jdahlin@async.com.br>
 
 	* Kiwi2/Widgets/ComboBox.py (ComboProxyMixin.__len__): Add

@@ -50,8 +50,8 @@ class BaseController:
         """
 
         if not view and not self.view:
-            raise AssertionError, \
-                "Need a view to create controller, found None" 
+            raise AssertionError(
+                "Need a view to create controller, found None" )
         else:
             self.set_view(view)
 
@@ -98,7 +98,7 @@ class BaseController:
         """view: the correspondent view for the controller"""
         if self.view:
             msg = "This controller already has a view: %s"
-            raise AssertionError, msg % self.view
+            raise AssertionError(msg % self.view)
         self.view = view
         view.set_controller(self)
     

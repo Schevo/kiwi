@@ -141,7 +141,7 @@ class EditableProxy(WidgetProxy):
                 value = self._get_datetime(value)
             except DateTimeError:
                 if self.proxy._conversion_errors:
-                    raise ConversionError, "Unconvertible value %r" % value
+                    raise ConversionError("Unconvertible value %r" % value)
                 # If we got an invalid date, set the model value to
                 # None. This is harsh, but more correct (the other
                 # option would be not updating it at all, leaving
@@ -154,7 +154,7 @@ class EditableProxy(WidgetProxy):
                 value = self._get_numeric(value)
             except ValueError:
                 if self.proxy._conversion_errors:
-                    raise ConversionError, "Unconvertible value %r" % value
+                    raise ConversionError("Unconvertible value %r" % value)
                 value = None
             return value
         
@@ -214,17 +214,17 @@ class EditableProxy(WidgetProxy):
                 if self.datetime:
                     valid_type = 1
                 else: 
-                    raise TypeError, ("%s needs to be set_datetime(); "
-                                      "an unexpected DateTime value %s "
-                                      "was found""" % (self.name, value))
+                    raise TypeError("%s needs to be set_datetime(); "
+                                    "an unexpected DateTime value %s "
+                                    "was found""" % (self.name, value))
             elif self.datetime:
-                raise TypeError, ("%s set as DateTime, but has non-datetime "
-                                  "value %r" % (self.name, value))
+                raise TypeError("%s set as DateTime, but has non-datetime "
+                                "value %r" % (self.name, value))
 
         if not valid_type:
-            raise TypeError, ("failed converting %s '%s' to string. Only "
-                              "None, DateTime, string, ints and float are "
-                              "allowed""" % (valuetype, str(value)))
+            raise TypeError("failed converting %s '%s' to string. Only "
+                            "None, DateTime, string, ints and float are "
+                            "allowed""" % (valuetype, str(value)))
 
         if self.format:
             try:
@@ -233,12 +233,14 @@ class EditableProxy(WidgetProxy):
                 else:
                     value = self.format % value
             except TypeError, e:
-                raise TypeError, ("Failed to convert the contents of %r: "
-                                  "The format string %r can't convert "
-                                  "the data %r %r.  Did you forget to call "
-                                  "set_numeric(), or are the arguments to "
-                                  "set_format() incorrect?" % (self.name, 
-                                  self.format, repr(value), type(value)))
+                raise TypeError("Failed to convert the contents of %r: "
+                                "The format string %r can't convert "
+                                "the data %r %r.  Did you forget to call "
+                                "set_numeric(), or are the arguments to "
+                                "set_format() incorrect?" % (self.name, 
+                                                             self.format,
+                                                             repr(value),
+                                                             type(value)))
 
         # if using a decimal separator, convert all numbers, whether
         # numeric or not

@@ -105,7 +105,7 @@ class Column:
             if ' ' in attribute:
                 msg = ("The attribute can not contain spaces, otherwise I can"
                        " not find the value in the instances: %s" % attribute)
-                raise AttributeError, msg
+                raise AttributeError(msg)
             self.attribute = attribute
         if title is not None:
             self.title = title
@@ -206,7 +206,7 @@ class Column:
         fields = data_string.split('|')
         if len(fields) != 10:
             msg = 'every column should have 10 fields: %s' % col
-            raise ValueError, msg
+            raise ValueError(msg)
 
         # the attribute is mandatory
         if not fields[0]:
@@ -350,14 +350,14 @@ class List(gtk.ScrolledWindow):
             value = kgetattr(instance, c.attribute, ValueUnset)
             if value is ValueUnset:
                 msg = "Failed to get attribute '%s' for %s"
-                raise TypeError, msg % (c.attribute, instance)
+                raise TypeError(msg % (c.attribute, instance))
             
             tp = type(value)
             c.data_type = tp
             if tp is type(None):
-                raise TypeError, \
+                raise TypeError(
                       """Detected invalid type None for column `%s'; please
-                      specify type in Column constructor.""" % c.attribute
+                      specify type in Column constructor.""" % c.attribute)
 
     def _create_columns(self):
         """Create the treeview columns"""
@@ -467,7 +467,7 @@ class List(gtk.ScrolledWindow):
 #            renderer.set_property('editable', True)
 #            renderer.connect('edited', self._on_renderer__edited, column_index)
         else:
-            raise ValueError, "the type %s is not supported yet" % data_type
+            raise ValueError("the type %s is not supported yet" % data_type)
         
         return renderer
 
@@ -627,7 +627,7 @@ eview that needs to
         elif isinstance(arg, gtk.TreeIter):
             item = self.model.get_value(arg, 0)
         else:
-            raise ValueError, "the index is not an intenger neither a iter"
+            raise ValueError("the index is not an intenger neither a iter")
         
         return item
 
@@ -637,7 +637,7 @@ eview that needs to
         elif isinstance(arg, gtk.TreeIter):
             self.model.set_value(arg, 0, item)
         else:
-            raise ValueError, "the index is not an intenger neither a iter"
+            raise ValueError("the index is not an intenger neither a iter")
             
     def __len__(self):
         return len(self.model)
@@ -781,7 +781,7 @@ eview that needs to
                 cols.append(str(col))
             self._column_definitions_string = '^'.join(cols)
         else:
-            raise ValueError, "value should be a string of a list of columns"
+            raise ValueError("value should be a string of a list of columns")
 
         self._clear_columns()
         self._create_columns()
@@ -792,13 +792,13 @@ eview that needs to
         if pspec.name == 'column-definitions':
             return self.get_column_definitions()
         else:
-            raise AttributeError, 'Unknown property %s' % pspec.name
+            raise AttributeError('Unknown property %s' % pspec.name)
 
     def do_set_property(self, pspec, value):
         if pspec.name == 'column-definitions':
             self.set_column_definitions(value)
         else:
-            raise AttributeError, 'Unknown property %s' % pspec.name
+            raise AttributeError('Unknown property %s' % pspec.name)
     
     def add_instance(self, instance, select=False):
         """Adds an instance to the list.
@@ -846,13 +846,13 @@ eview that needs to
         if not self._has_enough_type_information():
             msg = ("There is no columns neither data on the list yet so you "
                    "can not remove any instance")
-            raise RuntimeError, msg
+            raise RuntimeError(msg)
 
         # linear search for the instance to remove
         instance_iter = self._get_iter_from_instance(instance)
         if instance_iter is None:
             msg = "The instance %s is not in the list so I can not remove it"
-            raise ValueError, msg % instance
+            raise ValueError(msg % instance)
 
         # now is safe to remove it
         self.model.remove(instance_iter)
@@ -861,7 +861,7 @@ eview that needs to
         iter = self._get_iter_from_instance(new_instance)
         if iter is None: 
             msg = "The instance %s is not in the list so I can not update it"
-            raise ValueError, msg % new_instance
+            raise ValueError(msg % new_instance)
         self.model.row_changed(self.model.get_path(iter), iter)
         
     def set_column_visibility(self, column_index, visibility):

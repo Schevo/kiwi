@@ -214,8 +214,8 @@ Removes the instance from the clist. Raises KeyError if instance not in list.
         clist = self.clist
         row = clist.find_row_from_data(instance)
         if row < 0:
-            raise KeyError, "Instance %s not in list %s; it contains %s" \
-                             % (instance, self, self._list)
+            raise KeyError("Instance %s not in list %s; it contains %s"
+                           % (instance, self, self._list))
         clist.remove(row)
         self._list.remove(instance)
 
@@ -226,8 +226,8 @@ if instance not in list.
 """
         row = self.clist.find_row_from_data(instance)
         if row < 0:
-            raise KeyError, "Instance %s not in list %s; it contains %s" \
-                             % (instance, self, self._list)
+            raise KeyError("Instance %s not in list %s; it contains %s"
+                           % (instance, self, self._list))
         self._select_and_focus_row(row) 
 
     def update_instance(self, instance, select=False):
@@ -238,8 +238,8 @@ provided. Raises KeyError if instance not in list.
         clist = self.clist
         row = clist.find_row_from_data(instance)
         if row < 0:
-            raise KeyError, "Instance %s not in list %s; it contains %s" \
-                             % (instance, self, self._list)
+            raise KeyError("Instance %s not in list %s; it contains %s"
+                           % (instance, self, self._list))
         text = self._get_instance_text(instance)
         clist.set_row(row, text)
         if select:
@@ -307,8 +307,8 @@ is used.
         for c in columns:
             value = kgetattr(instance, c.attribute, ValueUnset)
             if value is ValueUnset:
-                msg = "Failed to get attribute '%s' for %s"
-                raise TypeError, msg % (c.attribute, instance)
+                raise TypeError("Failed to get attribute '%s' for %s"
+                                % (c.attribute, instance))
             if value is None:
                 value = ""
             elif type(value) is BooleanType:
@@ -326,8 +326,8 @@ is used.
                     else:                    
                         value = c.format % value
                 except TypeError: 
-                    raise TypeError, "Failed to convert %s to format %s" \
-                                  % (repr(value), c.format)
+                    raise TypeError("Failed to convert %s to format %s"
+                                    % (repr(value), c.format))
             else:
                 value = str(value)
             # Swap if special decimal_separator is set
@@ -345,8 +345,8 @@ is used.
         for c in columns:
             value = kgetattr(instance, c.attribute, ValueUnset)
             if value is ValueUnset:
-                msg = "Failed to get attribute '%s' for %s"
-                raise TypeError, msg % (c.attribute, instance)
+                raise TypeError("Failed to get attribute '%s' for %s"
+                                % (c.attribute, instance))
             attributes.append(value)
         return tuple(attributes)
 

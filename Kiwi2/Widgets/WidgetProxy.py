@@ -49,12 +49,12 @@ class WidgetProxyMixin(object):
         """
         if self._data_type is None:
             msg = "You must set the data type before updating a Kiwi widget"
-            raise TypeError, msg
+            raise TypeError(msg)
 
         dt = supported_types_names.index(self._data_type)
         if not isinstance(data, supported_types[dt]):
-            raise TypeError, "Data is supposed to be a %s but it is %s: %s" % \
-                  (self._data_type, type(data), data)
+            raise TypeError("Data is supposed to be a %s but it is %s: %s" % \
+                            (self._data_type, type(data), data))
 
     def read(self):
         """Get the content of the widget.
@@ -67,14 +67,14 @@ class WidgetProxyMixin(object):
         try:
             return getattr(self, "get_%s" % prop_name)()
         except AttributeError:
-            raise AttributeError, "Invalid property name: %s" % pspec.name
+            raise AttributeError("Invalid property name: %s" % pspec.name)
 
     def do_set_property(self, pspec, value):
         prop_name = pspec.name.replace("-", "_")
         try:
             getattr(self, "set_%s" % prop_name)(value)
         except AttributeError:
-            raise AttributeError, "Invalid property name: %s" % pspec.name
+            raise AttributeError("Invalid property name: %s" % pspec.name)
         
     def get_data_type(self):
         return self._data_type
@@ -85,8 +85,8 @@ class WidgetProxyMixin(object):
             return
         
         if data_type not in supported_types_names:
-            raise TypeError, "%s is not supported. Supported types are: %s" % \
-                  (data_type, ','.join(supported_types_names))
+            raise TypeError("%s is not supported. Supported types are: %s" %
+                            (data_type, ','.join(supported_types_names)))
         self._data_type = data_type
 
         # if we don't have a default value, get one from the default table
@@ -109,7 +109,7 @@ class WidgetProxyMixin(object):
         """
         if self._data_type is None:
             msg = "You must set the data type before converting a string"
-            raise TypeError, msg
+            raise TypeError(msg)
         assert isinstance(data, basestring)
         # if the user clear the widget we should not raise a conversion error
         if data == '':
@@ -120,7 +120,7 @@ class WidgetProxyMixin(object):
         """Convert a value to a string"""
         if self._data_type is None:
             msg = "You must set the data type before converting a type"
-            raise TypeError, msg
+            raise TypeError(msg)
         dt = supported_types_names.index(self._data_type)
         assert isinstance(data, supported_types[dt])
         return converters[TO_STR][self._data_type](data)

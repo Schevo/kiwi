@@ -46,13 +46,13 @@ def find_in_gladepath(filename):
     # check to see if gladepath is a list or tuple
     if not isinstance(gladepath, (tuple, list)):
         msg ="gladepath should be a list or tuple, found %s"
-        raise ValueError, msg % type(gladepath)
+        raise ValueError(msg % type(gladepath))
 
     if os.sep in filename or not gladepath:
         if os.path.isfile(filename):
             return filename
         else:
-            raise IOError, "%s not found" % filename
+            raise IOError("%s not found" % filename)
 
     for path in gladepath:
         # append slash to dirname
@@ -63,9 +63,8 @@ def find_in_gladepath(filename):
         if os.path.isfile(fname):
             return fname
 
-    raise IOError, \
-    """%s not found in path %s.  You probably need to
-Kiwi.set_gladepath() correctly""" % ( filename, gladepath )
+    raise IOError("%s not found in path %s.  You probably need to "
+                  "Kiwi.set_gladepath() correctly" % (filename, gladepath))
 
 #
 # Signal brokers
@@ -124,12 +123,12 @@ class SignalBroker(object):
                 continue
             widget = getattr(view, w_name, None)
             if not widget:
-                raise AttributeError, \
-                    "couldn't find widget %s in %s" % (w_name, view)
+                raise AttributeError("couldn't find widget %s in %s"
+                                     % (w_name, view))
             if not isinstance(widget, (gtk.Widget, gtk.Action)):
-                raise AttributeError, \
-                    "%s (%s) is not a widget or an action and can't be connected to" \
-                        % (w_name, widget)
+                raise AttributeError("%s (%s) is not a widget or an action "
+                                     "and can't be connected to"
+                                     % (w_name, widget))
             # Must use getattr; using the class method ends up with it
             # being called unbound and lacking, thus, "self".
             try:
@@ -138,8 +137,8 @@ class SignalBroker(object):
                 else:
                    widget.connect(signal, methods[fname])
             except TypeError, e:
-                raise AttributeError, "Widget %s doesn't provide a signal %s" \
-                                       % (widget.__class__, signal)
+                raise AttributeError("Widget %s doesn't provide a signal %s"
+                                     % (widget.__class__, signal))
             if not self._autoconnected.has_key(widget):
                 self._autoconnected[widget] = []
             self._autoconnected[widget].append(id)
@@ -160,7 +159,7 @@ class GladeSignalBroker(SignalBroker):
         # called by framework.basecontroller. takes a controller, and
         # creates the dictionary to attach to the signals in the tree.
         if not methods:
-            raise assertionerror, "controller must be provided"
+            raise assertionerror("controller must be provided")
 
         dict = {}
         for name, method in methods.items():
@@ -212,9 +211,9 @@ class SlaveView(gobject.GObject):
                          "gladename", "tree", "model", "controller"]:
             # XXX: take into account widget constructor?
             if reserved in self.widgets:
-                raise AttributeError, ("The widgets list for %s contains "
-                                       "a widget named `%s', which is "
-                                       "a reserved. name""" % (self, reserved))
+                raise AttributeError("The widgets list for %s contains "
+                                     "a widget named `%s', which is "
+                                     "a reserved. name""" % (self, reserved))
 
 
         self.glade_adaptor = None
@@ -225,9 +224,9 @@ class SlaveView(gobject.GObject):
             self.toplevel = getattr(self, self.toplevel_name, None)
         
         if not self.toplevel:
-            raise TypeError, \
-                ("A View requires an instance variable called toplevel "
-                 "that specifies the toplevel widget in it")
+            raise TypeError("A View requires an instance variable "
+                            "called toplevel that specifies the "
+                            "toplevel widget in it")
 
 
         self.proxies = []
@@ -245,7 +244,7 @@ class SlaveView(gobject.GObject):
         if container_name is None:
             msg = ("You provided a gladefile %s to grab the widgets from "
                    "but you didn't give me a toplevel/container name!")
-            raise ValueError, msg % self.gladefile
+            raise ValueError(msg % self.gladefile)
 
         # a SlaveView inside a glade file needs to come inside a toplevel
         # window, so we pull our slave out from it, grab its groups and
@@ -253,7 +252,7 @@ class SlaveView(gobject.GObject):
         shell = self.glade_adaptor.get_widget(container_name)
         if not isinstance(shell, gtk.Window):
             msg = "Container %s should be a Window, found %s"
-            raise TypeError, msg % (container_name, type(shell))
+            raise TypeError(msg % (container_name, type(shell)))
 
         # XXX grab the accel groups
 
@@ -292,11 +291,11 @@ class SlaveView(gobject.GObject):
         name = string.replace(name,'.','_')
         widget = getattr(self, name, None)
         if not widget:
-            raise AttributeError, \
-                "Widget %s not found in view %s" % (name, self)
+            raise AttributeError("Widget %s not found in view %s"
+                                 % (name, self))
         if not isinstance(widget, gtk.Widget):
-            raise TypeError, \
-                "%s in view %s is not a Widget" % (name, self)
+            raise TypeError("%s in view %s is not a Widget"
+                            % (name, self))
         return widget
 
     def set_controller(self, controller):
@@ -305,8 +304,8 @@ class SlaveView(gobject.GObject):
         been set before."""
         # Only one controller per view, please
         if self.controller:
-            raise AssertionError, \
-                "This view already has a controller: %s" % self.controller
+            raise AssertionError("This view already has a controller: %s"
+                                 % self.controller)
         self.controller = controller
 
     #
@@ -320,8 +319,8 @@ class SlaveView(gobject.GObject):
     def show_all(self, *args):
         """Shows all widgets attached to the toplevel widget"""
         if self.glade_adaptor is not None:
-            raise AssertionError, ("You don't want to call show_all on a "
-                                   "GazpachoView. Use show() instead.")
+            raise AssertionError("You don't want to call show_all on a "
+                                 "GazpachoView. Use show() instead.")
         self.toplevel.show_all()
 
     def focus_toplevel(self):
@@ -421,7 +420,7 @@ class SlaveView(gobject.GObject):
         if self.glade_adaptor is None:
             msg = ("You can't attach slaves if you are not using a glade file "
                    "in your View")
-            raise ValueError, msg
+            raise ValueError(msg)
         
         else:
             self.glade_adaptor.attach_slave(name, slave) # delegation powered
@@ -441,11 +440,11 @@ class SlaveView(gobject.GObject):
             - after: a boolean; if TRUE, we use connect_after(), otherwise, connect()
         """
         if not isinstance(widgets, (list, tuple)):
-            raise TypeError, "widgets must be a list, found %s" % widgets
+            raise TypeError("widgets must be a list, found %s" % widgets)
         for widget in widgets:
             if not isinstance(widget, gtk.Widget):
-                raise TypeError, \
-                "Only Gtk widgets may be passed in list, found\n%s" % widget
+                raise TypeError(
+                "Only Gtk widgets may be passed in list, found\n%s" % widget)
             if after:
                 widget.connect_after(signal, handler)
             else:
@@ -498,21 +497,21 @@ class BaseView(SlaveView):
             SlaveView.__init__(self, toplevel, widgets, gladefile, gladename,
                                toplevel_name)
         except KeyError:
-            raise KeyError, ("Some widgets were defined in self.widgets "
-                             "but not found in the glade tree (see previous "
-                             "messages to see which ones).")
+            raise KeyError("Some widgets were defined in self.widgets "
+                           "but not found in the glade tree (see previous "
+                           "messages to see which ones).")
             
 
         if not isinstance(self.toplevel, gtk.Window):
-            raise TypeError, ("toplevel widget must be a Window "
-                              "(or inherit from it),\nfound `%s' %s" 
-                              % (toplevel, self.toplevel))
+            raise TypeError("toplevel widget must be a Window "
+                            "(or inherit from it),\nfound `%s' %s" 
+                            % (toplevel, self.toplevel))
 
         if delete_handler:
             id = self.toplevel.connect("delete_event", delete_handler)
             if not id:
-                raise ValueError, \
-                    "Invalid delete handler provided: %s" % delete_handler
+                raise ValueError(
+                    "Invalid delete handler provided: %s" % delete_handler)
 
     def _init_glade_adaptor(self):
         self.glade_adaptor = GazpachoWidgetTree(self, self.gladefile,
@@ -554,8 +553,8 @@ class BaseView(SlaveView):
         elif isinstance(view, gtk.Window):
             self.toplevel.set_transient_for(view)
         else:
-            raise TypeError, ("Parameter to set_transient_for should "
-                              "be View (found %s)" % view)
+            raise TypeError("Parameter to set_transient_for should "
+                            "be View (found %s)" % view)
 
     def set_title(self, title):
         """Sets the view's window title"""
@@ -658,10 +657,10 @@ class GazpachoWidgetTree(GladeAdaptor):
         widgets = (widgets or self.view.widgets or [])[:]
         
         if not gladefile:
-            raise ValueError, "A gladefile wasn't provided."
+            raise ValueError("A gladefile wasn't provided.")
         elif not isinstance(gladefile, basestring):
-            raise TypeError, \
-                  "gladefile should be a string, found %s" % type(gladefile)
+            raise TypeError(
+                  "gladefile should be a string, found %s" % type(gladefile))
         
         # get base name of glade file
         basename = os.path.basename(gladefile)
@@ -687,13 +686,13 @@ class GazpachoWidgetTree(GladeAdaptor):
     def get_widget(self, name):
         """Retrieves the named widget from the View (or glade tree)"""
         if self.tree is None:
-            raise TypeError, \
-                  "No tree defined for %s, did you call the constructor?" % self.view
+            raise TypeError(
+                  "No tree defined for %s, did you call the constructor?" % self.view)
         name = name.replace('.', '_')
         widget = self.tree.get_widget(name)
         if widget is None:
-            raise AttributeError, \
-                  "Widget %s not found in view %s" % (name, self.view)
+            raise AttributeError(
+                  "Widget %s not found in view %s" % (name, self.view))
         return widget
 
     def get_widgets(self):
@@ -726,7 +725,7 @@ class GazpachoWidgetTree(GladeAdaptor):
             _warn("slave specified must be a SlaveView, found %s" % slave)
 
         if not hasattr(slave, "get_toplevel"):
-            raise TypeError, "Slave does not have a get_toplevel method"
+            raise TypeError("Slave does not have a get_toplevel method")
 
         shell = slave.get_toplevel()
 
@@ -738,8 +737,8 @@ class GazpachoWidgetTree(GladeAdaptor):
 
         placeholder  = self.get_widget(name)
         if not placeholder:
-            raise attributeerror, \
-                  "slave container widget `%s' not found" % name
+            raise attributeerror(
+                  "slave container widget `%s' not found" % name)
         parent = placeholder.get_parent()
 
         if slave._accel_groups:
@@ -771,8 +770,8 @@ class GazpachoWidgetTree(GladeAdaptor):
             parent.remove(placeholder)
             parent.add(new_widget)
         else:
-            raise typeerror, \
-                "widget to be replaced must be wrapped in eventbox"
+            raise typeerror(
+                "widget to be replaced must be wrapped in eventbox")
      
         # call slave's callback
         slave.on_attach(self)

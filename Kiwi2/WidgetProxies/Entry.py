@@ -121,8 +121,8 @@ class SpinButtonProxy(EntryProxy):
             print "OINK", value
             self.widget.set_text(value)
         else:
-            raise TypeError, \
-                "Value %s for %s is of invalid type" % (value, self.name)
+            raise TypeError(
+                "Value %s for %s is of invalid type" % (value, self.name))
         if old_text == value:
             # XXX GTK+ change from 1.2 to 2.x
             self.widget.emit("changed")
