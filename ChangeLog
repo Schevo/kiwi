@@ -1,5 +1,13 @@
 2005-03-05  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
+	* Kiwi2/Views.py (GazpachoWidgetTree.__init__): move the gladename
+	and gladefile class attributes to GladeSlaveView and GladeView. Fix
+	#1843
+	(GladeSlaveView, GladeView): 
+
+	* examples/HeyPlanet/heyglade3.py (MyView.gladefile): provide an
+	example of setting the gladefile as a class attribute
+
 	* Kiwi2/Delegates.py: add a keyactions argument to all the Delegates
 	so we can use it for the Controller
 

@@ -4,9 +4,9 @@ from Kiwi2.initgtk import gtk, quit_if_last
 
 class MyView(Views.GladeView):
     widgets = ["the_label"]   # widgets list
+    gladefile = "hey"
     def __init__(self):
         Views.GladeView.__init__(self,
-                                 gladefile="hey", 
                                  delete_handler=quit_if_last)
         text = self.the_label.get_text() # attached by constructor
         self.the_label.set_markup('<b>%s</b>' % text)

@@ -934,13 +934,10 @@ class BaseView(AbstractView):
 from gazpacho.loader import widgettree
 
 class GazpachoWidgetTree:
-    gladefile = None
-    gladename = None
     tree = None
-    def __init__(self, view, gladefile, widgets):
+    def __init__(self, view, gladefile, widgets, gladename=None):
         self.view = view
         
-        gladefile = gladefile or self.gladefile
         widgets = (widgets or self.view.widgets or [])[:]
         
         if not gladefile:
@@ -955,8 +952,8 @@ class GazpachoWidgetTree:
         
         gladefile = find_in_gladepath(filename + ".glade")
         self.tree = widgettree.WidgetTree(gladefile)
-        if self.gladename is None:
-            self.gladename = filename
+        self.gladename = gladename or filename
+            
         
         # Attach widgets in the widgetlist to the view specified, so
         # widgets = [label1, button1] -> view.label1, view.button1
@@ -1092,6 +1089,8 @@ class GladeSlaveView(SlaveView): # sane single inheritance
     will be assigned to the placeholder's original contents.
     """
     container_name = None
+    gladefile = None
+    gladename = None
     def __init__(self, gladefile=None, container_name=None, widgets=None):
         """
         Creates a new GladeSlaveView.
@@ -1117,7 +1116,10 @@ class GladeSlaveView(SlaveView): # sane single inheritance
             _warn("GladeSlaveView does not use the `toplevel' attribute; "
                   "instead, provide a container_name")
 
-        self.gazpacho = GazpachoWidgetTree(self, gladefile, widgets)
+        gladefile = gladefile or self.gladefile
+        
+        self.gazpacho = GazpachoWidgetTree(self, gladefile, widgets,
+                                           self.gladename)
 
         container_name = container_name or self.container_name \
                        or self.gazpacho.gladename
@@ -1148,6 +1150,8 @@ class GladeView(BaseView): # sane single inheritance
     Internally it has a instance of GazpachoWidgetTree to do the 
     the work related to the glade file
     """
+    gladefile = None
+    gladename = None
     
     def __init__(self, gladefile=None, toplevel_name=None,
                  delete_handler=None, widgets=None):
@@ -1171,8 +1175,10 @@ class GladeView(BaseView): # sane single inheritance
               from the glade file and attach to the view as instance
               variables
         """
+        gladefile = gladefile or self.gladefile
         
-        self.gazpacho = GazpachoWidgetTree(self, gladefile, widgets)
+        self.gazpacho = GazpachoWidgetTree(self, gladefile, widgets,
+                                           self.gladename)
         
         name = toplevel_name or self.gazpacho.gladename
         self.win = self.gazpacho.tree.get_widget(name)
