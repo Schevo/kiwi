@@ -1,5 +1,8 @@
 2005-02-26  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
+	* Kiwi2/Views.py: optimize color conversion to string by using
+	shifts instead of divisions
+
 	* tests/run_all_tests.py: fix the first line of the script
 
 2005-02-21  Lorenzo Gil Sanchez  <lgs@sicem.biz>

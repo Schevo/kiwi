@@ -357,12 +357,10 @@ class AbstractView(gobject.GObject):
     #
     def _gdk_color_to_string(self, color):
         # Maybe put this in a utils.py?
-        red, green, blue = color.red, color.green, color.blue
         # the values are in the 0-65535 range and we want 0-255
-        factor = 255.0 / 65535.0
-        red = int(red * factor)
-        green = int(green * factor)
-        blue = int(blue * factor)
+        red = color.red >> 8
+        green = color.green >> 8
+        blue = color.blue >> 8
         return "#%02X%02X%02X" % (red, green, blue)
         
     def set_background(self, widget, color, state=gtk.STATE_NORMAL):
