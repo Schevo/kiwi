@@ -87,5 +87,5 @@ def quit_if_last(*args):
                       tl.get_property('visible') == True]
     #print 'Toplevel visible windows:', real_toplevels
     # check if this window is the last one
-    if len(real_toplevels) == 1:
+    if len(real_toplevels) <= 1:
         gtk.main_quit()

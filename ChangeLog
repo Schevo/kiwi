@@ -1,5 +1,8 @@
 2005-03-05  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
+	* Kiwi2/initgtk.py (quit_if_last): also quit if there is no toplevels
+	(e.g., this function was called after hiding the last toplevel)
+
 	* examples/News/news3.py (Shell.on_ok__clicked): stay on the safe
 	side by checking if there is something selected
 
