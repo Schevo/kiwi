@@ -5,8 +5,7 @@ from utils import refresh_gui
 from Kiwi2.Widgets.List import List, Column
 from Kiwi2.initgtk import gtk, quit_if_last
 
-from unittest import TestCase, TestSuite, makeSuite, TextTestRunner
-import sys
+import unittest
 
 class Person:
     def __init__(self, name, age):
@@ -17,10 +16,7 @@ persons = (Person('Johan', 24), Person('Gustavo', 25),
            Person('Kiko', 28), Person('Salgado', 25),
            Person('Lorenzo', 26), Person('Henrique', 21))
 
-# this is the delay between each refresh of the screen in seconds
-delay = 0
-
-class ColumnTests(TestCase):
+class ColumnTests(unittest.TestCase):
 
     def setUp(self):
         self.win = gtk.Window()
@@ -31,26 +27,23 @@ class ColumnTests(TestCase):
         del self.win
 
     def testEmptyList(self):
-        global delay
         mylist = List()
         self.win.add(mylist)
         self.win.show_all()
-        refresh_gui(delay)
+        refresh_gui()
 
     def testOneColumn(self):
-        global delay
         # column's attribute can not contain spaces
         self.assertRaises(AttributeError, Column, 'test column')
         
         mylist = List(Column('test_column'))
         self.win.add(mylist)
         self.win.show_all()
-        refresh_gui(delay)
+        refresh_gui()
 
         self.assertEqual(1, len(mylist.treeview.get_columns()))
         
-
-class DataTests(TestCase):
+class DataTests(unittest.TestCase):
     """In all this tests we use the same configuration for a list"""
     def setUp(self):
         self.win = gtk.Window()
@@ -58,22 +51,20 @@ class DataTests(TestCase):
         self.list = List([Column('name'), Column('age')])
         self.win.add(self.list)
         self.win.show_all()
-        refresh_gui(delay)
+        refresh_gui()
 
     def tearDown(self):
         self.win.destroy()
         del self.win
 
     def testAddingOneInstance(self):
-        global delay
-
         # we should have two columns now
         self.assertEqual(2, len(self.list.treeview.get_columns()))
                          
         person = Person('henrique', 21)
         self.list.add_instance(person)
 
-        refresh_gui(delay)
+        refresh_gui()
 
         # usually you don't use the model directly, but tests are all about
         # breaking APIs, right?
@@ -85,27 +76,27 @@ class DataTests(TestCase):
         self.assertEqual(2, len(self.list.treeview.get_columns()))
 
     def testAddingAList(self):
-        global delay, persons
+        global persons
 
         self.list.add_list(persons)
-        refresh_gui(delay)
+        refresh_gui()
         
         self.assertEqual(len(self.list), len(persons))
         
     def testAddingABunchOfInstances(self):
-        global delay, persons
+        global persons
 
         for person in persons:
             self.list.add_instance(person)
-            refresh_gui(delay)
+            refresh_gui()
 
         self.assertEqual(len(self.list), len(persons))
 
     def testRemovingOneInstance(self):
-        global delay, persons
+        global  persons
 
         self.list.add_list(persons)
-        refresh_gui(delay)
+        refresh_gui()
 
         # we are going to remove Kiko
         person = persons[2]
@@ -125,10 +116,10 @@ class DataTests(TestCase):
                           existing_person)
 
     def testClearList(self):
-        global delay, persons
+        global persons
 
         self.list.add_list(persons)
-        refresh_gui(delay)
+        refresh_gui()
 
         self.list.clear()
 
@@ -136,15 +127,15 @@ class DataTests(TestCase):
         
 
     def testUpdatingOneInstance(self):
-        global delay, persons
+        global persons
 
         self.list.add_list(persons)
-        refresh_gui(delay)
+        refresh_gui()
 
         persons[0].age = 29
         self.list.update_instance(persons[0])
 
-        refresh_gui(delay)
+        refresh_gui()
         
         # Do we have the same number of instances that we had before ?
         self.assertEqual(len(self.list), len(persons))
@@ -158,7 +149,7 @@ class DataTests(TestCase):
 
 
     def testContains(self):
-        global delay, persons
+        global persons
 
         self.list.add_list(persons)
         self.assertEqual(persons[0] in self.list, True)
@@ -168,11 +159,4 @@ class DataTests(TestCase):
         
         
 if __name__ == '__main__':
-    import sys
-    if len(sys.argv) == 2:
-        delay = float(sys.argv[1])
-    suite = TestSuite()
-    suite.addTest(makeSuite(ColumnTests))
-    suite.addTest(makeSuite(DataTests))
-    TextTestRunner(verbosity=2).run(suite)
-    
+    unittest.main()

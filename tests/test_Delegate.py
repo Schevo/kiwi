@@ -4,8 +4,7 @@ from utils import refresh_gui
 from Kiwi2 import Delegates
 from Kiwi2.initgtk import gtk, quit_if_last
 
-from unittest import TestCase, TestSuite, makeSuite, TextTestRunner
-import sys
+import unittest
 
 class A:
     def on_foo__clicked(self, *args):
@@ -75,27 +74,22 @@ class GladeClickCounter(Delegates.Delegate):
     def on_button__clicked(self, *args):
         self.clicks += 1
         
-# this is the delay between each refresh of the screen in seconds
-delay = 0
-
-class DelegateTest(TestCase):
+class DelegateTest(unittest.TestCase):
     def testButtons(self):
-        global delay
         f = Foo()
         f.show_all()
-        refresh_gui(delay)
+        refresh_gui()
         f.foo.clicked()
-        refresh_gui(delay)
+        refresh_gui()
         self.assertEqual(f.x, "FOO in Foo")
         f.bar.clicked()
-        refresh_gui(delay)
+        refresh_gui()
         self.assertEqual(f.y, "BAR in B")
 
     def testClickCounter(self):
-        global delay
         clickcounter = ClickCounter()
         clickcounter.show_all()
-        refresh_gui(delay)
+        refresh_gui()
         
         # one for the boys
         clickcounter.button.clicked()
@@ -106,10 +100,9 @@ class DelegateTest(TestCase):
         self.assertEqual(clickcounter.clicks, 2)
 
     def testClickCounterGlade(self):
-        global delay
         clickcounter = GladeClickCounter()
         clickcounter.show_all()
-        refresh_gui(delay)
+        refresh_gui()
         
         # one for the boys
         clickcounter.button.clicked()
@@ -120,10 +113,4 @@ class DelegateTest(TestCase):
         self.assertEqual(clickcounter.clicks, 2)
         
 if __name__ == '__main__':
-    import sys
-    if len(sys.argv) == 2:
-        delay = float(sys.argv[1])
-    suite = TestSuite()
-    suite.addTest(makeSuite(DelegateTest))
-    TextTestRunner(verbosity=2).run(suite)
-    
+    unittest.main()

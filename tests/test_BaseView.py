@@ -8,8 +8,7 @@ from Kiwi2.initgtk import gtk
 from Kiwi2 import utils
 from gtk import keysyms
 
-from unittest import TestCase, TestSuite, makeSuite, TextTestRunner
-import sys
+import unittest
 
 class FooView(BaseView):
     widgets = [ "vbox", "label" ]
@@ -83,18 +82,12 @@ class NotWidgetFoo(FooView, BaseController):
     def on_noogie__haxored(self, *args):
         print "I AM NOT A NUMBER I AM A FREE MAN"
 
-
-# this is the delay between each refresh of the screen in seconds
-delay = 0
-
-class BaseViewTest(TestCase):
+class BaseViewTest(unittest.TestCase):
 
     def setUp(self):
-        global delay
-        self.delay = delay
         self.foo = FooController(FooView())
         self.foo.run()
-        refresh_gui(self.delay)
+        refresh_gui()
 
     def tearDown(self):
         for win in gtk.window_list_toplevels():
@@ -102,14 +95,14 @@ class BaseViewTest(TestCase):
 
     def testFooButton(self):
         self.foo.view.foo__button.clicked()
-        refresh_gui(self.delay)
+        refresh_gui()
         self.assertEqual(self.foo.view.label.get_text(),
                          "Good click!")
         
     def testSubView(self):
         self.foo.view.button.clicked()
         self.foo.bar.run(self.foo.view)
-        refresh_gui(self.delay)
+        refresh_gui()
         self.assertEqual(self.foo.bar, self.foo.bar.view)
         self.assertEqual(self.foo.bar.toplevel, self.foo.bar.win)
         # setting None as transient window should be an error
@@ -118,14 +111,14 @@ class BaseViewTest(TestCase):
     def testColors(self):
         self.foo.view.button.clicked()
         self.foo.bar.run(self.foo.view)
-        refresh_gui(self.delay)
+        refresh_gui()
         color = utils.get_background(self.foo.bar.win)
         self.assertEqual(color, "#001100")
         color = utils.get_foreground(self.foo.bar.label)
         self.assertEqual(color, "#CC99FF")
 
 
-class BrokenViewsTest(TestCase):
+class BrokenViewsTest(unittest.TestCase):
     
     def testNoWindow(self):
         # A View requires an instance variable called toplevel that
@@ -138,11 +131,4 @@ class BrokenViewsTest(TestCase):
         self.assertRaises(AttributeError, NotWidgetFoo)
         
 if __name__ == '__main__':
-    import sys
-    if len(sys.argv) == 2:
-        delay = float(sys.argv[1])
-    suite = TestSuite()
-    suite.addTest(makeSuite(BaseViewTest))
-    suite.addTest(makeSuite(BrokenViewsTest))
-    TextTestRunner(verbosity=2).run(suite)
-    
+    unittest.main()

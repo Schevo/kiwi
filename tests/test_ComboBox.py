@@ -71,10 +71,4 @@ class TestComboBox(unittest.TestCase):
         self.assertEqual(map(list, self.combo.get_model()), [])
     
 if __name__ == '__main__':
-    import sys
-    if len(sys.argv) == 2:
-        delay = float(sys.argv[1])
-    suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(TestComboBox))
-    runner = unittest.TextTestRunner(verbosity=2)
-    runner.run(suite)
+    unittest.main()

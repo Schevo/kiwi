@@ -4,8 +4,7 @@ from utils import refresh_gui
 from Kiwi2 import Delegates
 from Kiwi2.initgtk import gtk, quit_if_last
 
-from unittest import TestCase, TestSuite, makeSuite, TextTestRunner
-import sys
+import unittest
 
 class ActionDelegate(Delegates.Delegate):
     def __init__(self):
@@ -18,24 +17,14 @@ class ActionDelegate(Delegates.Delegate):
     def on_New__activate(self, *args):
         self.new_activated = True
         
-# this is the delay between each refresh of the screen in seconds
-delay = 0
-
-class ActionTest(TestCase):
+class ActionTest(unittest.TestCase):
     def testButtons(self):
-        global delay
         action_delegate = ActionDelegate()
         action_delegate.show_all()
-        refresh_gui(delay)
+        refresh_gui()
         action_delegate.New.activate()
-        refresh_gui(delay)
+        refresh_gui()
         self.assertEqual(action_delegate.new_activated, True)
 
 if __name__ == '__main__':
-    import sys
-    if len(sys.argv) == 2:
-        delay = float(sys.argv[1])
-    suite = TestSuite()
-    suite.addTest(makeSuite(ActionTest))
-    TextTestRunner(verbosity=2).run(suite)
-    
+    unittest.main()

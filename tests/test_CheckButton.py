@@ -3,22 +3,14 @@ from utils import refresh_gui
 
 from Kiwi2.Widgets import CheckButton
 
-from unittest import TestCase, TestSuite, makeSuite, TextTestRunner
-import sys
+import unittest
 
-class CheckButtonTest(TestCase):
+class CheckButtonTest(unittest.TestCase):
     def testForBool(self):
         myChkBtn = CheckButton()
-        self.assertEqual(myChkBtn.get_property("data-type"), "bool")
+        self.assertEqual(myChkBtn.get_property("data-type"), bool)
 
         self.assertRaises(TypeError, myChkBtn.set_property, ('data-type',
-        'bool'))
-
+                                                             bool))
 if __name__ == '__main__':
-    import sys
-    if len(sys.argv) == 2:
-        delay = float(sys.argv[1])
-    suite = TestSuite()
-    suite.addTest(makeSuite(CheckButtonTest))
-    TextTestRunner(verbosity=2).run(suite)
-    
+    unittest.main()
