@@ -1,5 +1,8 @@
 2005-02-16  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
+	* tests/test_BaseView.py: make all the tests run under the unittest
+	facilities. Integrate test_BaseView2.py here also.
+
 	* Kiwi2/Views.py (AbstractView._gdk_color_to_string) 
 	(AbstractView.get_background, AbstractView.get_foreground): provide
 	method to get the colors of a widget in the #XXXXX format
