@@ -2,7 +2,7 @@
 <glade-catalog name="kiwi2"
                library="kiwi2"
                libglade-module="Kiwi2.Widgets"
-               resource-path="/home/daniel/devel/Kiwi2/gazpacho-plugin">
+               resource-path="/home/gustavo/devel/Kiwi2/gazpacho-plugin">
   <glade-widget-classes>
     <glade-widget-class name="Kiwi2+Widgets+List+List"
                         generic-name="kiwilist"
@@ -163,6 +163,29 @@
      </properties>
     </glade-widget-class>
 
+    <glade-widget-class name="Kiwi2+Widgets+SpinButton+SpinButton"
+                        generic-name="kiwispinbutton"
+                        title="Kiwi Spin Button">
+      <properties>
+
+    	<property id="model-attribute"
+                  name="Model Attribute"
+                  translatable="False" />
+                  
+        <property id="data-type"
+                  name="Data Type"
+                  translatable="False"
+                  adaptor-class="SpinBtnDataTypeAdaptor">
+              <function name="save" type="override"/>
+                <editor>
+                  <function name="create" type="override"/>
+                  <function name="update" type="override"/>
+                </editor>
+        </property>
+        
+     </properties>
+    </glade-widget-class>
+
 </glade-widget-classes>
 
   <glade-widget-group name="kiwi2" title="Kiwi Widgets">
@@ -173,6 +196,7 @@
     <glade-widget-class-ref name="Kiwi2+Widgets+List+List"/>
     <glade-widget-class-ref name="Kiwi2+Widgets+CheckButton+CheckButton"/>
     <glade-widget-class-ref name="Kiwi2+Widgets+RadioButton+RadioButton"/>
+    <glade-widget-class-ref name="Kiwi2+Widgets+SpinButton+SpinButton"/>
 
   </glade-widget-group>
   

@@ -65,7 +65,20 @@ class DataTypeAdaptor(object):
         data_type = gwidget.get_glade_property('data-type')
         # data type is one of (str, float, int, bool)
         return data_type._value.__name__
-        
+
+class SpinBtnDataTypeAdaptor(DataTypeAdaptor):
+    def create_editor(self, context):
+        model = gtk.ListStore(str, object)
+        model.append((_('Integer'), int))
+        model.append((_('Float'), float))
+        combo = gtk.ComboBox(model)
+        renderer = gtk.CellRendererText()
+        combo.pack_start(renderer)
+        combo.add_attribute(renderer, 'text', 0)
+        combo.set_active(0)
+        combo.set_data('connection-id', -1)
+        return combo
+
 class ColumnDefinitionsAdaptor(object):
     def __init__(self):
         self._editor = ListColumnDefinitionsEditor()

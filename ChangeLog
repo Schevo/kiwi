@@ -1,3 +1,12 @@
+2005-29-03  Gustavo Rahal <gustavo@async.com.br>
+	
+	* Kiwi2/Widgets/SpinButton.py: added Spin Button support to Kiwi
+	* Kiwi2/Widgets/__init__.py: spinbutton
+	* Kiwi2/tests/test_SpinButton.py: test spinbutton
+	* Kiwi2/gazpacho-plugin/kiwi2.xml: spin button
+	* Kiwi2/gazpacho-plugin/kiwi2.py: new SpinBtnDataTypeAdaptor to deal
+	with int and float only
+
 2001-12-02  Daniel Saran R. da Cunha  <daniel@async.com.br>
 
 	* Kiwi2/Widgets/WidgetProxy.py:  don't try to set the widget content 
