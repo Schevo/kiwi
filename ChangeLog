@@ -1,7 +1,8 @@
 2005-03-07  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
-	* examples/Faren/faren2.py (FarenView.get_temp): second version of
-	Faren example
+	* examples/Faren/faren3.py: this one uses a GladeDelegate
+
+	* examples/Faren/faren2.py: second version of Faren example
 
 	* examples/Faren/faren.py: ported the basic Temperature example
 
