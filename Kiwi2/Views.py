@@ -29,7 +29,7 @@ are the base of Delegates and Proxies.
 """
 import os, string, re, sys
 
-from Kiwi2 import _warn, get_gladepath
+from Kiwi2 import _warn, get_gladepath, get_imagepath
 from Kiwi2.utils import gsignal
 from Kiwi2.initgtk import _non_interactive, gtk, gobject, quit_if_last
 from Kiwi2.Proxies import Proxy
@@ -65,6 +65,36 @@ def find_in_gladepath(filename):
 
     raise IOError("%s not found in path %s.  You probably need to "
                   "Kiwi.set_gladepath() correctly" % (filename, gladepath))
+
+#
+# Image path resolver
+#
+
+def image_path_resolver(filename):
+    imagepath = get_imagepath()
+
+    # check to see if imagepath is a list or tuple
+    if not isinstance(imagepath, (list, tuple)):
+        msg ="imagepath should be a list or tuple, found %s"
+        raise ValueError(msg % type(imagepath))
+
+    if os.sep in filename or not imagepath:
+        if os.path.isfile(filename):
+            return filename
+        else:
+            raise IOError("%s not found" % filename)
+
+    basefilename = os.path.basename(filename)
+    
+    for path in imagepath:
+        if not path:
+            continue
+        fname = os.path.join(path, basefilename)
+        if os.path.isfile(fname):
+            return fname
+
+    raise IOError("%s not found in path %s. You probably need to "
+                  "Kiwi.set_imagepath() correctly" % (filename, imagepath))
 
 #
 # Signal brokers
@@ -673,7 +703,8 @@ class GazpachoWidgetTree(GladeAdaptor):
         filename = os.path.splitext(basename)[0]
         
         gladefile = find_in_gladepath(filename + ".glade")
-        self.tree = widgettree.WidgetTree(gladefile)
+        self.tree = widgettree.WidgetTree(gladefile,
+                                          path_resolver=image_path_resolver)
         self.gladename = gladename or filename
             
         

@@ -1,3 +1,10 @@
+2005-03-29  Lorenzo Gil Sanchez  <lgs@sicem.biz>
+
+	* Kiwi2/__init__.py (imagepath): 
+	* Kiwi2/Views.py (GazpachoWidgetTree.__init__): use a path resolver
+	to correctly load images
+	(image_path_resolver): 
+
 2005-03-24 Gustavo Rahal <gustavo@async.com.br>
 	
 	* Kiwi2/__init__.py: fixed KIWI_GLADE_PATH
