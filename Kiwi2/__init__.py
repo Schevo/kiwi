@@ -76,3 +76,15 @@ def _warn(msg):
     stderr.write("Kiwi warning: "+msg+"\n")
 
 gladepath = []
+
+import os
+
+if os.environ.has_key('KIWI_GLADE_PATH'):
+    gladepath = string.split(os.environ['KIWI_GLADE_PATH'])
+
+def set_gladepath(path):
+    """Sets a new path to be used to search for glade files when creating
+    GladeViews or it's subclasses
+    """
+    global gladepath
+    gladepath = path
