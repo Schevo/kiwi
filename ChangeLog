@@ -1,3 +1,9 @@
+2001-11-26  Daniel Saran R. da Cunha  <daniel@async.com.br>
+
+	* gazpacho-plugin/kiwi2.xml: disabled hadjustment and vadjustment
+	properties on the List since they are ScrollWindow properties that
+	do not make sense with the list.
+
 2005-03-22  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
 	* gazpacho-plugin/kiwi2.py (DataTypeAdaptor.create_editor): handle

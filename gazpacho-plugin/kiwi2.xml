@@ -20,6 +20,9 @@
           </editor>
 
         </property>
+        <property id="hadjustment" disabled="True"/>
+        <property id="vadjustment" disabled="True"/>
+
       </properties>
     </glade-widget-class>
 
