@@ -1,5 +1,7 @@
 2005-03-07  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
+	* examples/Faren/faren.py: ported the basic Temperature example
+
 	* examples/Simple/simple.py: ported another example to Kiwi2
 
 2005-03-05  Lorenzo Gil Sanchez  <lgs@sicem.biz>
