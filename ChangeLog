@@ -1,5 +1,7 @@
 2005-03-24  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
+	* Kiwi2/examples/PersonalInformation: validation example
+	
 	* Kiwi2/Widgets/Entry.py: inform the user if he made a mistake while
 	typing a entry by setting the background of the entry and adding a
 	tooltip with a message explaining the error
