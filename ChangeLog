@@ -1,3 +1,8 @@
+2005-02-18  Lorenzo Gil Sanchez  <lgs@sicem.biz>
+
+	* examples/News/news.py: adapted to Kiwi2. Also use TreeView instead
+	of CList
+
 2005-02-17  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
 	* Kiwi2/Views.py: forget about GazpachoViews. Make GladeView and
