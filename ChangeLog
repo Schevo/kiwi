@@ -1,3 +1,10 @@
+2005-03-03  Lorenzo Gil Sanchez  <lgs@sicem.biz>
+
+	* examples/News/news4.py: new version using a GladeSlaveDelegate with
+	the KiwList in the file news_list.glade. Note how the column
+	definitions are in the glade file this time and how we setup
+	the signals of the KiwiList as any other widget.
+
 2005-03-02  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
 	* Kiwi2/List.py: several changes to make the Columns serializable and
