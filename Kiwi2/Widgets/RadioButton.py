@@ -48,6 +48,8 @@ class RadioButton(gtk.RadioButton, WidgetProxyMixin):
     def update(self, data):
         # first, trigger some basic validation
         WidgetProxyMixin.update(self, data)
+        if data is None:
+            return
         data = self.type2str(data)
         for rb in self.get_group():
             if rb.get_data_value() == data:

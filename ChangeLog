@@ -1,3 +1,11 @@
+2001-12-02  Daniel Saran R. da Cunha  <daniel@async.com.br>
+
+	* Kiwi2/Widgets/WidgetProxy.py:  don't try to set the widget content 
+	if the data is None
+
+	* Kiwi2/Widgets/RadioButton.py: don't update the view if there is no
+	data in the model 
+
 2005-03-29  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
 	* Kiwi2/Widgets/RadioButton.py (RadioButton.read): fixed small stylist

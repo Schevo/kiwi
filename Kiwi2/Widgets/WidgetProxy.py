@@ -59,9 +59,9 @@ class WidgetProxyMixin(object):
             _warn("Trying to set a widget with data None. This probably means "
                   "that the model has not been initialized")
             
-        if not isinstance(data, self._data_type):
-            raise TypeError("Data is supposed to be a %s but it is %s: %s" % \
-                            (self._data_type, type(data), data))
+        elif not isinstance(data, self._data_type):
+            raise TypeError("%s: Data is supposed to be a %s but it is %s: %s" % \
+                            (self.name, self._data_type, type(data), data))
 
     def read(self):
         """Get the content of the widget.
