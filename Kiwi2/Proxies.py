@@ -586,6 +586,11 @@ class Proxy:
             if not isinstance(widget, WidgetProxyMixin):
                 continue
 
+            data_type = widget.get_property('data-type')
+            if data_type is None:
+                raise TypeError("The KiwiWidget %s should have a data type "
+                                "set up" % widget)
+            
             attribute = widget.get_property('model-attribute')
             if not attribute:
                 # we don't listen for changes in this widget because

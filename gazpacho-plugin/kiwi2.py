@@ -19,6 +19,7 @@ widget_prefix = 'Kiwi'
 import gtk
 from gazpacho.custompropertyeditor import CustomPropertyEditor
 from gazpacho.util import get_bool_from_string_with_default
+from gazpacho.widget import get_widget_from_gtk_widget
 
 class DataTypeAdaptor(object):
     def set(self, context, kiwiwidget, value):
@@ -26,10 +27,10 @@ class DataTypeAdaptor(object):
 
     def create_editor(self, context):
         model = gtk.ListStore(str, object)
-        model.append((_('String'), 'str'))
-        model.append((_('Integer'), 'int'))
-        model.append((_('Float'), 'float'))
-        model.append((_('Boolean'), 'bool'))
+        model.append((_('String'), str))
+        model.append((_('Integer'), int))
+        model.append((_('Float'), float))
+        model.append((_('Boolean'), bool))
         combo = gtk.ComboBox(model)
         renderer = gtk.CellRendererText()
         combo.pack_start(renderer)
@@ -59,6 +60,12 @@ class DataTypeAdaptor(object):
         active_iter = combo.get_active_iter()
         value = combo.get_model().get_value(active_iter, 1)
         proxy.set_value(value)
+
+    def save(self, context, widget):
+        gwidget = get_widget_from_gtk_widget(widget)
+        data_type = gwidget.get_glade_property('data-type')
+        # data type is one of (str, float, int, bool)
+        return data_type._value.__name__
         
 class ColumnDefinitionsAdaptor(object):
     def __init__(self):

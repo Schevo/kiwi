@@ -1,5 +1,19 @@
 2005-03-22  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
+	* gazpacho-plugin/kiwi2.py (DataTypeAdaptor.create_editor): handle
+	data-types as objects, not as strings
+
+	* Kiwi2/Widgets/WidgetProxy.py: make data-type be an object property
+	instead of a string one.
+
+	* Kiwi2/Widgets/List.py: 
+	* Kiwi2/Widgets/datatypes.py: 
+	* Kiwi2/Widgets/__init__.py: put all the type functionality in
+	datatypes.py
+
+	* Kiwi2/Proxies.py (Proxy._setup_widgets): make sure all the
+	KiwiWidgets have a data-type
+
 	* Kiwi2/Widgets/ComboBox.py (ComboBoxEntry.__init__): fixed a typo
 
 2005-03-22  Johan Dahlin  <johan@async.com.br>

@@ -24,7 +24,7 @@
 
 from Kiwi2.accessors import kgetattr
 from Kiwi2 import ValueUnset
-from Kiwi2.Widgets import str2bool
+from Kiwi2.Widgets.datatypes import str2bool
 from Kiwi2.initgtk import gtk, gobject
 from Kiwi2.utils import gsignal, gproperty
 
