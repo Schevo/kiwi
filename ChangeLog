@@ -1,5 +1,8 @@
 2005-03-05  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
+	* examples/News/news4.py (Shell.__init__): provide an example of
+	keyactions
+
 	* Kiwi2/initgtk.py (quit_if_last): also quit if there is no toplevels
 	(e.g., this function was called after hiding the last toplevel)
 

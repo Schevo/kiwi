@@ -41,7 +41,13 @@ class ListSlave(GladeSlaveDelegate):
 class Shell(GladeDelegate):
     widgets = ["ok", "cancel", "header", "footer", "title"]
     def __init__(self):
-        GladeDelegate.__init__(self, "news_shell", delete_handler=quit_if_last)
+        keyactions = {
+            gtk.keysyms.a: self.on_ok__clicked,
+            gtk.keysyms.b: self.on_cancel__clicked,
+            }
+
+        GladeDelegate.__init__(self, "news_shell", delete_handler=quit_if_last,
+                               keyactions=keyactions)
 
         # paint header and footer; they are eventboxes that hold a
         # label and buttonbox respectively
