@@ -1,5 +1,8 @@
 2005-02-11  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
+	* Kiwi2/__init__.py (standard_widgets): fixed a bug about not importing
+	sys and using sys.stderr
+
 	* Kiwi2/AbstractViews.py (SignalBroker.__init__): refactor SignalBroker
 	__init__ method so subclasses can customize it
 	(SignalBroker._do_connections): new method that do all the connections

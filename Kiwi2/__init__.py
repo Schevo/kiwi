@@ -45,8 +45,9 @@ standard_widgets = {
 # Kiwi Combo, GtkRadioButton are non-standard and are handled specially
 # inside AbstractProxy
 
+from sys import stderr
 
 def _warn(msg):
-    sys.stderr.write("Kiwi warning: "+msg+"\n")
+    stderr.write("Kiwi warning: "+msg+"\n")
 
 gladepath = []
