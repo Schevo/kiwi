@@ -1,5 +1,8 @@
 2005-03-11  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
+	* Kiwi2/Views.py (GladeSignalBroker._connect_glade_signals): remove
+	the double connection
+
 	* tests/test_Delegate.py (DelegateTest.testButtons): add another test
 	to check if the callbacks are being called more than one time
 

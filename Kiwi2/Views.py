@@ -167,8 +167,6 @@ class GladeSignalBroker(SignalBroker):
                 dict[name] = method
         view.glade_adaptor.signal_autoconnect(dict)
 
-        self._autoconnect_by_method_name(view, methods)
-        
 
 class SlaveView(gobject.GObject):
     """
