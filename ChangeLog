@@ -1,5 +1,12 @@
 2005-02-17  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
+	* Kiwi2/Views.py: forget about GazpachoViews. Make GladeView and
+	GladeSlaveView use Gazpacho internally with delegation and don't use
+	AbstractGladeView anymore. I still need to implement attach_slave
+	with this delegation aproach.
+
+	* Kiwi2/Delegates.py: minor PEP-8 changes and change Kiwi to Kiwi2
+
 	* tests/run_all_tests.py: convenience script to run all of the tests
 
 	* tests/test_BaseViewInherit.py: adapted to run under unittest

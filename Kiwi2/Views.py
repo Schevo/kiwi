@@ -266,6 +266,10 @@ class AbstractView:
     # GTK+ proxies and convenience functions
     #
 
+    def show(self, *args):
+        """Shows the toplevel widget"""
+        self.toplevel.show()
+
     def show_all(self, *args):
         """Shows all widgets attached to the toplevel widget"""
         self.toplevel.show_all()
@@ -571,7 +575,7 @@ class AbstractView:
 #         widget.set_data("_kiwi_avoid_select", 1)
 #     
 
-class GladeManager:
+class AbstractGladeView:
     """
     Abstract class that does basic Glade file handling. It needs to
     take care of self.widgets as well, since we need to attach the widgets
@@ -583,7 +587,7 @@ class GladeManager:
     gladefile = None
     gladename = None
     tree = None
-    def __init__(self, view, gladefile, widgets):
+    def __init__(self, gladefile, widgets):
         """
         Inits the AbstractGladeView. Sets up gladefile, gladename,
         widgets and tree. Attaches named widgets from tree to
@@ -599,7 +603,7 @@ class GladeManager:
 
         # get base name of glade file
         basename = os.path.basename(gladefile)
-        filename = os.path.splitext(basename)
+        filename = os.path.splitext(basename)[0]
         
         gladefile = find_in_gladepath(filename + ".glade") 
         # GladeXML accepts a second parameter that allows you to specify
@@ -617,7 +621,7 @@ class GladeManager:
         for w in widgets:
             widget = self.tree.get_widget(w)
             if widget:
-                setattr(view, w, widget)
+                setattr(self, w, widget)
             else:
                 _warn("Widget %s was not found in glade widget tree." % w)
 
@@ -776,60 +780,6 @@ Creates a new SlaveView. Parameters:
 #
 #
 
-#class GladeSlaveView(AbstractGladeView, AbstractView):
-    #"""A SlaveView that is built upon a Glade file. The contents you
-#want to be used as a slave should be placed inside a placeholder
-#Window. The placeholder will be destroyed and self.toplevel 
-#will be assigned to the placeholder's original contents."""
-    #container_name = None
-    #def __init__(self, gladefile=None, container_name=None, widgets=None):
-        #"""
-        #Creates a new GladeSlaveView.
-
-        #- gladefile: the name of the glade filename; it will be searched for
-          #in the gladepath (GLADEPATH). If not supplied, the name of the
-          #gladefile will be used.
-
-        #- container_name: the name of the Window enclosing the slave. If
-          #not supplied, the same name as the gladefile name will be used.
-
-        #- widgets: the widgets list, which can also be assigned as a class
-          #attribute.
-
-        #The container_name parameter should indicate the name of this
-        #toplevel window. The slave will be removed from this placeholder, and
-        #self.toplevel will be assigned to it. The placeholder Window's destroy()
-        #method is called.
-        #"""
-
-        #if getattr(self, "toplevel", None):
-            #_warn("GladeSlaveView does not use the `toplevel' attribute; "
-                  #"instead, provide a container_name")
-
-        #AbstractGladeView.__init__(self, gladefile, widgets)
-
-        #container_name = container_name or self.container_name or self.gladename
-
-        ## GladeSlaveViews need to come inside a toplevel window, so we
-        ## pull our slave out from it, grab its groups and murder it later.
-        #shell = self.tree.get_widget(container_name)
-        #if not isinstance(shell, gtk.Window):
-            #raise TypeError,  "Container %s should be a Window, found %s" \
-                               #% (container_name, shell)
-
-        ## LLL changed in GTK+ 2.x
-        ##self._accel_groups = gtk_accel_groups_from_object(shell.get_toplevel()._o)
-        #self.toplevel = shell.get_children()[0]
-
-        #shell.remove(self.toplevel)
-        #shell.destroy()
-
-        #AbstractView.__init__(self, self.toplevel, widgets)
-
-#
-#
-#
-        
 class BaseView(AbstractView):
     """A view with a toplevel window."""
     win = None
@@ -975,61 +925,171 @@ class BaseView(AbstractView):
 #
 #
 
-#class GladeView(AbstractGladeView, BaseView):
-    #"""
-    #A complete view based on a Glade file, and which contains a
-    #top-level window."""
-    #def __init__(self, gladefile=None, toplevel_name=None, 
-                 #delete_handler=None, widgets=None):
-        #"""
-        #Creates a new GladeView. Parameters:
+from gazpacho.loader import widgettree
 
-            #- gladefile: name of the glade file we are loading. If the
-              #file name is not suffixed by '.glade', append it. If not
-              #set, use the 'glade' attribute of the instance.
-
-            #- toplevel_name: *name* of the top-level widget that will be
-              #considered the win member. Should correspond to a Window.
-              #If not set, uses the name of the gladefile (minus
-              #'.glade')
-
-              #Note that it is the *name* of the widget, not the widget itself: this is
-              #different from Base/SlaveView!
-
-            #- delete_handler: function to be called as a callback when
-              #delete is called on the toplevel. 
-
-            #- widgets: a list of strings that define widget names to get
-              #from the glade file and attach to the view as instance
-              #variables
-        #"""
-        #AbstractGladeView.__init__(self, gladefile, widgets)
+class GazpachoWidgetTree:
+    gladefile = None
+    gladename = None
+    tree = None
+    def __init__(self, view, gladefile, widgets):
+        self.view = view
         
-        #name = toplevel_name or self.gladename
-        #self.win = self.tree.get_widget(name)
-        #self._accel_groups = []
-
-        #if not self.win:
-            #msg = "%s must contain a widget called %s"
-            #raise SyntaxError, msg % (self.gladefile, name)
-        #if self.win.flags() & gtk.VISIBLE:
-            #_warn("widget %s (%s) is visible; that's probably "
-                  #"wrong" % (self.win, name))
+        gladefile = gladefile or self.gladefile
+        widgets = (widgets or self.view.widgets or [])[:]
+        
+        if not gladefile:
+            raise ValueError, "A gladefile wasn't provided."
+        elif not isinstance(gladefile, basestring):
+            raise TypeError, \
+                  "gladefile should be a string, found %s" % type(gladefile)
+        
+        # get base name of glade file
+        basename = os.path.basename(gladefile)
+        filename = os.path.splitext(basename)[0]
+        
+        gladefile = find_in_gladepath(filename + ".glade")
+        self.tree = widgettree.WidgetTree(gladefile)
+        if self.gladename is None:
+            self.gladename = filename
+        
+        # Attach widgets in the widgetlist to the view specified, so
+        # widgets = [label1, button1] -> view.label1, view.button1
+        for w in widgets:
+            widget = self.tree.get_widget(w)
+            if widget is not None:
+                setattr(self.view, w, widget)
+            else:
+                _warn("Widget %s was not found in glade widget tree." % w)
+        
+        self.widgets = widgets
+        self.gladefile = gladefile
+        
+    def get_widget_from_glade_tree(self, name):
+        """Retrieves the named widget from the View (or glade tree)"""
+        if self.tree is None:
+            raise TypeError, \
+                  "No tree defined for %s, did you call the constructor?" % self.view
+        name = name.repace('.', '_')
+        widget = self.tree.get_widget(name)
+        if widget is None:
+            raise AttributeError, \
+                  "Widget %s not found in view %s" % (name, self.view)
+        return widget
     
-        #try:
-            ## BaseView wants self.win defined
-            #BaseView.__init__(self, delete_handler=delete_handler)
-        #except KeyError: 
-            #raise KeyError, ("Some widgets were defined in self.widgets " 
-                             #"but not found in the glade tree (see previous "
-                             #"messenges to see which ones).")
-
-    #def show_all(self, *args):
-        #"""Don't use show_all on a GladeView; use show()"""
-        #raise AssertionError, ("You don't want to call show_all on a "
-                               #"GladeView. Use show() instead.")
+    def _attach_callbacks(self, controller):
+        self.__broker = GladeSignalBroker(self, controller)
+        
     
-    #def show_all_and_loop(self, *args):
-        #"""Don't use show_all_and_loop on a GladeView; use show_and_loop()"""
-        #raise AssertionError, ("You don't want to call show_all_and_loop "
-                               #"on GladeView.  Use show_and_loop() instead.")
+    #
+    # XXX write attach_slave
+    #
+
+class GladeSlaveView(AbstractGladeView, AbstractView):
+    """A SlaveView that is built upon a Glade file. The contents you
+    want to be used as a slave should be placed inside a placeholder
+    Window. The placeholder will be destroyed and self.toplevel 
+    will be assigned to the placeholder's original contents.
+    """
+    container_name = None
+    def __init__(self, gladefile=None, container_name=None, widgets=None):
+        """
+        Creates a new GladeSlaveView.
+
+        - gladefile: the name of the glade filename; it will be searched for
+          in the gladepath (GLADEPATH). If not supplied, the name of the
+          gladefile will be used.
+
+        - container_name: the name of the Window enclosing the slave. If
+          not supplied, the same name as the gladefile name will be used.
+
+        - widgets: the widgets list, which can also be assigned as a class
+          attribute.
+
+        The container_name parameter should indicate the name of this
+        toplevel window. The slave will be removed from this placeholder, and
+        self.toplevel will be assigned to it. The placeholder Window's destroy()
+        method is called.
+        """
+        
+        # try looking at toplevel property of AbstractView
+        if getattr(self, "toplevel", None) is not None:
+            _warn("GladeSlaveView does not use the `toplevel' attribute; "
+                  "instead, provide a container_name")
+
+        self.gazpacho = GazpachoWidgetTree(self, gladefile, widgets)
+
+        container_name = container_name or self.container_name \
+                       or self.gazpacho.gladename
+
+        # GladeSlaveViews need to come inside a toplevel window, so we
+        # pull our slave out from it, grab its groups and murder it later.
+        shell = self.gazpacho.tree.get_widget(container_name)
+        if not isinstance(shell, gtk.Window):
+            raise TypeError, "Container %s should be a Window, found %s" \
+                  % (container_name, shell)
+
+        # LLL changed in GTK+ 2.x
+        #self._accel_groups = gtk_accel_groups_from_object(shell.get_toplevel()._o)
+        self.toplevel = shell.get_child()
+
+        shell.remove(self.toplevel)
+        shell.destroy()
+
+        AbstractView.__init__(self, self.toplevel, widgets)
+
+class GladeView(BaseView): # sane single inheritance
+    """A complete view based on a Glade file, and which contains a
+    top-level window.
+    
+    Internally it has a instance of GazpachoWidgetTree to do the 
+    the work related to the glade file
+    """
+    
+    def __init__(self, gladefile=None, toplevel_name=None,
+                 delete_handler=None, widgets=None):
+        """Creates a new GazpachoView. Parameters:
+            
+            - gladefile: name of the glade file we are loading. If the
+              file name is not suffixed by '.glade', append it. If not
+              set, use the 'glade' attribute of the instance.
+              
+            - toplevel_name: *name* of the top level widget that will be
+              considered the win member. Should correspond to a Window.
+              If not set, uses the name of the gladefile (without '.glade')
+              
+              Note that it is the *name* of the widget, not the widget itself:
+              this is different from Base/SlaveView!
+              
+            - delete_handler: function to be called as a callback when
+              delete is called on the top level
+              
+            - widgets: a list of strings that define widget names to get
+              from the glade file and attach to the view as instance
+              variables
+        """
+        
+        self.gazpacho = GazpachoWidgetTree(self, gladefile, widgets)
+        
+        name = toplevel_name or self.gazpacho.gladename
+        self.win = self.gazpacho.tree.get_widget(name)
+        self._accel_groups = []
+        
+        if self.win is None:
+            msg = "%s must contain a widget called %"
+            raise SyntaxError, msg % (self.gladefile, name)
+        if self.win.flags() & gtk.VISIBLE:
+            _warn("widget %s (%s) is visible; that's probably "
+                  "wrong" % (self.win, name))
+            
+        try:
+            # BaseView wants self.win defined
+            BaseView.__init__(self, delete_handler=delete_handler)
+        except KeyError:
+            raise KeyError, ("Some widgets were defined in self.widgets "
+                             "but not found in the glade tree (see previous "
+                             "messages to see which ones).")
+        
+    def show_all(self, *args):
+        """Don't use show_all on a GazpachoView; use show()"""
+        raise AssertionError, ("You don't want to call show_all on a "
+                               "GazpachoView. Use show() instead.")
