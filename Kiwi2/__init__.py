@@ -22,40 +22,26 @@
 # Author(s): Christian Reis <kiko@async.com.br>
 #
 
+USE_MX = False
+
 class ValueUnset:
     """To differentiate from places where None is a valid default. Used
     mainly in the Kiwi Proxy"""
     pass
 
-# this functions will live here until we find a better place
-def str2bool(value, default_value=True):
-    if value.upper() in ('TRUE', '1'):
-        return True
-    elif value.upper() in ('FALSE', '0'):
-        return False
-    else:
-        return default_value
-
-def str2enum(value_name, enum_class):
-    for value, enum in enum_class.__enum_values__.items():
-        if value_name in (enum.value_name, enum.value_nick):
-            return enum
-
-def str2type(value, default_type=str):
-    type_map = {'str': str, 'int': int, 'float': float}
-    return type_map.get(value, default_type)
+def get_decimal_separator():
+    return '.'
 
 from Kiwi2.initgtk import gtk
 #from Kiwi2.WidgetProxies import Entry, Text, CheckButton, OptionMenu
-#from Kiwi2.WidgetProxies.Base import ConversionError
 
 from Kiwi2.version import version
 kiwi_version = version
 
-from Kiwi2.List import List
+#from Kiwi2.Widgets import List, Entry
 
 standard_widgets = {
-    #gtk.Entry        : Entry.EntryProxy,
+#    gtk.Entry        : Entry,
     #gtk.Combo        : Entry.ComboProxy,
     #gtk.Label        : Entry.LabelProxy,
     #gtk.SpinButton   : Entry.SpinButtonProxy,
@@ -88,3 +74,7 @@ def set_gladepath(path):
     """
     global gladepath
     gladepath = path
+
+def get_gladepath():
+    global gladepath
+    return gladepath
