@@ -930,6 +930,12 @@ eview that needs to
         self.treeview.thaw_notify()
         return ret
 
+    def clear(self):
+        """Removes all the instances of the list"""
+        self.treeview.freeze_notify()
+        self.model.clear()
+        self.treeview.thaw_notify()
+        
 gobject.type_register(List)
 
 if __name__ == '__main__':

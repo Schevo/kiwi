@@ -124,6 +124,16 @@ class DataTests(TestCase):
         self.assertRaises(ValueError, self.list.remove_instance,
                           existing_person)
         
+
+    def testClearList(self):
+        global delay, persons
+
+        self.list.add_list(persons)
+        refresh_gui(delay)
+
+        self.list.clear()
+
+        self.assertEqual(len(self.list), 0)
         
 if __name__ == '__main__':
     import sys

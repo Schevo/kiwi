@@ -1,5 +1,10 @@
 2005-03-18  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
+	* tests/test_List.py (DataTests.testClearList): added test for the
+	clear method
+
+	* Kiwi2/Widgets/List.py (List.clear): added
+
 	* Kiwi2/Views.py (SignalBroker._autoconnect_by_method_name): allow
 	to connect to the actions objects and also improve error message
 	when a method's signature is bad
