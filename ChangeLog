@@ -1,5 +1,8 @@
 2005-03-05  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
+	* Kiwi2/Delegates.py: add a keyactions argument to all the Delegates
+	so we can use it for the Controller
+
 	* examples/News/news4.py (Shell.__init__): provide an example of
 	keyactions
 

@@ -36,45 +36,47 @@ class SlaveDelegate(SlaveView, BaseController):
     single package. It does not possess a top-level window, but is instead
     intended to be plugged in to a View or Delegate using attach_slave().
     """
-    def __init__(self, toplevel=None, widgets=[]):
+    def __init__(self, toplevel=None, widgets=[], keyactions=None):
         """Create new SlaveDelegate. toplevel is the toplevel widget,
         defaults to the value of the class' toplevel attribute, and if not
         present, raises AttributeError.
         """
         SlaveView.__init__(self, toplevel, widgets)
-        BaseController.__init__(self, view=self)
+        BaseController.__init__(self, view=self, keyactions=keyactions)
 
 class GladeSlaveDelegate(GladeSlaveView, BaseController):
     """A class that combines a controller and a GladeSlaveView. It is
     intended to be plugged into a View or Delegate using attach_slave().
     """
-    def __init__(self, gladefile=None, container_name=None, widgets=[]):
+    def __init__(self, gladefile=None, container_name=None, widgets=[],
+                 keyactions=None):
         """Creates a new GladeSlaveDelegate. gladefile is the name of
         the Glade XML file, and container_name is the name of the toplevel
         GtkWindow that holds the slave.
         """
         GladeSlaveView.__init__(self, gladefile, container_name, widgets)
-        BaseController.__init__(self, view=self)
+        BaseController.__init__(self, view=self, keyactions=keyactions)
 
 class Delegate(BaseView, BaseController):
     """A class that combines view and controller functionality into a
     single package. The Delegate class possesses a top-level window.
     """
-    def __init__(self, toplevel=None, delete_handler=None, widgets=[]):
+    def __init__(self, toplevel=None, delete_handler=None, widgets=[],
+                 keyactions=None):
         """Creates a new Delegate. For parameters , see BaseView.__init__"""
         BaseView.__init__(self, toplevel, delete_handler, widgets)
-        BaseController.__init__(self, view=self)
+        BaseController.__init__(self, view=self, keyactions=keyactions)
 
 class GladeDelegate(GladeView, BaseController):
     """A Delegate that uses a Glade file to specify its UI."""
     def __init__(self, gladefile=None, toplevel_name=None, 
-                 delete_handler=None, widgets=[]):
+                 delete_handler=None, widgets=[], keyactions=None):
         """Creates a new GladeDelegate. For parameters,
         see GladeView.__init__
         """
         GladeView.__init__(self, gladefile, toplevel_name, delete_handler, 
                            widgets)
-        BaseController.__init__(self, view=self)
+        BaseController.__init__(self, view=self, keyactions=keyactions)
 
 class ListDelegate(SlaveDelegate):
     """A View that builds a List around a specification for a class,
