@@ -1,3 +1,8 @@
+2005-03-16  Lorenzo Gil Sanchez  <lgs@sicem.biz>
+
+	* Kiwi2/Views.py (SlaveView._init_glade_adaptor): allow the container
+	name to have the same name as the gladefile. Fix a bug with Daniel code
+
 2005-03-11  Lorenzo Gil Sanchez   <lgs@sicem.biz>
 
 	* Kiwi2/Views.py (GladeSignalBroker._connect_glade_signals): remove

@@ -167,6 +167,8 @@ class GladeSignalBroker(SignalBroker):
                 dict[name] = method
         view.glade_adaptor.signal_autoconnect(dict)
 
+        self._autoconnect_by_method_name(view, methods)
+        
 
 class SlaveView(gobject.GObject):
     """
@@ -239,7 +241,7 @@ class SlaveView(gobject.GObject):
         self.glade_adaptor = GazpachoWidgetTree(self, self.gladefile,
                                                 self.widgets, self.gladename)
 
-        container_name = self.toplevel_name or self.gladename
+        container_name = self.toplevel_name or self.gladename or self.gladefile
             
         if container_name is None:
             msg = ("You provided a gladefile %s to grab the widgets from "
