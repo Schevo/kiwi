@@ -25,6 +25,7 @@
 from Kiwi2.initgtk import gtk, gobject
 from Kiwi2.Widgets.WidgetProxy import WidgetProxyMixin, implementsIProxy
 from Kiwi2.utils import gsignal, gproperty, set_foreground
+from Kiwi2 import _warn
 
 class Label(gtk.Label, WidgetProxyMixin):
     implementsIProxy()
@@ -33,6 +34,8 @@ class Label(gtk.Label, WidgetProxyMixin):
         gtk.Label.__init__(self)
         WidgetProxyMixin.__init__(self)
         self.set_use_markup(True)
+        self._attr_dic = {"style":None, "weight":None, "size":None}
+        self._size_list = ('xx-small', 'x-small', 'small', 'medium', 'large', 'x-large', 'xx-large')
 
     def read(self):
         return self.str2type(self.get_text())
@@ -43,11 +46,63 @@ class Label(gtk.Label, WidgetProxyMixin):
         
         self.set_text(self.type2str(data))
 
+    #def _attribute_string(self):
+        #self.attr_str = '<span style="italic" weight="bold" size=xx-small>'
+    
+    def _apply_attributes(self):
+        # join the attributes
+        attr_str = ''
+        # sorting is been done so we can be sure of the order of the attributes. Helps writing tests cases
+        keys = self._attr_dic.keys()
+        keys.sort()
+        for key in keys:
+            if self._attr_dic[key] is not None:
+                attr_str +=  '%s="%s" '%(key, self._attr_dic[key])
+        label_str = '<span %s>%s</span>'%(attr_str, self.get_text())
+        
+        self.set_markup(label_str)
+        
     def set_bold(self, value):
+        """ If True set the text to bold. False sets the text to normal """
         if value:
-            self.set_markup("<b>%s</b>" % self.get_text())
+            if self._attr_dic["weight"] is None:
+                self._attr_dic["weight"] = "bold"
+                self._apply_attributes()
         else:
-            self.set_markup(self.get_text())
+            if self._attr_dic["weight"] is not None:
+                self._attr_dic["weight"] = None
+                self._apply_attributes()
+
+    def set_italic(self, value):
+        """ If True set the text to italic. False sets the text to normal """
+        if value:
+            if self._attr_dic["style"] is None:
+                self._attr_dic["style"] = "italic"
+                self._apply_attributes()
+        else:
+            if self._attr_dic["style"] is not None:
+                self._attr_dic["style"] = None
+                self._apply_attributes()
+    
+    def set_size(self, size=None):
+        """ Set the size of the label. If size is empty the label will be set to the default size.
+        Accepted values are: xx-small, x-small, small, medium, large, x-large, xx-large
+        """
+        # sets to default size
+        if size is None:
+            self._attr_dic["size"] = None
+            return
+
+        if size not in self._size_list:
+            raise ValueError('Size of "%s" label is not valid' %self.get_text())
+        else:
+            self._attr_dic["size"] = size
+            self._apply_attributes()
+    
+    def set_text(self, text):
+        """ Overrides gtk.Label set_text method. Sets the new text of the label but keeps the formating """
+        gtk.Label.set_text(self, text)
+        self._apply_attributes()
 
     def set_color(self, color):
        set_foreground(self, color) 
