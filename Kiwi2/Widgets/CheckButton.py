@@ -33,10 +33,10 @@ class CheckButton(gtk.CheckButton, WidgetProxyMixin):
     def __init__(self):
         WidgetProxyMixin.__init__(self)
         gtk.CheckButton.__init__(self)
-        self.set_property("data-type", "bool")
+        self.set_property("data-type", bool)
     
     def set_data_type(self, data_type):
-        if data_type == "bool" or data_type is None:
+        if data_type == bool or data_type is None:
             WidgetProxyMixin.set_data_type(self, data_type)
         else:
             raise TypeError, "CheckButtons only accept boolean values"
