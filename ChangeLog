@@ -1,5 +1,8 @@
 2005-03-22  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
+	* Kiwi2/Widgets/ComboBox.py (ComboProxyMixin.prefill): allow 
+	prefill with the empty list
+
 	* examples/FavouriteColor/color2.py: example of ComboBoxEntry
 
 	* examples/FavouriteColor/color.py: example of ComboBox

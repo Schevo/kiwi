@@ -62,7 +62,7 @@ class ComboProxyMixin(WidgetProxyMixin):
 
         if len(itemdata) == 0:
             self.clear()
-
+            return
         
         if sort:
             # we can't sort tuples
