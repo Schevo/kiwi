@@ -169,7 +169,7 @@ class Column:
         del dict['attribute']
         return "<%s %s: %s>" % (self.__class__.__name__, attr, dict)
 
-class KiwiList(gtk.TreeView):
+class KiwiList(gtk.ScrolledWindow):
     """An enhanced version of GtkTreeView, which provides pythonic wrappers
     for accessing rows, and optional facilities for column sorting (with
     types) and column selection."""
@@ -183,22 +183,31 @@ class KiwiList(gtk.TreeView):
                  mode=gtk.SELECTION_BROWSE):
         """Create a new Kiwi TreeView.
         """
+        gtk.ScrolledWindow.__init__(self)
+        # we always want a vertical scrollbar. Otherwise the button on top
+        # of it doesn't make sense. This button is used to display the popup
+        # menu
+        self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
+        
         self._column_definitions = list(column_definitions)
 
         self.model = gtk.ListStore(object)
         self.model.set_sort_func(0, self._sort_function)
-        gtk.TreeView.__init__(self, self.model)
-        self.set_rules_hint(True)
+        self.treeview = gtk.TreeView(self.model)
+        self.treeview.show()
+        self.add(self.treeview)
+        
+        self.treeview.set_rules_hint(True)
 
         # these tooltips are used for the columns
         self._tooltips = gtk.Tooltips()
 
         # convinience connections
-        id = self.get_selection().connect("changed",
-                                          self._on_selection__changed)
+        id = self.treeview.get_selection().connect("changed",
+                                                   self._on_selection__changed)
         self._selection_changed_id = id
-        id = self.connect_after("row-activated",
-                                self._on_treeview__row_activated)
+        id = self.treeview.connect_after("row-activated",
+                                         self._on_treeview__row_activated)
         self._row_activated_id = id
 
         # create a popup menu for showing or hiding columns
@@ -232,9 +241,9 @@ class KiwiList(gtk.TreeView):
         self._setup()
 
         if instance_list is not None:
-            self.freeze_notify()
+            self.treeview.freeze_notify()
             self._load(instance_list)
-            self.thaw_notify()
+            self.treeview.thaw_notify()
 
         if self._sort_column_definition_index != -1:
             cd = self._column_definitions[self._sort_column_definition_index]
@@ -243,6 +252,7 @@ class KiwiList(gtk.TreeView):
         # Set selection mode last to avoid spurious events
         self.set_selection_mode(mode)
 
+#        self.__setup_popup_button()
 
     def _setup(self):
         """Post initialize the KiwiList. This should be called everytime
@@ -252,7 +262,7 @@ class KiwiList(gtk.TreeView):
         self._sort_column_definition_index = self._which_sort()
         i = self._sort_column_definition_index
         if i != -1:
-            treeview_column = self.get_column(i)
+            treeview_column = self.treeview.get_column(i)
             treeview_column.set_sort_indicator(True)
 
         # fine grain setup
@@ -261,14 +271,14 @@ class KiwiList(gtk.TreeView):
     def _setup_columns(self):
         autosize = True
         for i, column in enumerate(self._column_definitions):
-            treeview_column = self.get_column(i)
+            treeview_column = self.treeview.get_column(i)
             treeview_column.connect("clicked", self._on_column__clicked, i)
             if column.width is not None:
                 treeview_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
                 treeview_column.set_fixed_width(column.width)
                 autosize = False
             if column.tooltip is not None:
-                widget = self._get_column_button(treeview_column)
+                widget = self.__get_column_button(treeview_column)
                 if widget is not None:
                     self._tooltips.set_tip(widget, column.tooltip)
                     
@@ -318,7 +328,7 @@ class KiwiList(gtk.TreeView):
             treeview_column = gtk.TreeViewColumn()
 
             # we need to set our own widget because otherwise
-            # _get_column_button won't work
+            # __get_column_button won't work
             label = gtk.Label(col.title)
             label.show()
             treeview_column.set_widget(label)
@@ -327,7 +337,7 @@ class KiwiList(gtk.TreeView):
             treeview_column.pack_start(renderer)
             treeview_column.set_cell_data_func(renderer, self._set_cell_data,
                                                col.attribute)
-            self.append_column(treeview_column)
+            self.treeview.append_column(treeview_column)
             treeview_column.set_visible(col.visible)
             treeview_column.set_resizable(True)
             treeview_column.set_clickable(True)
@@ -341,6 +351,11 @@ class KiwiList(gtk.TreeView):
             menuitem.show()
             self._popup.append(menuitem)
 
+            # setup the button to show the popup menu
+            button = self.__get_column_button(treeview_column)
+            button.connect('button-press-event',
+                           self._on_header__button_press_event)
+            
     def _create_best_renderer_for_type(self, data_type, column_index):
         """Create the best CellRenderer for a given type.
         It also set the property of the renderer that depends on the model,
@@ -367,19 +382,22 @@ class KiwiList(gtk.TreeView):
         
         return renderer
 
-    def _set_cell_data(self, column, cellrenderer, model, iter, model_attribute):
-        """This method is called for every cell in the treeview that needs to be
-        renderer. No need to say it has to be *fast*
+    def _set_cell_data(self, column, cellrenderer, model, iter,
+                       model_attribute):
+        """This method is called for every cell in the treeview that needs to
+        be renderer. No need to say it has to be *fast*
         """
         renderer_prop = cellrenderer.get_data('renderer-property')
         instance = model.get_value(iter, 0)
         data = getattr(instance, model_attribute, None)
         cellrenderer.set_property(renderer_prop, data)
 
-    def _on_popup_button__clicked(self, button):
-        self._popup.popup(None, None, None, 0, 0)
+    def _on_header__button_press_event(self, button, event):
+        if event.button == 3:
+            self._popup.popup(None, None, None, event.button, event.time)
+            return True
 
-#        event.button, event.time)    
+        return False
 
     def _on_menuitem__activate(self, menuitem, treeview_column):
         treeview_column.set_visible(menuitem.get_active())
@@ -413,7 +431,7 @@ class KiwiList(gtk.TreeView):
         return data_iter
 
     def _select_and_focus_row(self, row_iter):
-        self.set_cursor(self.model.get_path(row_iter))
+        self.treeview.set_cursor(self.model.get_path(row_iter))
                     
     # sorting methods
     def _which_sort(self):
@@ -439,7 +457,7 @@ class KiwiList(gtk.TreeView):
             # this mean we are not sorting at all
             return
 
-        old_column = self.get_column(self._sort_column_definition_index)
+        old_column = self.treeview.get_column(self._sort_column_definition_index)
         old_column.set_sort_indicator(False)
         
         # reverse the old order or start with SORT_DESCENDING if there was no
@@ -508,11 +526,11 @@ class KiwiList(gtk.TreeView):
         # we don't want to autosize again, or we may cancel user
         # modifications.
         if self._autosize:
-            self.columns_autosize()
+            self.treeview.columns_autosize()
             self._autosize = False
 
     # hacks
-    def _get_column_button(self, column):
+    def __get_column_button(self, column):
         """Return the button widget of a particular TreeViewColumn.
 
         This hack is needed since that widget is private of the TreeView but
@@ -521,11 +539,64 @@ class KiwiList(gtk.TreeView):
         Use this function at your own risk
         """
         button = column.get_widget()
-        assert button is not None, "You must call column.set_widget() before calling _get_column_button"
+        assert button is not None, "You must call column.set_widget() before calling __get_column_button"
         while not isinstance(button, gtk.Button):
             button = button.get_parent()
 
         return button
+
+    # start of the hack to put a button on top of the vertical scrollbar
+    def __setup_popup_button(self):
+        """Put a button on top of the vertical scrollbar to show the popup
+        menu.
+        Internally it uses a POPUP window so you can tell how *Evil* is this.
+        """
+        self.__popup_window = gtk.Window(gtk.WINDOW_POPUP)
+        self.__popup_button = gtk.Button('*')
+        self.__popup_window.add(self.__popup_button)
+        self.__popup_window.show_all()
+        
+        self.forall(self.__find_vertical_scrollbar)
+        self.connect('size-allocate', self._on_scrolled_window__size_allocate)
+        self.connect('realize', self._on_scrolled_window__realize)
+
+    def __find_vertical_scrollbar(self, widget):
+        """This method is called from a .forall() method in the ScrolledWindow.
+        It just save a reference to the vertical scrollbar for doing evil
+        things later.
+        """
+        if isinstance(widget, gtk.VScrollbar):
+            self.__vscrollbar = widget
+
+
+    def __get_header_height(self):
+        treeview_column = self.treeview.get_column(0)
+        button = self.__get_column_button(treeview_column)
+        alloc = button.get_allocation()
+        return alloc.height
+
+    def _on_scrolled_window__realize(self, widget):
+        toplevel = widget.get_toplevel()
+        self.__popup_window.set_transient_for(toplevel)
+        self.__popup_window.set_destroy_with_parent(True)
+        
+    def _on_scrolled_window__size_allocate(self, widget, allocation):
+        """Resize the Vertical Scrollbar to make it smaller and let space
+        for the popup button. Also put that button there.
+        """
+        old_alloc = self.__vscrollbar.get_allocation()
+        height = self.__get_header_height()
+        new_alloc = gtk.gdk.Rectangle(old_alloc.x, old_alloc.y + height,
+                                      old_alloc.width,
+                                      old_alloc.height - height)
+        self.__vscrollbar.size_allocate(new_alloc)
+        # put the popup_window in its position
+        gdk_window = self.window
+        if gdk_window is not None:
+            x, y = gdk_window.get_origin()
+            self.__popup_window.move(x + old_alloc.x, y + old_alloc.y)
+        
+    # end of the popup button hack
     
     #
     # Public API
@@ -536,7 +607,7 @@ class KiwiList(gtk.TreeView):
         - select: whether or not the new item should appear selected.
         """
         # Freeze and save original selection mode to avoid blinking
-        self.freeze_notify()
+        self.treeview.freeze_notify()
         old_mode = self.get_selection_mode()
         self.set_selection_mode(gtk.SELECTION_SINGLE)
         
@@ -547,32 +618,33 @@ class KiwiList(gtk.TreeView):
 
         row_iter = self.model.append((instance,))
         if self._autosize:
-            self.columns_autosize()
+            self.treeview.columns_autosize()
 
         # Avoid spurious selection or signal emissions when swapping
         # selection mode
-        self.handler_block(self._row_activated_id)
+        selection = self.treeview.get_selection()
+        selection.handler_block(self._selection_changed_id)
         self.set_selection_mode(old_mode)
-        self.handler_unblock(self._row_activated_id)
+        selection.handler_unblock(self._selection_changed_id)
 
         if select:
             self._select_and_focus_row(row_iter)
-        self.thaw_notify()
+        self.treeview.thaw_notify()
 
     def set_column_visibility(self, column_index, visibility):
-        self.get_column(column_index).set_visible(visibility)
+        self.treeview.get_column(column_index).set_visible(visibility)
 
     def get_selection_mode(self):
-        return self.get_selection().get_mode()
+        return self.treeview.get_selection().get_mode()
     
     def set_selection_mode(self, mode):
-        self.get_selection().set_mode(mode)
+        self.treeview.get_selection().set_mode(mode)
 
     def unselect_all(self):
-        self.get_selection().unselect_all()
+        self.treeview.get_selection().unselect_all()
         
     def get_selected(self):
-        selection = self.get_selection()
+        selection = self.treeview.get_selection()
         model, paths = selection.get_selected_rows()
         if paths:
             result = [model.get_value(model.get_iter(p), 0) for p in paths]
@@ -598,7 +670,7 @@ class KiwiList(gtk.TreeView):
         # change mode to selection single to avoid generating spurious
         # select_row signals. yes, we could do this using emit_stop_by_name 
         # and then emit, but I think this is easier on the eyes
-        self.freeze_notify()
+        self.treeview.freeze_notify()
         old_mode = self.get_selection_mode()
         old_sel = self.get_selected()
         self.set_selection_mode(gtk.SELECTION_SINGLE)
@@ -610,11 +682,9 @@ class KiwiList(gtk.TreeView):
 
         # Avoid spurious selection or signal emissions when swapping
         # selection mode
-        if self._handler_sig:
-            self.handler_block(self._handler_sig)
+        self.treeview.handler_block(self._selection_changed_id)
         self.set_selection_mode(old_mode)
-        if self._handler_sig:
-            self.handler_unblock(self._handler_sig)
+        self.treeview.handler_unblock(self._selection_changed_id)
 
         if restore_selection:
             for instance in old_sel:
@@ -632,7 +702,7 @@ class KiwiList(gtk.TreeView):
             row_iter = self.model.get_iter_first()
             self._select_and_focus_row(row_iter)
             
-        self.thaw_notify()
+        self.treeview.thaw_notify()
         return ret
 
 gobject.type_register(KiwiList)
@@ -666,31 +736,7 @@ if __name__ == '__main__':
     # add an extra person
     l.add_instance(Person('Nando', 29, 'Santos', False))
 
-    sw = gtk.ScrolledWindow()
-    sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-    sw.add(l)
-
-    hack = {}
-    def find_vertical_scrollbar(widget, hack):
-        if isinstance(widget, gtk.VScrollbar):
-            hack['scrollbar'] = widget
-            
-    sw.forall(find_vertical_scrollbar, hack)
-
-    scrollbar = hack['scrollbar']
-
-#    button = l.get_
-    def fix_vertical_scrollbar(scrollbar):
-        alloc = scrollbar.get_allocation()
-        print alloc.x, alloc.y, alloc.width, alloc.height
-        new_alloc = gtk.gdk.Rectangle(alloc.x, alloc.y + 20,
-                                      alloc.width,
-                                      alloc.height - 20)
-        scrollbar.size_allocate(new_alloc)
-            
-    gobject.idle_add(fix_vertical_scrollbar, scrollbar)
-    
-    win.add(sw)
+    win.add(l)
     win.show_all()
     
     gtk.main()

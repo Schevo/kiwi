@@ -1,3 +1,9 @@
+2005-02-28  Lorenzo Gil Sanchez  <lgs@sicem.biz>
+
+	* Kiwi2/List.py (KiwiList.__init__): for now, use right click button
+	on the header to show the popup menu. Thunderbird style button on top
+	of the vertical scrollbar will be done later.
+
 2005-02-26  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
 	* examples/News/news3.py: adapt the example to use the new signal
