@@ -34,7 +34,7 @@ class WidgetProxyMixin(object):
     need a validation framework.
     """
 
-    def __init__(self, data_type=None, model_attribute=None,
+    def __init__(self, data_type=str, model_attribute=None,
                  default_value=None):
         self._default_value = default_value
         self.set_data_type(data_type)

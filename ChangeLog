@@ -1,3 +1,15 @@
+2001-11-27  Daniel Saran R. da Cunha  <daniel@async.com.br>
+	
+	* examples/SexSelection: New example to test Radio Button
+	
+	* Kiwi2/Widgets/WidgetProxy.py (WidgetProxyMixin.__init__): The default
+	data type is a string because we always need a default. Otherwise 
+	gazpacho doesn't save this property.
+
+	* gazpacho-plugin/kiwi2.xml: 
+	* Kiwi2/Widgets/__init__.py: 
+	* Kiwi2/Widgets/RadioButton.py : support for Radio Buttons
+
 2005-03-23  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
 	* Kiwi2/Widgets/datatypes.py: added a date type and functions to
