@@ -750,11 +750,12 @@ class AbstractGladeView:
 
 class SlaveView(AbstractView):
     """A view for a widget hierarchy without a Window or Dialog
-enclosing it. Instead, the SlaveView is intended to be attached to
-another View (or directly to a Window). The toplevel widget is
-offered through get_toplevel().
+    enclosing it. Instead, the SlaveView is intended to be attached to
+    another View (or directly to a Window). The toplevel widget is
+    offered through get_toplevel().
 
-SlaveView holds two public variables:
+    SlaveView holds two public variables:
+        
     - controller: which is the controller associated to this view. For
       delegates that subclass slaveview, this corresponds to self.
     - widgets: a list of widget names. This list describes which widgets
@@ -765,20 +766,16 @@ SlaveView holds two public variables:
       For proxies, names prefixed with a colon (:) are considered to be
       widgets associated to model attributes (with the same names, or
       with accessors with the appropriate names). See VirtualProxy for
-      more details."""
+      more details.
+      """
     def __init__(self, toplevel=None, widgets=None):
+        """Creates a new SlaveView. Parameters:
+            - toplevel: the toplevel widget for this view.
         """
-Creates a new SlaveView. Parameters:
-    - toplevel: the toplevel widget for this view.
-"""
         AbstractView.__init__(self, toplevel, widgets)
         
-        # LLL This hase changed in GTK+ 2.x
-        #self._accel_groups = gtk_accel_groups_from_object(self.toplevel._o)
+        self._accel_groups = gtk.accel_groups_from_object(self.toplevel)
 
-#
-#
-#
 
 class BaseView(AbstractView):
     """A view with a toplevel window."""
@@ -969,7 +966,7 @@ class GazpachoWidgetTree:
         if self.tree is None:
             raise TypeError, \
                   "No tree defined for %s, did you call the constructor?" % self.view
-        name = name.repace('.', '_')
+        name = name.replace('.', '_')
         widget = self.tree.get_widget(name)
         if widget is None:
             raise AttributeError, \
@@ -979,10 +976,105 @@ class GazpachoWidgetTree:
     def _attach_callbacks(self, controller):
         self.__broker = GladeSignalBroker(self, controller)
         
-    
-    #
-    # XXX write attach_slave
-    #
+
+    def attach_slave(self, name, slave):
+        """Attaches a slaveview to the current view, substituting the
+        widget specified by name.  the widget specified *must* be a
+        eventbox; its child widget will be removed and substituted for
+        the specified slaveview's toplevel widget::
+
+         .-----------------------. the widget that is indicated in the diagram
+         |window/view (self.view)| as placeholder will be substituted for the 
+         |  .----------------.   | slaveview's toplevel.
+         |  | eventbox (name)|   |  .-----------------.
+         |  |.--------------.|      |slaveview (slave)| 
+         |  || placeholder  <----.  |.---------------.|
+         |  |'--------------'|    \___ toplevel      ||
+         |  '----------------'   |  ''---------------'|
+         '-----------------------'  '-----------------'
+
+        the original way of attachment (naming the *child* widget
+        instead of the eventbox) is still supported for compatibility
+        reasons but will print a warning.
+        """
+        if not isinstance(slave, (SlaveView, GladeSlaveView)):
+            _warn("slave specified must be a SlaveView "
+                  "or GladeSlaveView, found %s""" % slave) 
+
+        if not hasattr(slave, "get_toplevel"):
+            raise TypeError, "Slave does not have a get_toplevel method"
+
+        shell = slave.get_toplevel()
+
+        if isinstance(shell, gtk.Window): # view with toplevel window
+            new_widget = shell.get_child()
+            shell.remove(new_widget) # remove from window to allow reparent
+        else: # slaveview
+            new_widget = shell
+
+        placeholder  = self.get_widget_from_glade_tree(name)
+        if not placeholder:
+            raise attributeerror, \
+                  "slave container widget `%s' not found" % name
+        parent = placeholder.get_parent()
+
+        if slave._accel_groups:
+            # take care of accelerator groups; attach to parent window if we
+            # have one; if embedding a slave into another slave, store its
+            # accel groups; otherwise complain if we're dropping the accelerators
+            win = parent.get_toplevel()
+            if isinstance(win, gtk.Window):
+                # use idle_add to be sure we attach the groups as late
+                # as possible and avoid reattaching groups -- see
+                # comment in _attach_groups.
+                gtk.idle_add(self._attach_groups, win, slave._accel_groups)
+            elif isinstance(self.view, (SlaveView, GladeSlaveView)):
+                self.view._accel_groups.extend(slave._accel_groups)
+            else:
+                _warn("attached slave %s to parent %s, but parent lacked "
+                      "a window and was not a slave view" % (slave, self))
+            slave._accel_groups = []
+
+        if isinstance(placeholder, gtk.EventBox):
+            # standard mechanism
+            child = placeholder.get_child()
+            if child is not None:
+                placeholder.remove(child)
+            placeholder.add(new_widget)
+        elif isinstance(parent, gtk.EventBox):
+            # backwards compatibility
+            _warn("attach_slave's api has changed: read docs, update code!")
+            parent.remove(placeholder)
+            parent.add(new_widget)
+        else:
+            raise typeerror, \
+                "widget to be replaced must be wrapped in eventbox"
+     
+        # call slave's callback
+        slave.on_attach(self)
+
+        # return placeholder we just removed
+        return placeholder
+
+    def _attach_groups(self, win, accel_groups):
+        # get groups currently attached to the window; we use them
+        # to avoid reattaching an accelerator to the same window, which
+        # generates messages like:
+        #
+        # gtk-critical **: file gtkaccelgroup.c: line 188
+        # (gtk_accel_group_attach): assertion `g_slist_find
+        # (accel_group->attach_objects, object) == null' failed.
+        #
+        # interestingly, this happens many times with notebook,
+        # because libglade creates and attaches groups in runtime to
+        # its toplevel window.
+        current_groups = gtk.accel_groups_from_object(win)
+        for group in accel_groups:
+            if group in current_groups:
+                # skip group already attached
+                continue
+            win.add_accel_group(group)
+
 
 class GladeSlaveView(AbstractGladeView, AbstractView):
     """A SlaveView that is built upon a Glade file. The contents you
@@ -1093,3 +1185,6 @@ class GladeView(BaseView): # sane single inheritance
         """Don't use show_all on a GazpachoView; use show()"""
         raise AssertionError, ("You don't want to call show_all on a "
                                "GazpachoView. Use show() instead.")
+
+    def attach_slave(self, name, slave):
+        self.gazpacho.attach_slave(name, slave) # delegation powered

@@ -1,5 +1,8 @@
 2005-02-18  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
+	* Kiwi2/Views.py: implement attach_slave for GazpachoTree and so for
+	GladeView and GladeSlaveView
+
 	* Kiwi2/initgtk.py (quit_if_last): only see TOPLEVEL windows, no
 	POPUPs
 
