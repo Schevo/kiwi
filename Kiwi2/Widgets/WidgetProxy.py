@@ -42,7 +42,12 @@ class WidgetProxyMixin(object):
             self._default_value_set = False
         else:
             self._default_value_set = True            
+
+        # we need initial values so this variables always exist
+        self._data_type = None
+        self._model_attribute = None
         
+        # now we setup the variables with our parameters
         self.set_data_type(data_type)
         self.set_model_attribute(model_attribute)
         
@@ -79,6 +84,7 @@ class WidgetProxyMixin(object):
             raise AttributeError("Invalid property name: %s" % pspec.name)
 
     def do_set_property(self, pspec, value):
+        print "do_set_property", pspec, type(value)
         prop_name = pspec.name.replace("-", "_")
         try:
             getattr(self, "set_%s" % prop_name)(value)
@@ -89,6 +95,11 @@ class WidgetProxyMixin(object):
         return self._data_type
 
     def set_data_type(self, data_type):
+        """Set the data type for the widget
+        
+        data_type can be None, a type object or a string with the name of the
+        type object, so None, "<type 'str'>" or 'str'
+        """
         if data_type is None:
             self._data_type = None
             return
