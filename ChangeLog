@@ -1,3 +1,15 @@
+2005-03-24 Gustavo Rahal <gustavo@async.com.br>
+	
+	* Kiwi2/__init__.py: fixed KIWI_GLADE_PATH
+	* Kiwi2/Widgets/Wizard.py: new wizard widget
+	* Kiwi2/Widgets/Wizard.glade: glade file that defines the structure of
+	the wizard.
+	* Kiwi2/examples/Wizard: directory with a new three step wizard example
+	* Kiwi2/Widgets/CheckButton.py: since default data-types of widgets are
+	string is was necessary a modication on the constructor to set to
+	boolean
+	* Kiwi2/Widgets/__init__.py: added Wizard widget
+
 2005-03-24  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
 	* Kiwi2/Widgets/WidgetProxy.py (WidgetProxyMixin.update): add a warning

@@ -31,7 +31,8 @@ class CheckButton(gtk.CheckButton, WidgetProxyMixin):
     gsignal('toggled', 'override')
         
     def __init__(self):
-        WidgetProxyMixin.__init__(self)
+        # changed default data_type because checkbuttons can only accept bool values
+        WidgetProxyMixin.__init__(self, data_type=bool)
         gtk.CheckButton.__init__(self)
         self.set_property("data-type", bool)
     
