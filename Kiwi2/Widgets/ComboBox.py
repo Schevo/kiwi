@@ -118,7 +118,7 @@ class ComboProxyMixin(WidgetProxyMixin):
             if model.get_value(it, 0) == label:
                 self.set_active_iter(it)
                 return
-            it = model.next_iter(it)
+            it = model.iter_next(it)
 
         raise KeyError, "No item correspond to label %s" % label
     
@@ -132,7 +132,14 @@ class ComboProxyMixin(WidgetProxyMixin):
             it = model.next_iter(it)
 
         raise KeyError, "No item correspond to data %s" % repr(label)
-    
+
+    def get_selected_data(self):
+        model = self.get_model()
+        iter = self.get_active_iter()
+        if not iter:
+            return
+        return model.get(iter, 1)[0]
+            
 class ComboBox(gtk.ComboBox, ComboProxyMixin):
     implementsIProxy()
     gsignal('changed', 'override')
