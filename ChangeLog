@@ -1,3 +1,10 @@
+2005-03-21  Evandro Vale Miquelito  <evandro@async.com.br>
+
+	* Kiwi2/Widgets/List.py (List.update_instance): A small fix for
+	update_instance method. Now we verify if the instance even
+	exists in the list.
+
+
 2005-03-21  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
 	* tests/test_List.py (DataTests.testContains): added a test for
