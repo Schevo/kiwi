@@ -64,6 +64,17 @@ class ClickCounter(Delegates.Delegate):
     def on_button__clicked(self, *args):
         self.clicks += 1
 
+class GladeClickCounter(Delegates.Delegate):
+    def __init__(self):
+        Delegates.Delegate.__init__(self, gladefile="simple_button",
+                                    widgets=['button'],
+                                    delete_handler=quit_if_last)
+
+        self.clicks = 0
+
+    def on_button__clicked(self, *args):
+        self.clicks += 1
+        
 # this is the delay between each refresh of the screen in seconds
 delay = 0
 
@@ -83,6 +94,20 @@ class DelegateTest(TestCase):
     def testClickCounter(self):
         global delay
         clickcounter = ClickCounter()
+        clickcounter.show_all()
+        refresh_gui(delay)
+        
+        # one for the boys
+        clickcounter.button.clicked()
+        self.assertEqual(clickcounter.clicks, 1)
+
+        # one for the girls
+        clickcounter.button.clicked()
+        self.assertEqual(clickcounter.clicks, 2)
+
+    def testClickCounterGlade(self):
+        global delay
+        clickcounter = GladeClickCounter()
         clickcounter.show_all()
         refresh_gui(delay)
         
