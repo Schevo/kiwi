@@ -1,0 +1,4 @@
+2005-02-05  Lorenzo Gil Sanchez  <lgs@sicem.biz>
+
+	* setup.py: remove non used imports
+

@@ -4,15 +4,13 @@
 # Code by Async Open Source <http://www.async.com.br>
 # setup.py writen by Christian Reis <kiko@async.com.br>
 
-import string
-from commands import getoutput
-from distutils.core import setup, Extension
+from distutils.core import setup
 
 execfile("Kiwi2/version.py")
 
 setup(
     name = "Kiwi2",
-    version =  string.join(map(str, version), '.'),
+    version =  ".".join(map(str, version)),
     description = "A framework and a set of enhanced widgets based on PyGTK",
     long_description = """
     Kiwi2 offers a set of enhanced widgets for
