@@ -644,7 +644,9 @@ eview that needs to
 
     def __nonzero__(self):
         return True
-    
+
+
+    # utility methods used by public api methods   
     def _load(self, instance_list, progress_handler=None):
         if not instance_list: # do nothing if empty list or None provided
             return
@@ -666,6 +668,17 @@ eview that needs to
             self.treeview.columns_autosize()
             self._autosize = False
 
+    def _get_iter_from_instance(self, instance):
+        """Returns the treeiter where this instance is using a linear search.
+        If the instance is not in the list it returns None
+        """
+        row_iter = self.model.get_iter_first()
+        while row_iter:
+            model_instance = self.model.get_value(row_iter, 0)
+            if model_instance is instance:
+                return row_iter
+            row_iter = self.model.iter_next(row_iter)
+        
     # hacks
     def __get_column_button(self, column):
         """Return the button widget of a particular TreeViewColumn.
@@ -823,6 +836,25 @@ eview that needs to
             self._select_and_focus_row(row_iter)
         self.treeview.thaw_notify()
 
+    def remove_instance(self, instance):
+        """Remove an instance from the list.
+        If the instance is not in the list it returns False. Otherwise it
+        returns True.
+        """
+        if not self._has_enough_type_information():
+            msg = ("There is no columns neither data on the list yet so you "
+                   "can not remove any instance")
+            raise RuntimeError, msg
+
+        # linear search for the instance to remove
+        instance_iter = self._get_iter_from_instance(instance)
+        if instance_iter is None:
+            msg = "The instance %s is not in the list so I can not remove it"
+            raise ValueError, msg % instance
+
+        # now is safe to remove it
+        self.model.remove(instance_iter)
+        
     def set_column_visibility(self, column_index, visibility):
         self.treeview.get_column(column_index).set_visible(visibility)
 

@@ -126,17 +126,18 @@ class SignalBroker(object):
             if not widget:
                 raise AttributeError, \
                     "couldn't find widget %s in %s" % (w_name, view)
-            if not isinstance(widget, gtk.Widget):
+            if not isinstance(widget, (gtk.Widget, gtk.Action)):
                 raise AttributeError, \
-                    "%s (%s) is not a widget and can't be connected to" \
+                    "%s (%s) is not a widget or an action and can't be connected to" \
                         % (w_name, widget)
             # Must use getattr; using the class method ends up with it
             # being called unbound and lacking, thus, "self".
-            if after:
-                id = widget.connect_after(signal, methods[fname])
-            else:
-                id = widget.connect(signal, methods[fname])
-            if not id:
+            try:
+                if after:
+                   widget.connect_after(signal, methods[fname])
+                else:
+                   widget.connect(signal, methods[fname])
+            except TypeError, e:
                 raise AttributeError, "Widget %s doesn't provide a signal %s" \
                                        % (widget.__class__, signal)
             if not self._autoconnected.has_key(widget):

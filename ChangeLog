@@ -1,5 +1,11 @@
 2005-03-18  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
+	* Kiwi2/Views.py (SignalBroker._autoconnect_by_method_name): allow
+	to connect to the actions objects and also improve error message
+	when a method's signature is bad
+
+	* Kiwi2/Widgets/List.py (List.remove_instance): added
+
 	* tests/test_List.py: added several tests for removing and adding data
 	to the list
 
