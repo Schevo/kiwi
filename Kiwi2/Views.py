@@ -67,7 +67,7 @@ Kiwi.set_gladepath() correctly""" % ( filename, gladepath )
 # Signal brokers
 #
 
-class SignalBroker:
+class SignalBroker(object):
     def __init__(self, view, controller):
         methods = controller._get_all_methods()
         self._do_connections(view, methods)
