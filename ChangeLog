@@ -1,5 +1,8 @@
 2005-03-18  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
+	* tests/test_List.py: added several tests for removing and adding data
+	to the list
+
 	* tests/test_Action.py: test that menubars and toolbars work with
 	Kiwi autoconnect mechanism
 
