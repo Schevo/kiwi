@@ -1,3 +1,17 @@
+2005-02-11  Lorenzo Gil Sanchez  <lgs@sicem.biz>
+
+	* Kiwi2/AbstractViews.py (SignalBroker.__init__): refactor SignalBroker
+	__init__ method so subclasses can customize it
+	(SignalBroker._do_connections): new method that do all the connections
+	this signal broker is supposed to make. In the base SignalBroker it
+	only calls _autoconnect_by_method_name but in GladeSignalBroker it
+	also calls _connect_glade_signals
+
+2005-02-10  Lorenzo Gil Sanchez  <lgs@sicem.biz>
+
+	* Kiwi2/initgtk.py: added explanation on why do we have a separate
+	initgtk.py module
+
 2005-02-05  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
 	* setup.py: remove non used imports

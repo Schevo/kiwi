@@ -70,8 +70,12 @@ Kiwi.set_gladepath() correctly""" % ( filename, gladepath )
 class SignalBroker:
     def __init__(self, view, controller):
         methods = controller._get_all_methods()
-        self._autoconnect_by_method_name(view, methods)
+        self._do_connections(view, methods)
 
+    def _do_connections(self, view, methods):
+        """This method allows subclasses to add more connection mechanism"""
+        self._autoconnect_by_method_name(view, methods)
+        
     def _autoconnect_by_method_name(self, view, methods):
         """
         Offers autoconnection of widget signals based on function names.
@@ -138,10 +142,11 @@ class SignalBroker:
 class GladeSignalBroker(SignalBroker):
     def __init__(self, view, controller):
         SignalBroker.__init__(self, view, controller)
-        # XXX: avoid duplicated call?
-        methods = controller._get_all_methods()
-        self._connect_glade_signals(view, methods)
 
+    def _do_connections(self, view, methods):
+        super(GladeSignalBroker, self)._do_connections(view, methods)
+        self._connect_glade_signals(view, methods)
+        
     def _connect_glade_signals(self, view, methods):
         # mainly because the two classes cannot have a common base
         # class. studying the class layout carefully or using
@@ -339,14 +344,13 @@ class AbstractView:
     #
     # Color control
     #
-
     def set_background(self, widget, color, state=gtk.STATE_NORMAL):
         """sets the background color for a widget"""
-        self.set_color(widget, color, "bg", state)
+        widget.modify_bg(state, gtk.gdk.color_parse(color))
 
     def set_foreground(self, widget, color, state=gtk.STATE_NORMAL):
         """sets the foreground color for a widget"""
-        self.set_color(widget, color, "fg", state)
+        widget.modify_fg(state, self.gdk.color_parse(color))
 
     def set_color(self, widget, color, attr_name, state=gtk.STATE_NORMAL):
         """
