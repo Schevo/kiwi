@@ -1,3 +1,10 @@
+2005-03-21  Lorenzo Gil Sanchez  <lgs@sicem.biz>
+
+	* Kiwi2/Widgets/List.py (List.update_instance): added update_instance
+
+	* tests/test_List.py (DataTests.testUpdatingOneInstance): added a test
+	for update_instance
+
 2005-03-18  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
 	* tests/test_List.py (DataTests.testClearList): added test for the

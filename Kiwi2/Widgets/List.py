@@ -854,6 +854,10 @@ eview that needs to
 
         # now is safe to remove it
         self.model.remove(instance_iter)
+
+    def update_instance(self, new_instance):
+        iter = self._get_iter_from_instance(new_instance)
+        self.model.row_changed(self.model.get_path(iter), iter)
         
     def set_column_visibility(self, column_index, visibility):
         self.treeview.get_column(column_index).set_visible(visibility)

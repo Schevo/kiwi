@@ -123,7 +123,6 @@ class DataTests(TestCase):
         existing_person = Person('Gustavo', 25)
         self.assertRaises(ValueError, self.list.remove_instance,
                           existing_person)
-        
 
     def testClearList(self):
         global delay, persons
@@ -134,6 +133,29 @@ class DataTests(TestCase):
         self.list.clear()
 
         self.assertEqual(len(self.list), 0)
+        
+
+    def testUpdatingOneInstance(self):
+        global delay, persons
+
+        self.list.add_list(persons)
+        refresh_gui(delay)
+
+        persons[0].age = 29
+        self.list.update_instance(persons[0])
+
+        refresh_gui(delay)
+        
+        # Do we have the same number of instances that we had before ?
+        self.assertEqual(len(self.list), len(persons))
+
+        # Trying to find our updated instance in the list
+        self.assertEqual(self.list[0].age, 29)
+
+        # let's be evil
+        new_person = Person('Nando', 32)
+        self.list.update_instance(new_person)
+
         
 if __name__ == '__main__':
     import sys
