@@ -1,0 +1,15 @@
+2005-03-15  Lorenzo Gil Sanchez  <lgs@sicem.biz>
+
+	* kiwi2.xml: add a libglade-module attribute since that is used now
+	for writing the 'requires' tag
+
+	* kiwi2.py: change the order of the arguments in the update_editor
+	methods since that was changed in Gazpacho
+
+2005-03-10  Lorenzo Gil Sanchez  <lgs@sicem.biz>
+
+	* Kiwi4Gazpacho/kiwi2.py: 
+	* Kiwi4Gazpacho/kiwi2.xml: added support for Kiwi Label and Kiwi Entry
+
+	* Kiwi4Gazpacho/README: added a note about how to create kiwi widget
+	icons

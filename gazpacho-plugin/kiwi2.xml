@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<glade-catalog name="kiwi2"
+               library="kiwi2"
+               libglade-module="Kiwi2.Widgets"
+               resource-path="/home/lgs/Kiwi2/gazpacho-plugin">
+  <glade-widget-classes>
+    <glade-widget-class name="Kiwi2+Widgets+List+List"
+                        generic-name="kiwilist"
+                        title="Kiwi List" >
+      <function name="fill-empty" type="ignore" />
+      <properties>
+
+        <property id="column-definitions" name="Column Definitions" translatable="False" adaptor-class="ColumnDefinitionsAdaptor">
+          <type>String</type>
+          <function name="get" type="ignore"/>
+          <function name="set" type="override"/>
+          <editor>
+            <function name="create" type="override"/>
+            <function name="update" type="override"/>
+          </editor>
+
+        </property>
+      </properties>
+    </glade-widget-class>
+    <glade-widget-class name="Kiwi2+Widgets+Entry+Entry"
+                        generic-name="kiwientry"
+                        title="Kiwi Entry" >
+      <properties>
+
+        <property id="data-type"
+                  name="Data Type"
+                  translatable="False"
+                  adaptor-class="DataTypeAdaptor">
+          <type>String</type>
+          <function name="get" type="ignore"/>
+          <function name="set" type="override"/>
+          <editor>
+            <function name="create" type="override"/>
+            <function name="update" type="override"/>
+          </editor>
+
+        </property>
+	<property id="model-attribute"
+                  name="Model Attribute"
+                  translatable="False" />
+
+      </properties>
+    </glade-widget-class>
+
+    <glade-widget-class name="Kiwi2+Widgets+Label+Label"
+                        generic-name="kiwilabel"
+                        title="Kiwi Label" >
+      <properties>
+
+        <property id="data-type"
+                  name="Data Type"
+                  translatable="False"
+                  adaptor-class="DataTypeAdaptor">
+          <type>String</type>
+          <function name="get" type="ignore"/>
+          <function name="set" type="override"/>
+          <editor>
+            <function name="create" type="override"/>
+            <function name="update" type="override"/>
+          </editor>
+
+        </property>
+	<property id="model-attribute"
+                  name="Model Attribute"
+                  translatable="False" />
+
+      </properties>
+    </glade-widget-class>
+
+  </glade-widget-classes>
+
+  <glade-widget-group name="kiwi2" title="Kiwi Widgets">
+    <glade-widget-class-ref name="Kiwi2+Widgets+Entry+Entry"/>
+    <glade-widget-class-ref name="Kiwi2+Widgets+Label+Label"/>
+    <glade-widget-class-ref name="Kiwi2+Widgets+List+List"/>
+  </glade-widget-group>
+  
+</glade-catalog>
