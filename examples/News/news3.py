@@ -63,8 +63,10 @@ class Shell(Delegates.GladeDelegate):
         
     def on_ok__clicked(self, *args):
         kiwilist = self.slave.get_toplevel()
-        item = kiwilist.get_selected()[0]
-        self.emit('result', item.url)
+        selected = kiwilist.get_selected()
+        if selected is not None:
+            item = selected[0]
+            self.emit('result', item.url)
         self.hide_and_quit()
 
     def on_cancel__clicked(self, *args):
