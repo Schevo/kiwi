@@ -132,20 +132,13 @@ class ComboProxyMixin(WidgetProxyMixin):
                 self.set_active_iter(row.iter)
                 break
         else:
-            raise KeyError("No item correspond to data %r" % data)
+            if row[COL_COMBO_DATA] is None:
+                #the user only prefilled the combo with strings
+                self.select_item_by_label(data)
+            else:
+                raise KeyError("No item correspond to data %r" % data)
 
-    def get_selected_label(self):
-        model = self.get_model()
-        iter = self.get_active_iter()
-        if iter:
-            return model.get(iter, COL_COMBO_LABEL)[0]
-            
-    def get_selected_data(self):
-        model = self.get_model()
-        iter = self.get_active_iter()
-        if iter:
-            return model.get(iter, COL_COMBO_DATA)[0]
-
+    
 class ComboBox(gtk.ComboBox, ComboProxyMixin):
     implementsIProxy()
     gsignal('changed', 'override')
@@ -161,35 +154,43 @@ class ComboBox(gtk.ComboBox, ComboProxyMixin):
     def do_changed(self):
         self.emit('content-changed')
         self.chain()
-        
+ 
     def read(self):
-        active_iter = self.get_active_iter()
-        if active_iter is not None:
-            text = self.get_model().get_value(active_iter, 0)
-            return self.str2type(text)
+        data = self.get_selected_data()
+        if data is not None:
+            return data
 
     def update(self, data):
-        # first, trigger some basic validation
-        WidgetProxyMixin.update(self, data)
-        model = self.get_model()
-        it = model.get_iter_first()
-        while it:
-            v = model.get_value(it, 0)
-            if v == data:
-                self.set_active_iter(it)
-                break
-            it = model.iter_next(it)
+        # We dont need validation because the user always choose a valid value
+        if data is not None:
+            self.select_item_by_data(data)
 
     def prefill(self, itemdata, sort=False):
         super(ComboBox, self).prefill(itemdata, sort)
-
+    
         # we always have something selected, by default the first item
         self.set_active(0)
         self.emit('content-changed')
 
     def clear(self):
         ComboProxyMixin.clear(self)
-        
+    
+    def get_selected_label(self):
+        model = self.get_model()
+        iter = self.get_active_iter()
+        if iter:
+            return model.get_value(iter, COL_COMBO_LABEL)
+
+    def get_selected_data(self):
+        model = self.get_model()
+        iter = self.get_active_iter()
+        if iter:
+            data = model.get_value(iter, COL_COMBO_DATA)
+            if data is None:
+                #the user only prefilled the combo with strings
+                return model.get_value(iter, COL_COMBO_LABEL)
+            return data    
+ 
 gobject.type_register(ComboBox)
 
 class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin):

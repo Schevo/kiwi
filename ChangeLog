@@ -1,3 +1,8 @@
+2005-03-30  Daniel Saran R. da Cunha  <daniel@async.com.br>
+
+	* Kiwi2/Widgets/ComboBox.py: ComboBox now use the data, when it exists,
+	instead of label of its items to update the model and view.
+
 2005-29-03  Gustavo Rahal <gustavo@async.com.br>
 	
 	* Kiwi2/Widgets/SpinButton.py: added Spin Button support to Kiwi
