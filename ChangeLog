@@ -1,3 +1,7 @@
+2005-03-22  Lorenzo Gil Sanchez  <lgs@sicem.biz>
+
+	* Kiwi2/Widgets/ComboBox.py (ComboBoxEntry.__init__): fixed a typo
+
 2005-03-22  Johan Dahlin  <johan@async.com.br>
 
 	* Kiwi2/Controllers.py:

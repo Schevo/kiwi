@@ -196,7 +196,7 @@ class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin):
     implementsIProxy()
     
     def __init__(self):
-        gtk.ComboBox.__init__(self)
+        gtk.ComboBoxEntry.__init__(self)
         ComboProxyMixin.__init__(self)
 
         self.set_text_column(0)
