@@ -1,10 +1,21 @@
+2005-03-22  Lorenzo Gil Sanchez  <lgs@sicem.biz>
+
+	* examples/FavouriteColor/color2.py: example of ComboBoxEntry
+
+	* examples/FavouriteColor/color.py: example of ComboBox
+
+	* kiwi2.xml: added combos to gazpacho-plugin
+	
+	* Kiwi2/Widgets/__init__.py: 
+	* Kiwi2/Widgets/ComboBox.py: first support for ComboBoxes 
+	(old OptionMenu) and ComboBoxEntries (old Combos)
+
 2005-03-21  Evandro Vale Miquelito  <evandro@async.com.br>
 
 	* Kiwi2/Widgets/List.py (List.update_instance): A small fix for
 	update_instance method. Now we verify if the instance even
 	exists in the list.
-
-
+	
 2005-03-21  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
 	* tests/test_List.py (DataTests.testContains): added a test for
@@ -44,6 +55,14 @@
 	* Kiwi2/Views.py (SlaveView._init_glade_adaptor): allow the container
 	name to have the same name as the gladefile. Fix a bug with Daniel code
 
+2005-03-15  Lorenzo Gil Sanchez  <lgs@sicem.biz>
+
+	* gazpacho-plugin/kiwi2.xml: add a libglade-module attribute since that
+	is used now for writing the 'requires' tag
+
+	* gazpacho-plugin/kiwi2.py: change the order of the arguments in the
+	update_editor methods since that was changed in Gazpacho
+	
 2005-03-11  Lorenzo Gil Sanchez   <lgs@sicem.biz>
 
 	* Kiwi2/Views.py (GladeSignalBroker._connect_glade_signals): remove
@@ -112,6 +131,13 @@
 	* Kiwi2/Proxies.py: change the VirtualProxy class to be the only Proxy
 	class and work by composition of the View classes
 
+	* gazpacho-plugin/kiwi2.py: 
+	* gazpacho-plugin/kiwi2.xml: added support for Kiwi Label and Kiwi
+	Entry
+
+	* gazpacho-plugin/README: added a note about how to create kiwi widget
+	icons
+	
 2005-03-07  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
 	* Kiwi2/List.py (List.__init__): fix a typo

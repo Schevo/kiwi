@@ -72,11 +72,33 @@
       </properties>
     </glade-widget-class>
 
+    <glade-widget-class name="Kiwi2+Widgets+ComboBox+ComboBox"
+                        generic-name="kiwicombobox"
+                        title="Kiwi Combo Box">
+      <properties>
+        <!-- These properties are buggie in GTK+ 2.4 -->
+        <property id="column-span-column" disabled="True" />
+        <property id="row-span-column" disabled="True" />
+      </properties>
+    </glade-widget-class>
+
+    <glade-widget-class name="Kiwi2+Widgets+ComboBox+ComboBoxEntry"
+                        generic-name="kiwicomboboxentry"
+                        title="Kiwi Combo Box Entry">
+      <properties>
+        <!-- These properties are buggie in GTK+ 2.4 -->
+        <property id="column-span-column" disabled="True" />
+        <property id="row-span-column" disabled="True" />
+      </properties>
+    </glade-widget-class>
+
   </glade-widget-classes>
 
   <glade-widget-group name="kiwi2" title="Kiwi Widgets">
     <glade-widget-class-ref name="Kiwi2+Widgets+Entry+Entry"/>
     <glade-widget-class-ref name="Kiwi2+Widgets+Label+Label"/>
+    <glade-widget-class-ref name="Kiwi2+Widgets+ComboBox+ComboBox"/>
+    <glade-widget-class-ref name="Kiwi2+Widgets+ComboBox+ComboBoxEntry"/>
     <glade-widget-class-ref name="Kiwi2+Widgets+List+List"/>
   </glade-widget-group>
   
