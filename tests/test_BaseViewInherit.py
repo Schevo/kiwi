@@ -1,9 +1,11 @@
 #!/usr/bin/env python
-import sys
-sys.path.insert(0, "..")
+from utils import refresh_gui
 
-from Kiwi import Delegates
-from Kiwi.initgtk import gtk
+from Kiwi2 import Delegates
+from Kiwi2.initgtk import gtk, quit_if_last
+
+from unittest import TestCase, TestSuite, makeSuite, TextTestRunner
+import sys
 
 class A:
     def on_foo__clicked(self, *args):
@@ -39,20 +41,35 @@ class Foo(X,Y,Delegates.Delegate):
         v.add(self.bar)
         self.win.add(v)
         self.x = self.y = "NOOO"
-        Delegates.Delegate.__init__(self, delete_handler=gtk.mainquit)
+        Delegates.Delegate.__init__(self, delete_handler=quit_if_last)
 
     def on_foo__clicked(self, *args):
         self.x = "FOO in Foo"
-        print "Foo clicked ok!"
     
     def on_bar__clicked(self, *args):
         self.y = "BAR in B"
-        print "Bar clicked ok!"
 
-f = Foo()
-f.foo.clicked()
-f.bar.clicked()
-assert f.x == "FOO in Foo", f.x
-assert f.y == "BAR in B", f.y
-f.show_all_and_loop()
-print "ok"
+# this is the delay between each refresh of the screen in seconds
+delay = 0
+
+class DelegateTest(TestCase):
+    def testButtons(self):
+        global delay
+        f = Foo()
+        f.show_all()
+        refresh_gui(delay)
+        f.foo.clicked()
+        refresh_gui(delay)
+        self.assertEqual(f.x, "FOO in Foo")
+        f.bar.clicked()
+        refresh_gui(delay)
+        self.assertEqual(f.y, "BAR in B")
+    
+if __name__ == '__main__':
+    import sys
+    if len(sys.argv) == 2:
+        delay = float(sys.argv[1])
+    suite = TestSuite()
+    suite.addTest(makeSuite(DelegateTest))
+    TextTestRunner(verbosity=2).run(suite)
+    

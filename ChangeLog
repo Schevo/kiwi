@@ -1,5 +1,9 @@
 2005-02-17  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
+	* tests/run_all_tests.py: convenience script to run all of the tests
+
+	* tests/test_BaseViewInherit.py: adapted to run under unittest
+
 	* examples/HeyPlanet/heygazpacho3.py: copy of heygazpacho3.py using
 	Gazpachoview
 
