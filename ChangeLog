@@ -1,5 +1,12 @@
 2005-03-22  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
+	* examples/NewsForm/newsform.py: added a size field to test
+	validations in integer entries
+
+	* Kiwi2/Widgets/WidgetProxy.py (WidgetProxyMixin.__init__): allow to
+	initialize a widget with None values for their properties so we
+	can correctly get the default value when setting the data type
+
 	* gazpacho-plugin/kiwi2.xml: disable text-column which is not useful
 	in ComboBoxEntry
 

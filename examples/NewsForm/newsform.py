@@ -5,11 +5,11 @@ from Kiwi2.initgtk import gtk, quit_if_last
 # Empty model; GladeProxy will use it to hold the attributes
 class NewsItem:
     """An instance representing an item of news. 
-       Attributes: title, author, url"""
+       Attributes: title, author, url, size"""
     pass
 
 item = NewsItem()
-my_widgets = ["title", "author", "url"]
+my_widgets = ["title", "author", "url", "size"]
 view = Views.BaseView(gladefile="newsform", widgets=my_widgets,
                       delete_handler=quit_if_last)
 view.add_proxy(item, my_widgets)
@@ -17,4 +17,4 @@ view.focus_topmost()
 view.show()
 gtk.main() # runs till window is closed as per delete_handler
 
-print 'Item: "%s" (%s) %s' % (item.title, item.author, item.url)
+print 'Item: "%s" (%s) %s %d' % (item.title, item.author, item.url, item.size)
