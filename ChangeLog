@@ -1,4 +1,4 @@
-2005-03-11  Lorenzo Gil Sanchez  <lgs@sicem.biz>
+2005-03-11  Lorenzo Gil Sanchez   <lgs@sicem.biz>
 
 	* Kiwi2/Views.py (GladeSignalBroker._connect_glade_signals): remove
 	the double connection
