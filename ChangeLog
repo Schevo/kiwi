@@ -1,3 +1,8 @@
+2005-03-23  Lorenzo Gil Sanchez  <lgs@sicem.biz>
+
+	* gazpacho-plugin/kiwi2.py (DataTypeAdaptor.create_editor): add support
+	for date types
+
 2001-11-27  Daniel Saran R. da Cunha  <daniel@async.com.br>
 	
 	* examples/SexSelection: New example to test Radio Button

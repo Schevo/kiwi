@@ -21,6 +21,8 @@ from gazpacho.custompropertyeditor import CustomPropertyEditor
 from gazpacho.util import get_bool_from_string_with_default
 from gazpacho.widget import get_widget_from_gtk_widget
 
+from datetime import date
+
 class DataTypeAdaptor(object):
     def create_editor(self, context):
         model = gtk.ListStore(str, object)
@@ -28,6 +30,7 @@ class DataTypeAdaptor(object):
         model.append((_('Integer'), int))
         model.append((_('Float'), float))
         model.append((_('Boolean'), bool))
+        model.append((_('Date'), date))
         combo = gtk.ComboBox(model)
         renderer = gtk.CellRendererText()
         combo.pack_start(renderer)
