@@ -162,69 +162,7 @@ class KiwiListDelegate(SlaveDelegate):
     
     def __len__(self):
         """Returns the number of instances in the list"""
-        return len(self._list)
-
-    def add_list(self, list, clear=True, restore_selection=False,
-                 progress_handler=None):
-        """
-Allows a list to be loaded in the CList, by default clearing it first.
-freeze() and thaw() are called internally to avoid flashing.
-    - list: a list to be added to the delegate
-    - clear: a boolean that specifies whether or not to clear the clist
-    - restore_selection: a boolean that specifies whether or not to
-      try and preserve the original selection in the list (provided that
-      at least some instances are still present in the new list.)
-    - progress_handler: a callback function to be called while the clist
-      is being filled
-
-      There is a problem with select=True and mode SELECTION_BROWSE. The
-      focus_row is not updated, and the end result is that you have a
-      row selected but another row focused, which is a serious bug. I
-      have implemented a workaround for this in pygtk-0.6.12.
-"""
-        # change mode to selection single to avoid generating spurious
-        # select_row signals. yes, we could do this using emit_stop_by_name 
-        # and then emit, but I think this is easier on the eyes
-        clist = self.clist
-        clist.freeze()
-        clist.disable_shade()
-        old_mode = clist['selection_mode']
-        old_sel = self.get_selected()
-        clist.set_selection_mode(gtk.SELECTION_SINGLE)
-        if clear:
-            clist.unselect_all()
-            clist.clear()
-            self._list = [] # reset _list; this is required because 
-                            # _load() does not reset it 
-        ret = self._load(list, progress_handler)
-
-        # Avoid spurious selection or signal emissions when swapping
-        # selection mode
-        if self._handler_sig:
-            clist.signal_handler_block(self._handler_sig)
-        clist.set_selection_mode(old_mode)
-        if self._handler_sig:
-            clist.signal_handler_unblock(self._handler_sig)
-
-        if restore_selection:
-            for instance in old_sel:
-                # we need to find the rows because some instances may
-                # have disappeared with the clear/_load
-                row = clist.find_row_from_data(instance)
-                if row >= 0:
-                    self._select_and_focus_row(row)
-        elif (old_mode in (gtk.SELECTION_BROWSE, gtk.SELECTION_EXTENDED)
-              and clear and self.clist.selection):
-            # If the mode was browse, and we cleared the list, we need
-            # to make sure that at least one selection signal is
-            # emitted, or applications might end up with inconsistent
-            # state.
-            row = self.clist.selection[0]
-            self._select_and_focus_row(row)
-            
-        clist.enable_shade()
-        clist.thaw()
-        return ret
+        return len(self.list)
 
     def clear_list(self):
         """Clears the list of all items."""
