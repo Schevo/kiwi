@@ -1,3 +1,7 @@
+2005-02-26  Lorenzo Gil Sanchez  <lgs@sicem.biz>
+
+	* tests/run_all_tests.py: fix the first line of the script
+
 2005-02-21  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
 	* Kiwi2/AbstractViews.py: we don't use this file anymore. Its contents
