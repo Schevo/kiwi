@@ -22,7 +22,13 @@
 # Author(s): Christian Reis <kiko@async.com.br>
 #
 
-"""This module initializes GTK+ and sets up any globals necessary"""
+"""
+This module initializes GTK+ and sets up any globals necessary
+
+The reason to initialize GTK+ in a separate module and not in the __init__.py
+file is that some parts of the Kiwi Framework should be usable without
+any graphics involved.
+"""
 
 try:
     import pygtk
