@@ -1,5 +1,8 @@
 2005-03-10  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
+	* Kiwi2/Views.py (GladeSignalBroker._connect_glade_signals): don't
+	call autoconnect_by_method_name twice
+
 	* Kiwi2/utils.py (get_foreground): fix the call to gdk_color_to_string
 
 	* Kiwi2/Views.py (SlaveView.__init__): if we don't have a toplevel
