@@ -26,6 +26,9 @@ from Kiwi2.initgtk import gtk, gobject
 from Kiwi2.Widgets.WidgetProxy import WidgetProxyMixin, implementsIProxy
 from Kiwi2.utils import gsignal
 
+(COL_COMBO_LABEL,
+ COL_COMBO_DATA) = range(2)
+
 class ComboProxyMixin(WidgetProxyMixin):
     """Our combos always have one model with two columns, one for the string
     that is displayed and one for the object it cames from.
@@ -37,6 +40,9 @@ class ComboProxyMixin(WidgetProxyMixin):
         model = gtk.ListStore(str, object)
         self.set_model(model)
 
+    def __len__(self):
+        return len(self.get_model())
+    
     def prefill(self, itemdata, sort=False):
         """Fills the Combo with listitems corresponding to the itemdata
         provided.
@@ -56,9 +62,8 @@ class ComboProxyMixin(WidgetProxyMixin):
         label or not. By default it is not sorted
         """
         if not isinstance(itemdata, (list, tuple)):
-            msg = ("'data' parameter must be a list or tuple of item "
-                   "descriptions, found %s") % type(itemdata)
-            raise TypeError, msg
+            raise TypeError("'data' parameter must be a list or tuple of item "
+                            "descriptions, found %s") % type(itemdata)
 
         if len(itemdata) == 0:
             self.clear()
@@ -83,13 +88,12 @@ class ComboProxyMixin(WidgetProxyMixin):
             elif isinstance(item, (list, tuple)):
                 text, data = item
             else:
-                msg = ("Incorrect format for itemdata; see docstring for "
-                       "more information")
-                raise TypeError, msg
+                raise TypeError("Incorrect format for itemdata; see "
+                                "docstring for more information")
 
             if text in values:
-                msg = "Tried to insert duplicate value %s into Combo!" % item
-                raise KeyError, msg
+                raise KeyError("Tried to insert duplicate value "
+                               "%s into Combo!" % item)
 
             values.append(text)
             model.append((text, data))
@@ -100,46 +104,48 @@ class ComboProxyMixin(WidgetProxyMixin):
         - data: the data to be associated with that item
         """
         if not isinstance(label, str):
-            raise TypeError, "label must be string, found %s" % label
+            raise TypeError("label must be string, found %s" % label)
         model = self.get_model()
         model.append((label, data))
 
     def clear(self):
         """Removes all items from list"""
-        self.get_model().clear()
+        model = self.get_model()
+        model.clear()
 
     def select_item_by_position(self, pos):
         self.set_active(pos)
 
     def select_item_by_label(self, label):
         model = self.get_model()
-        it = model.get_iter_first()
-        while it:
-            if model.get_value(it, 0) == label:
-                self.set_active_iter(it)
-                return
-            it = model.iter_next(it)
-
-        raise KeyError, "No item correspond to label %s" % label
+        for row in model:
+            if row[COL_COMBO_LABEL] == label:
+                self.set_active_iter(row.iter)
+                break
+        else:
+            raise KeyError("No item correspond to label %s" % label)
     
     def select_item_by_data(self, data):
         model = self.get_model()
-        it = model.get_iter_first()
-        while it:
-            if model.get_value(it, 1) == data:
-                self.set_active_iter(it)
-                return
-            it = model.next_iter(it)
+        for row in model:
+            if row[COL_COMBO_DATA] == data:
+                self.set_active_iter(row.iter)
+                break
+        else:
+            raise KeyError("No item correspond to data %r" % data)
 
-        raise KeyError, "No item correspond to data %s" % repr(label)
-
+    def get_selected_label(self):
+        model = self.get_model()
+        iter = self.get_active_iter()
+        if iter:
+            return model.get(iter, COL_COMBO_LABEL)[0]
+            
     def get_selected_data(self):
         model = self.get_model()
         iter = self.get_active_iter()
-        if not iter:
-            return
-        return model.get(iter, 1)[0]
-            
+        if iter:
+            return model.get(iter, COL_COMBO_DATA)[0]
+
 class ComboBox(gtk.ComboBox, ComboProxyMixin):
     implementsIProxy()
     gsignal('changed', 'override')
@@ -180,6 +186,9 @@ class ComboBox(gtk.ComboBox, ComboProxyMixin):
         # we always have something selected, by default the first item
         self.set_active(0)
         self.emit('content-changed')
+
+    def clear(self):
+        ComboProxyMixin.clear(self)
         
 gobject.type_register(ComboBox)
 
@@ -217,7 +226,7 @@ class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin):
         
     def clear(self):
         """Removes all items from list and erases entry"""
-        super(ComboBoxEntry, self).clear()
+        ComboProxyMixin.clear(self)
         self.child.set_text("")
         
 gobject.type_register(ComboBoxEntry)

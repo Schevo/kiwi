@@ -1,3 +1,13 @@
+2005-03-22  Johan Dahlin  <jdahlin@async.com.br>
+
+	* Kiwi2/Widgets/ComboBox.py (ComboProxyMixin.__len__): Add
+	(ComboBox.clear): Call ComboProxyMixin.clear
+	(ComboBoxEntry.clear): Ditto
+	(ComboProxyMixin.get_selected_label): Add
+	(ComboProxyMixin.select_item_by_position) 
+	(ComboProxyMixin.select_item_by_label) 
+	(ComboProxyMixin.select_item_by_data): Simplify
+
 2005-03-22 Gustavo Rahal <gustavo@async.com.br>
 
 	* Kiwi2/Widgets/CheckButton.py: added Checkbutton kiwi widget
