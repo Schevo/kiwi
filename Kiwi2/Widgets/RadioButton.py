@@ -35,7 +35,6 @@ class RadioButton(gtk.RadioButton, WidgetProxyMixin):
     def __init__(self):
         WidgetProxyMixin.__init__(self)
         gtk.RadioButton.__init__(self)
-        self._data_value = ''
     
     def do_toggled(self):
         self.emit('content-changed')
@@ -44,11 +43,13 @@ class RadioButton(gtk.RadioButton, WidgetProxyMixin):
     def read(self):
         for rb in self.get_group():
             if rb.get_active():
-                return rb.get_data_value()
+                data = WidgetProxyMixin.str2type(self, rb.get_data_value())
+                return data
 
     def update(self, data):
         # first, trigger some basic validation
         WidgetProxyMixin.update(self, data)
+        data = WidgetProxyMixin.type2str(self, data)
         for rb in self.get_group():
             if rb.get_data_value() == data:
                 rb.set_active(True)
@@ -57,6 +58,9 @@ class RadioButton(gtk.RadioButton, WidgetProxyMixin):
         self._data_value = data
     
     def get_data_value(self):
+        if not self._data_value:
+            raise AttributeError,("RadioButton '%s' does not have a data value \
+associated." % (self.name) )
         return self._data_value
 
 gobject.type_register(RadioButton)
