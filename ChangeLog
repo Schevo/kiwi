@@ -1,5 +1,16 @@
 2005-03-03  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
+	* Kiwi2/List.py (List.add_list): block and unblock the selection signal
+	on the selection object instead of the treeview object
+	(List._load): add a progress_handler (non used so far) argument so
+	the call from add_list() works
+	(List._create_best_renderer_for_type): don't make the cells editable
+	until we have a 'editable' property to switch this feature on and off.
+	This is needed so we can still double click on the rows
+
+	* Kiwi2/Views.py (GladeSlaveView.__init__): fix some errors so we can
+	use this view
+
 	* examples/News/news4.py: new version using a GladeSlaveDelegate with
 	the KiwList in the file news_list.glade. Note how the column
 	definitions are in the glade file this time and how we setup

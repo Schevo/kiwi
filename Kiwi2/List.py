@@ -239,7 +239,7 @@ class List(gtk.ScrolledWindow):
         'column-definitions' : (str, 'ColumnDefinitions',
                                 'A string with the columns definitions',
                                 '',
-                                gobject.PARAM_READWRITE)
+                                gobject.PARAM_READWRITE),
         }
     
     def __init__(self, column_definitions=[],
@@ -423,19 +423,19 @@ class List(gtk.ScrolledWindow):
         if data_type in (int, float):
             renderer = gtk.CellRendererText()
             renderer.set_data('renderer-property', 'text')
-            renderer.set_property('editable', True)
-            renderer.connect('edited', self._on_renderer__edited, column_index)
+#            renderer.set_property('editable', True)
+#            renderer.connect('edited', self._on_renderer__edited, column_index)
         elif data_type is bool:
             renderer = gtk.CellRendererToggle()
             renderer.set_data('renderer-property', 'active')
-            renderer.set_property('activatable', True)
-            renderer.connect('toggled', self._on_renderer__toggled,
-                             column_index)
+ #           renderer.set_property('activatable', True)
+ #           renderer.connect('toggled', self._on_renderer__toggled,
+ #                            column_index)
         elif issubclass(data_type, basestring):
             renderer = gtk.CellRendererText()
             renderer.set_data('renderer-property', 'text')
-            renderer.set_property('editable', True)
-            renderer.connect('edited', self._on_renderer__edited, column_index)
+#            renderer.set_property('editable', True)
+#            renderer.connect('edited', self._on_renderer__edited, column_index)
         else:
             raise ValueError, "the type %s is not supported yet" % data_type
         
@@ -612,7 +612,7 @@ eview that needs to
     def __nonzero__(self):
         return True
     
-    def _load(self, instance_list):
+    def _load(self, instance_list, progress_handler=None):
         if not instance_list: # do nothing if empty list or None provided
             return
 
@@ -830,9 +830,10 @@ eview that needs to
 
         # Avoid spurious selection or signal emissions when swapping
         # selection mode
-        self.treeview.handler_block(self._selection_changed_id)
+        selection = self.treeview.get_selection()
+        selection.handler_block(self._selection_changed_id)
         self.set_selection_mode(old_mode)
-        self.treeview.handler_unblock(self._selection_changed_id)
+        selection.handler_unblock(self._selection_changed_id)
 
         if restore_selection:
             for instance in old_sel:

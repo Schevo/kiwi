@@ -131,6 +131,7 @@ class SignalBroker:
             if after:
                 id = widget.connect_after(signal, methods[fname])
             else:
+                print 'signal, widget', signal, widget, fname, type(widget)
                 id = widget.connect(signal, methods[fname])
             if not id:
                 raise AttributeError, "Widget %s doesn't provide a signal %s" \
@@ -1082,7 +1083,7 @@ class GazpachoWidgetTree:
             win.add_accel_group(group)
 
 
-class GladeSlaveView(AbstractGladeView, AbstractView):
+class GladeSlaveView(SlaveView): # sane single inheritance
     """A SlaveView that is built upon a Glade file. The contents you
     want to be used as a slave should be placed inside a placeholder
     Window. The placeholder will be destroyed and self.toplevel 
@@ -1105,8 +1106,8 @@ class GladeSlaveView(AbstractGladeView, AbstractView):
 
         The container_name parameter should indicate the name of this
         toplevel window. The slave will be removed from this placeholder, and
-        self.toplevel will be assigned to it. The placeholder Window's destroy()
-        method is called.
+        self.toplevel will be assigned to it. The placeholder
+        Window's destroy() method is called.
         """
         
         # try looking at toplevel property of AbstractView
@@ -1133,7 +1134,10 @@ class GladeSlaveView(AbstractGladeView, AbstractView):
         shell.remove(self.toplevel)
         shell.destroy()
 
-        AbstractView.__init__(self, self.toplevel, widgets)
+        SlaveView.__init__(self, self.toplevel, widgets)
+
+    def attach_slave(self, name, slave):
+        self.gazpacho.attach_slave(name, slave) # delegation powered
 
 class GladeView(BaseView): # sane single inheritance
     """A complete view based on a Glade file, and which contains a
