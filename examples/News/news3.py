@@ -36,13 +36,15 @@ class Shell(Delegates.GladeDelegate):
         # paint header and footer; they are eventboxes that hold a
         # label and buttonbox respectively
         self.set_background(self.header,"white") 
-        self.set_background(self.footer,"#A0A0A0") 
-#        self.title.set_color("blue") 
+        self.set_background(self.footer,"#A0A0A0")
+        self.set_foreground(self.title, "blue")
 
         # Create the delegate and set it up
-        slave = Delegates.KiwiListDelegate(my_columns, news)
-        slave.list.connect('selection-change', self.news_selected)
-        slave.list.connect('double-click', self.double_click)
+        kiwilist = List.KiwiList(my_columns, news)
+        kiwilist.connect('selection-change', self.news_selected)
+        kiwilist.connect('double-click', self.double_click)
+        slave = Delegates.SlaveDelegate(toplevel=kiwilist)
+        
         self.attach_slave("placeholder", slave)
         slave.show_all()
         slave.focus_toplevel() # Must be done after attach
@@ -51,7 +53,8 @@ class Shell(Delegates.GladeDelegate):
     
     def news_selected(self, the_list):
         # only one item can be selected in mode SELECTION_BROWSE
-        item = self.slave.get_selected()[0]
+        kiwilist = self.slave.get_toplevel()
+        item = kiwilist.get_selected()[0]
         print "%s %s %s\n" % (item.title, item.author, item.url)
 
     def double_click(self, the_list, selected_object):
@@ -59,7 +62,8 @@ class Shell(Delegates.GladeDelegate):
         self.hide_and_quit()
         
     def on_ok__clicked(self, *args):
-        item = self.slave.get_selected()[0]
+        kiwilist = self.slave.get_toplevel()
+        item = kiwilist.get_selected()[0]
         self.emit('result', item.url)
         self.hide_and_quit()
 

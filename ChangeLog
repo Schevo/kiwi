@@ -1,5 +1,8 @@
 2005-02-28  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
+	* examples/News/news3.py: don't use KiwiListDelegate anymore but just
+	a simple SlaveDelegate. Also fix the small bug about the color
+
 	* Kiwi2/List.py (KiwiList.__init__): for now, use right click button
 	on the header to show the popup menu. Thunderbird style button on top
 	of the vertical scrollbar will be done later.
