@@ -1,6 +1,11 @@
 2005-04-01  Daniel Saran R. da Cunha  <daniel@async.com.br>
 
 	* Kiwi2/Widgets/ComboBox.py (ComboProxyMixin.select_item_by_data): 
+	Cleaning the code 
+
+2005-04-01  Daniel Saran R. da Cunha  <daniel@async.com.br>
+
+	* Kiwi2/Widgets/ComboBox.py (ComboProxyMixin.select_item_by_data): 
 	Don't try to select a row if there is no data in the combo.
 
 2005-03-30  Gustavo Rahal <gustavo@async.com.br>

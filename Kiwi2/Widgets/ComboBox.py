@@ -127,14 +127,12 @@ class ComboProxyMixin(WidgetProxyMixin):
     
     def select_item_by_data(self, data):
         model = self.get_model()
-        if not len(model):
-            return
         for row in model:
             if row[COL_COMBO_DATA] == data:
                 self.set_active_iter(row.iter)
                 break
         else:
-            if row[COL_COMBO_DATA] is None:
+            if len(model) and row[COL_COMBO_DATA] is None:
                 #the user only prefilled the combo with strings
                 self.select_item_by_label(data)
             else:
