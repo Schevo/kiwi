@@ -425,7 +425,13 @@ class SlaveView(gobject.GObject):
         else:
             self.glade_adaptor.attach_slave(name, slave) # delegation powered
     
-    
+    def get_slave(self, holder):
+        if (self.glade_adaptor.slaves and 
+            self.glade_adaptor.slaves.has_key(holder)):
+            return self.glade_adaptor.slaves[holder]
+        raise AttributeError, "Unknown slave for holder: %s" % holder
+
+
     #
     # Signal connection
     #
@@ -682,6 +688,7 @@ class GazpachoWidgetTree(GladeAdaptor):
         
         self.widgets = widgets
         self.gladefile = gladefile
+        self.slaves = {}
         
     def get_widget(self, name):
         """Retrieves the named widget from the View (or glade tree)"""
@@ -736,6 +743,7 @@ class GazpachoWidgetTree(GladeAdaptor):
             new_widget = shell
 
         placeholder  = self.get_widget(name)
+
         if not placeholder:
             raise attributeerror(
                   "slave container widget `%s' not found" % name)
@@ -775,6 +783,12 @@ class GazpachoWidgetTree(GladeAdaptor):
      
         # call slave's callback
         slave.on_attach(self)
+
+        if self.slaves.has_key(name):
+            # I prefer to don't emit a raise here because it's really
+            # possible to change a certain slave in runtime.
+            raise _warn("You already have a slave %s attached" % name)
+        self.slaves[name] = slave
 
         # return placeholder we just removed
         return placeholder
