@@ -1,3 +1,11 @@
+2005-03-11  Lorenzo Gil Sanchez  <lgs@sicem.biz>
+
+	* Kiwi2/Widgets/List.py: add two extra flags: _columns_created and
+	_columns_configured to avoid creating the columns several times
+
+	* tests/test_List.py (ListTest.testAddingOneInstance): improve test
+	to check that the columns remain sane
+
 2005-03-10  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
 	* Kiwi2/Views.py (GladeSignalBroker._connect_glade_signals): don't

@@ -261,6 +261,9 @@ class List(gtk.ScrolledWindow):
         # menu
         self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
 
+        self._columns_created = False
+        self._columns_configured = False
+        
         self.model = gtk.ListStore(object)
         self.model.set_sort_func(0, self._sort_function)
         self.treeview = gtk.TreeView(self.model)
@@ -361,6 +364,9 @@ class List(gtk.ScrolledWindow):
         for i, col in enumerate(self._column_definitions):
             self._create_column(col, i)
 
+        self._columns_created = True
+        self._columns_configured = False
+        
     def _create_column(self, col_definition, col_index):
         treeview_column = gtk.TreeViewColumn()
 
@@ -400,6 +406,8 @@ class List(gtk.ScrolledWindow):
         self._autosize = autosize
 
         #clist.enable_column_select()
+
+        self._columns_configured = True
 
     def _setup_column(self, col_definition, col_index, treeview_column):
 
@@ -518,7 +526,10 @@ eview that needs to
         # we also need to clear the popup
         for child in self._popup.get_children():
             self._popup.remove(child)
-    
+
+        self._columns_created = False
+        self._columns_configured = False
+        
     # selection methods
     def _find_iter_from_data(self, instance):
         data_iter = self.model.get_iter_first()
@@ -640,8 +651,10 @@ eview that needs to
 
         if not self._has_enough_type_information():
             self._get_types(instance_list[0])
-            self._create_columns()
-            self._setup()
+            if not self._columns_created:
+                self._create_columns()
+            if not self._columns_configured:
+                self._setup()
             
         for instance in instance_list:
             self.model.append((instance,))
@@ -780,8 +793,10 @@ eview that needs to
 
         if not self._has_enough_type_information():
             self._get_types(instance)
-            self._create_columns()
-            self._setup()
+            if not self._columns_created:
+                self._create_columns()
+            if not self._columns_configured:
+                self._setup()
 
         # Freeze and save original selection mode to avoid blinking
         self.treeview.freeze_notify()

@@ -49,6 +49,9 @@ class ListTest(TestCase):
         self.win.show_all()
         refresh_gui(delay)
 
+        # we should have two columns now
+        self.assertEqual(2, len(mylist.treeview.get_columns()))
+                         
         class Person:
             def __init__(self, name, age):
                 self.name, self.age = name, age
@@ -63,7 +66,10 @@ class ListTest(TestCase):
         self.assertEqual(mylist.model[0][0], person)
         self.assertEqual(mylist.model[0][0].name, 'henrique')
         self.assertEqual(mylist.model[0][0].age, 21)
-    
+
+        # we still have to columns, right?
+        self.assertEqual(2, len(mylist.treeview.get_columns()))
+        
 if __name__ == '__main__':
     import sys
     if len(sys.argv) == 2:
