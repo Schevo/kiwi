@@ -2,6 +2,7 @@
 
 	* tests/test_List.py (DataTests.testContains): added a test for
 	__contains__
+	(DataTests.testUpdatingOneInstance): fixed test
 
 	* Kiwi2/Widgets/List.py (List.update_instance): added update_instance
 	(List.__contains__): added __contains__ method

@@ -154,7 +154,7 @@ class DataTests(TestCase):
 
         # let's be evil
         new_person = Person('Nando', 32)
-        self.list.update_instance(new_person)
+        self.assertRaises(ValueError, self.list.update_instance, new_person)
 
 
     def testContains(self):
