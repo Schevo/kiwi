@@ -29,7 +29,7 @@ are the base of Delegates and Proxies.
 """
 import os, string, re, sys
 
-from Kiwi2 import _warn, get_glade_path
+from Kiwi2 import _warn, get_gladepath
 from Kiwi2.initgtk import _non_interactive, gtk, gobject, quit_if_last
 from Kiwi2.Proxies import Proxy
 
@@ -40,7 +40,7 @@ from Kiwi2.Proxies import Proxy
 def find_in_gladepath(filename):
     """Looks in gladepath for the file specified"""
 
-    gladepath = get_glade_path()
+    gladepath = get_gladepath()
     
     # check to see if gladepath is a list or tuple
     if not isinstance(gladepath, (tuple, list)):

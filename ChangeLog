@@ -1,5 +1,7 @@
 2005-03-10  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
+	* Kiwi2/Views.py (find_in_gladepath): fixed a typo
+
 	* examples/* adapt examples to work with the new changes
 	
 	* Kiwi2/Controllers.py: don't use string module and ListType and
