@@ -1,5 +1,8 @@
 2005-02-17  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
+	* Kiwi2/initgtk.py (quit_if_last): mainquit is deprecated, did you know
+	that?
+
 	* examples/HeyPlanet/heyglade3.py: 
 	* examples/HeyPlanet/heyglade2.py: 
 	* examples/HeyPlanet/heyglade.py: 

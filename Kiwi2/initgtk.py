@@ -82,4 +82,4 @@ def quit_if_last(*args):
     toplevels = gtk.window_list_toplevels()
     # check if this window is the last one
     if len(toplevels) == 1:
-        gtk.mainquit()
+        gtk.main_quit()
