@@ -83,7 +83,9 @@ def quit_if_last(*args):
     toplevels = gtk.window_list_toplevels()
     # we don't care about popup windows
     real_toplevels = [tl for tl in toplevels \
-                      if tl.get_property('type') == gtk.WINDOW_TOPLEVEL]
+                      if tl.get_property('type') == gtk.WINDOW_TOPLEVEL and \
+                      tl.get_property('visible') == True]
+    #print 'Toplevel visible windows:', real_toplevels
     # check if this window is the last one
     if len(real_toplevels) == 1:
         gtk.main_quit()

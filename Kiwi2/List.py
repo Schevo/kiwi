@@ -457,7 +457,7 @@ eview that needs to
         """
         renderer_prop = cellrenderer.get_data('renderer-property')
         instance = model.get_value(iter, 0)
-        data = getattr(instance, model_attribute, None)
+        data = kgetattr(instance, model_attribute, None)
         cellrenderer.set_property(renderer_prop, data)
 
     def _on_header__button_press_event(self, button, event):
@@ -533,8 +533,8 @@ eview that needs to
         obj2 = model.get_value(iter2, 0)
         cd = self._column_definitions[self._sort_column_definition_index]
         attr = cd.attribute
-        value1 = getattr(obj1, attr)
-        value2 = getattr(obj2, attr)
+        value1 = kgetattr(obj1, attr)
+        value2 = kgetattr(obj2, attr)
         return cmp(value1, value2)
 
     def _on_column__clicked(self, treeview_column, column_index):

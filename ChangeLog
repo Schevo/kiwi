@@ -1,3 +1,15 @@
+2005-03-05  Lorenzo Gil Sanchez  <lgs@sicem.biz>
+
+	* Kiwi2/Views.py (BaseView._setup_keypress_handler): put this
+	method only in BaseView to avoid warnings
+
+	* Kiwi2/List.py: use kgetattr instead of getattr when accesing the
+	attributes of an instance
+
+	* Kiwi2/initgtk.py (quit_if_last): don't treat hide windows as
+	toplevels when seeing if we need to quit because usually there are
+	several windows in a glade file.
+
 2005-03-04  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
 	* Kiwi2/Views.py (SignalBroker): super() only works with new style

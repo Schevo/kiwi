@@ -131,7 +131,6 @@ class SignalBroker(object):
             if after:
                 id = widget.connect_after(signal, methods[fname])
             else:
-                print 'signal, widget', signal, widget, fname, type(widget)
                 id = widget.connect(signal, methods[fname])
             if not id:
                 raise AttributeError, "Widget %s doesn't provide a signal %s" \
@@ -440,13 +439,12 @@ class AbstractView(gobject.GObject):
 
     def _attach_callbacks(self, controller):
         self.__broker = SignalBroker(self, controller)
-        self._setup_keypress_handler(controller.on_key_press)
 
-    def _setup_keypress_handler(self, keypress_handler):
-        # Only useful in BaseView and derived classes
-        # XXX: support slaveview correctly
-        _warn("Tried to setup a keypress handler for %s "
-              "but no toplevel window exists to attach to" % self)
+#    def _setup_keypress_handler(self, keypress_handler):
+#        # Only useful in BaseView and derived classes
+#        # XXX: support slaveview correctly
+#        _warn("Tried to setup a keypress handler for %s "
+#              "but no toplevel window exists to attach to" % self)
     
     #
     # Signal connection
@@ -814,6 +812,10 @@ class BaseView(AbstractView):
     # Hook for keypress handling
     #
 
+    def _attach_callbacks(self, controller):
+        super(BaseView, self)._attach_callbacks(controller)
+        self._setup_keypress_handler(controller.on_key_press)
+        
     def _setup_keypress_handler(self, keypress_handler):
         self.win.connect_after("key_press_event", keypress_handler)
 
