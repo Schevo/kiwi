@@ -645,6 +645,8 @@ eview that needs to
     def __nonzero__(self):
         return True
 
+    def __contains__(self, instance):
+        return self._get_iter_from_instance(instance) is not None
 
     # utility methods used by public api methods   
     def _load(self, instance_list, progress_handler=None):

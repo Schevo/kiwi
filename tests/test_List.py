@@ -156,6 +156,16 @@ class DataTests(TestCase):
         new_person = Person('Nando', 32)
         self.list.update_instance(new_person)
 
+
+    def testContains(self):
+        global delay, persons
+
+        self.list.add_list(persons)
+        self.assertEqual(persons[0] in self.list, True)
+
+        new_person = Person('Nando', 32)
+        self.assertEqual(new_person in self.list, False)
+        
         
 if __name__ == '__main__':
     import sys
