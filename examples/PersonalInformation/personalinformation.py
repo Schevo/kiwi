@@ -12,11 +12,11 @@ class Form(Views.BaseView):
 
     def __init__(self):
         Views.BaseView.__init__(self, gladefile="personalinformation",
-                                widgets=['name', 'age', 'birthdate'],
+                                widgets=['name', 'age', 'birthdate', 'height'],
                                 delete_handler=quit_if_last)
 
 person = Person()
 form = Form()
-proxy = form.add_proxy(person, ['name', 'age', 'birthdate'])
+proxy = form.add_proxy(person, ['name', 'age', 'birthdate', 'height'])
 form.show_all()
 gtk.main()

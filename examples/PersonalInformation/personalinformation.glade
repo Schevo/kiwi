@@ -11,55 +11,49 @@
                 <property name="row_spacing">6</property>
                 <property name="column_spacing">6</property>
                 <property name="events">all-events-mask | button-motion-mask | button-press-mask | button-release-mask | button1-motion-mask | button2-motion-mask | button3-motion-mask | enter-notify-mask | exposure-mask | focus-change-mask | key-press-mask | key-release-mask | leave-notify-mask | pointer-motion-hint-mask | pointer-motion-mask | property-change-mask | proximity-in-mask | proximity-out-mask | scroll-mask | structure-mask | substructure-mask | visibility-notify-mask</property>
-                <property name="n_rows">3</property>
+                <property name="n_rows">4</property>
                 <property name="n_columns">2</property>
                 <property name="visible">True</property>
                 <child>
-                    <widget class="GtkLabel" id="label1">
-                        <property name="pattern" context="True" translatable="True"></property>
-                        <property name="label" context="True" translatable="True">Name:</property>
-                        <property name="events">all-events-mask | button-motion-mask | button-press-mask | button-release-mask | button1-motion-mask | button2-motion-mask | button3-motion-mask | enter-notify-mask | exposure-mask | focus-change-mask | key-press-mask | key-release-mask | leave-notify-mask | pointer-motion-hint-mask | pointer-motion-mask | property-change-mask | proximity-in-mask | proximity-out-mask | scroll-mask | structure-mask | substructure-mask | visibility-notify-mask</property>
-                        <property name="xalign">1.0</property>
-                        <property name="visible">True</property>
-                    </widget>
-                    <packing/>
-                </child>
-                <child>
-                    <widget class="GtkLabel" id="label2">
-                        <property name="pattern" context="True" translatable="True"></property>
-                        <property name="label" context="True" translatable="True">Age:</property>
+                    <widget class="GtkLabel" id="label4">
+                        <property name="pattern" translatable="True"></property>
+                        <property name="label" translatable="True">Height:</property>
                         <property name="events">all-events-mask | button-motion-mask | button-press-mask | button-release-mask | button1-motion-mask | button2-motion-mask | button3-motion-mask | enter-notify-mask | exposure-mask | focus-change-mask | key-press-mask | key-release-mask | leave-notify-mask | pointer-motion-hint-mask | pointer-motion-mask | property-change-mask | proximity-in-mask | proximity-out-mask | scroll-mask | structure-mask | substructure-mask | visibility-notify-mask</property>
                         <property name="xalign">1.0</property>
                         <property name="visible">True</property>
                     </widget>
                     <packing>
-                        <property name="bottom_attach">2</property>
-                        <property name="top_attach">1</property>
+                        <property name="bottom_attach">4</property>
+                        <property name="top_attach">3</property>
                     </packing>
                 </child>
                 <child>
-                    <widget class="GtkLabel" id="label3">
-                        <property name="pattern" context="True" translatable="True"></property>
-                        <property name="label" context="True" translatable="True">Birthdate:</property>
-                        <property name="events">all-events-mask | button-motion-mask | button-press-mask | button-release-mask | button1-motion-mask | button2-motion-mask | button3-motion-mask | enter-notify-mask | exposure-mask | focus-change-mask | key-press-mask | key-release-mask | leave-notify-mask | pointer-motion-hint-mask | pointer-motion-mask | property-change-mask | proximity-in-mask | proximity-out-mask | scroll-mask | structure-mask | substructure-mask | visibility-notify-mask</property>
-                        <property name="xalign">1.0</property>
-                        <property name="visible">True</property>
-                    </widget>
-                    <packing>
-                        <property name="bottom_attach">3</property>
-                        <property name="top_attach">2</property>
-                    </packing>
-                </child>
-                <child>
-                    <widget class="Kiwi2+Widgets+Entry+Entry" id="name">
-                        <property name="model_attribute">name</property>
+                    <widget class="Kiwi2+Widgets+Entry+Entry" id="height">
+                        <property name="model_attribute">height</property>
                         <property name="events">all-events-mask | button-motion-mask | button-press-mask | button-release-mask | button1-motion-mask | button2-motion-mask | button3-motion-mask | enter-notify-mask | exposure-mask | focus-change-mask | key-press-mask | key-release-mask | leave-notify-mask | pointer-motion-hint-mask | pointer-motion-mask | property-change-mask | proximity-in-mask | proximity-out-mask | scroll-mask | structure-mask | substructure-mask | visibility-notify-mask</property>
                         <property name="can_focus">True</property>
-                        <property name="data_type">str</property>
+                        <property name="data_type">float</property>
                         <property name="visible">True</property>
                     </widget>
                     <packing>
                         <property name="left_attach">1</property>
+                        <property name="bottom_attach">4</property>
+                        <property name="top_attach">3</property>
+                        <property name="right_attach">2</property>
+                    </packing>
+                </child>
+                <child>
+                    <widget class="Kiwi2+Widgets+Entry+Entry" id="birthdate">
+                        <property name="model_attribute">birthdate</property>
+                        <property name="events">all-events-mask | button-motion-mask | button-press-mask | button-release-mask | button1-motion-mask | button2-motion-mask | button3-motion-mask | enter-notify-mask | exposure-mask | focus-change-mask | key-press-mask | key-release-mask | leave-notify-mask | pointer-motion-hint-mask | pointer-motion-mask | property-change-mask | proximity-in-mask | proximity-out-mask | scroll-mask | structure-mask | substructure-mask | visibility-notify-mask</property>
+                        <property name="can_focus">True</property>
+                        <property name="data_type">date</property>
+                        <property name="visible">True</property>
+                    </widget>
+                    <packing>
+                        <property name="left_attach">1</property>
+                        <property name="bottom_attach">3</property>
+                        <property name="top_attach">2</property>
                         <property name="right_attach">2</property>
                     </packing>
                 </child>
@@ -79,19 +73,53 @@
                     </packing>
                 </child>
                 <child>
-                    <widget class="Kiwi2+Widgets+Entry+Entry" id="birthdate">
-                        <property name="model_attribute">birthdate</property>
+                    <widget class="Kiwi2+Widgets+Entry+Entry" id="name">
+                        <property name="model_attribute">name</property>
                         <property name="events">all-events-mask | button-motion-mask | button-press-mask | button-release-mask | button1-motion-mask | button2-motion-mask | button3-motion-mask | enter-notify-mask | exposure-mask | focus-change-mask | key-press-mask | key-release-mask | leave-notify-mask | pointer-motion-hint-mask | pointer-motion-mask | property-change-mask | proximity-in-mask | proximity-out-mask | scroll-mask | structure-mask | substructure-mask | visibility-notify-mask</property>
                         <property name="can_focus">True</property>
-                        <property name="data_type">date</property>
+                        <property name="data_type">str</property>
                         <property name="visible">True</property>
                     </widget>
                     <packing>
                         <property name="left_attach">1</property>
-                        <property name="bottom_attach">3</property>
-                        <property name="top_attach">2</property>
                         <property name="right_attach">2</property>
                     </packing>
+                </child>
+                <child>
+                    <widget class="GtkLabel" id="label3">
+                        <property name="pattern" context="True" translatable="True"></property>
+                        <property name="label" context="True" translatable="True">Birthdate:</property>
+                        <property name="events">all-events-mask | button-motion-mask | button-press-mask | button-release-mask | button1-motion-mask | button2-motion-mask | button3-motion-mask | enter-notify-mask | exposure-mask | focus-change-mask | key-press-mask | key-release-mask | leave-notify-mask | pointer-motion-hint-mask | pointer-motion-mask | property-change-mask | proximity-in-mask | proximity-out-mask | scroll-mask | structure-mask | substructure-mask | visibility-notify-mask</property>
+                        <property name="xalign">1.0</property>
+                        <property name="visible">True</property>
+                    </widget>
+                    <packing>
+                        <property name="bottom_attach">3</property>
+                        <property name="top_attach">2</property>
+                    </packing>
+                </child>
+                <child>
+                    <widget class="GtkLabel" id="label2">
+                        <property name="pattern" context="True" translatable="True"></property>
+                        <property name="label" context="True" translatable="True">Age:</property>
+                        <property name="events">all-events-mask | button-motion-mask | button-press-mask | button-release-mask | button1-motion-mask | button2-motion-mask | button3-motion-mask | enter-notify-mask | exposure-mask | focus-change-mask | key-press-mask | key-release-mask | leave-notify-mask | pointer-motion-hint-mask | pointer-motion-mask | property-change-mask | proximity-in-mask | proximity-out-mask | scroll-mask | structure-mask | substructure-mask | visibility-notify-mask</property>
+                        <property name="xalign">1.0</property>
+                        <property name="visible">True</property>
+                    </widget>
+                    <packing>
+                        <property name="bottom_attach">2</property>
+                        <property name="top_attach">1</property>
+                    </packing>
+                </child>
+                <child>
+                    <widget class="GtkLabel" id="label1">
+                        <property name="pattern" context="True" translatable="True"></property>
+                        <property name="label" context="True" translatable="True">Name:</property>
+                        <property name="events">all-events-mask | button-motion-mask | button-press-mask | button-release-mask | button1-motion-mask | button2-motion-mask | button3-motion-mask | enter-notify-mask | exposure-mask | focus-change-mask | key-press-mask | key-release-mask | leave-notify-mask | pointer-motion-hint-mask | pointer-motion-mask | property-change-mask | proximity-in-mask | proximity-out-mask | scroll-mask | structure-mask | substructure-mask | visibility-notify-mask</property>
+                        <property name="xalign">1.0</property>
+                        <property name="visible">True</property>
+                    </widget>
+                    <packing/>
                 </child>
             </widget>
         </child>

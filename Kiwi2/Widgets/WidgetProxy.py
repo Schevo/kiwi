@@ -65,8 +65,8 @@ class WidgetProxyMixin(object):
                   "that the model has not been initialized")
             
         elif not isinstance(data, self._data_type):
-            raise TypeError("%s: Data is supposed to be a %s but it is %s: %s" % \
-                            (self.name, self._data_type, type(data), data))
+            raise TypeError("%s: Data is supposed to be a %s but it is %s: %s" \
+                            %(self.name, self._data_type, type(data), data))
 
     def read(self):
         """Get the content of the widget.

@@ -1,3 +1,11 @@
+2005-04-05  Gustavo Rahal <gustavo@async.com.br>
+	
+	* Kiwi2/Widgets/Entry.py: fixed and improved input checking
+	* Kiwi2/Widgets/datatypes.py: improve float number and date
+	checkings to support locale variations
+	* examples/PersonalInformation/personalinformation.py: added
+	height entry
+	* test/test_Entry.py: added KiwiEntry test case
 
 2005-04-01  Evandro Vale Miquelito <evandro@async.com.br>
 
