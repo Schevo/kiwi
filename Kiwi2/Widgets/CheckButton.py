@@ -29,11 +29,17 @@ from Kiwi2.utils import gsignal
 class CheckButton(gtk.CheckButton, WidgetProxyMixin):
     implementsIProxy()
     gsignal('toggled', 'override')
-    
+        
     def __init__(self):
-        gtk.CheckButton.__init__(self)
         WidgetProxyMixin.__init__(self)
+        gtk.CheckButton.__init__(self)
         self.set_property("data-type", "bool")
+    
+    def set_data_type(self, data_type):
+        if data_type == "bool" or data_type is None:
+            WidgetProxyMixin.set_data_type(self, data_type)
+        else:
+            raise TypeError, "CheckButtons only accept boolean values"
 
     def do_toggled(self):
         self.emit('content-changed')
@@ -45,7 +51,6 @@ class CheckButton(gtk.CheckButton, WidgetProxyMixin):
     def update(self, data):
         # first, trigger some basic validation
         WidgetProxyMixin.update(self, data)
-        
         self.set_active(data)
 
 gobject.type_register(CheckButton)
