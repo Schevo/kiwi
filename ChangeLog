@@ -1,5 +1,8 @@
 2005-03-24  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
+	* Kiwi2/Widgets/WidgetProxy.py (WidgetProxyMixin.update): add a warning
+	when setting None in a widget
+
 	* Kiwi2/examples/PersonalInformation: validation example
 	
 	* Kiwi2/Widgets/Entry.py: inform the user if he made a mistake while

@@ -22,6 +22,7 @@
 # Author(s): Christian Reis <kiko@async.com.br>
 #
 
+from Kiwi2 import _warn
 from Kiwi2.initgtk import gobject
 from Kiwi2.Widgets import datatypes
 
@@ -54,6 +55,10 @@ class WidgetProxyMixin(object):
             msg = "You must set the data type before updating a Kiwi widget"
             raise TypeError(msg)
 
+        if data is None:
+            _warn("Trying to set a widget with data None. This probably means "
+                  "that the model has not been initialized")
+            
         if not isinstance(data, self._data_type):
             raise TypeError("Data is supposed to be a %s but it is %s: %s" % \
                             (self._data_type, type(data), data))
