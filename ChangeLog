@@ -31,6 +31,11 @@
 
 2005-03-22 Gustavo Rahal <gustavo@async.com.br>
 
+	* Kiwi2/tests/test_CheckButton.py: added a test for CheckButtons
+	* Kiwi2/Widgets/CheckButton.py: test for bool value in set_data_type
+
+2005-03-22 Gustavo Rahal <gustavo@async.com.br>
+
 	* Kiwi2/Widgets/CheckButton.py: added Checkbutton kiwi widget
 	* Kiwi2/Widgets/__init__.py: support for Checkbutton
 	* kiwi2.xml: added checkbutton to gazpacho-plugin
