@@ -1,3 +1,9 @@
+
+2005-04-01  Evandro Vale Miquelito <evandro@async.com.br>
+
+	* Kiwi2/Widgets/List.py:
+	Adding a new select_instance method.
+
 2005-04-01  Daniel Saran R. da Cunha  <daniel@async.com.br>
 
 	* Kiwi2/Widgets/ComboBox.py (ComboProxyMixin.select_item_by_data): 

@@ -680,6 +680,13 @@ eview that needs to
             if model_instance is instance:
                 return row_iter
             row_iter = self.model.iter_next(row_iter)
+
+    def get_iter(self, instance):
+        iter = self._get_iter_from_instance(instance)
+        if iter is None: 
+            msg = "The instance %s is not in the list."
+            raise ValueError(msg % instance)
+        return iter
         
     # hacks
     def __get_column_button(self, column):
@@ -849,19 +856,12 @@ eview that needs to
             raise RuntimeError(msg)
 
         # linear search for the instance to remove
-        instance_iter = self._get_iter_from_instance(instance)
-        if instance_iter is None:
-            msg = "The instance %s is not in the list so I can not remove it"
-            raise ValueError(msg % instance)
-
+        iter = self.get_iter(instance)
         # now is safe to remove it
-        self.model.remove(instance_iter)
+        self.model.remove(iter)
 
     def update_instance(self, new_instance):
-        iter = self._get_iter_from_instance(new_instance)
-        if iter is None: 
-            msg = "The instance %s is not in the list so I can not update it"
-            raise ValueError(msg % new_instance)
+        iter = self.get_iter(new_instance)
         self.model.row_changed(self.model.get_path(iter), iter)
         
     def set_column_visibility(self, column_index, visibility):
@@ -875,7 +875,11 @@ eview that needs to
 
     def unselect_all(self):
         self.treeview.get_selection().unselect_all()
-        
+
+    def select_instance(self, instance):
+        iter = self.get_iter(instance)
+        self.treeview.get_selection().select_iter(iter)
+
     def get_selected(self):
         selection = self.treeview.get_selection()
         model, paths = selection.get_selected_rows()
