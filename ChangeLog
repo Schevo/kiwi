@@ -1,5 +1,23 @@
 2005-02-21  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
+	* Kiwi2/AbstractViews.py: we don't use this file anymore. Its contents
+	were moved to Views.py
+	
+	* Kiwi2/__init__.py: put the ValueUnset class here so we avoid
+	some cyclic dependencies
+
+	* Kiwi2/Views.py (GladeSignalBroker._connect_glade_signals): make
+	AbstractView inherit form GObject so we can enjoy GSignals in the
+	views.
+	(BaseView.connect): can't proxy these methods anymore because we
+	have our own signals now
+
+	* Kiwi2/Delegates.py: added the KiwiListDelegated. Not sure if we
+	should deprecate this delegate now that we are pushing all the
+	functionality to the Kiwi2.List class.
+
+	* Kiwi2/initgtk.py: we need gobject for signals
+
 	* examples/News/news3.py: 
 	* examples/News/news2.py: converted examples to use Kiwi2
 

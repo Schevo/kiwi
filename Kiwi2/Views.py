@@ -30,7 +30,7 @@ are the base of Delegates and Proxies.
 import os, string, re, sys
 
 from Kiwi2 import _warn, gladepath
-from Kiwi2.initgtk import _non_interactive, gtk, quit_if_last
+from Kiwi2.initgtk import _non_interactive, gtk, gobject, quit_if_last
 
 #
 # Gladepath handling
@@ -169,7 +169,7 @@ class GladeSignalBroker(SignalBroker):
 # Abstract Classes, used by other Views
 #
 
-class AbstractView:
+class AbstractView(gobject.GObject):
     """
     Base class for all View classes. Defines the essential class
     attributes (controller, toplevel, widgets) and handles
@@ -187,12 +187,19 @@ class AbstractView:
     widgets = None
     _initted = False
 
+    __gsignals__ = {
+        # This signal is emited when the view wants to return a result value
+        'result' : (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, (object,))
+        }
+    
     def __init__(self, toplevel, widgets=None):
         """
         Creates a new AbstractView. Sets up self.toplevel and
         self.widgets, checks for reserved names, and converts the
         widgets defined in the _widget_map to Kiwi widgets.
         """
+        gobject.GObject.__init__(self)
+        
         self.toplevel = toplevel or self.toplevel
         self.widgets = widgets or self.widgets or []
         self._initted = True
@@ -574,6 +581,7 @@ class AbstractView:
 #     def _entry_button_press_event(self, widget, *args):
 #         widget.set_data("_kiwi_avoid_select", 1)
 #     
+gobject.type_register(AbstractView)
 
 class AbstractGladeView:
     """
@@ -808,27 +816,27 @@ class BaseView(AbstractView):
     #
 
     def _setup_keypress_handler(self, keypress_handler):
-        self.connect_after("key_press_event", keypress_handler)
+        self.win.connect_after("key_press_event", keypress_handler)
 
     #
     # Proxying for self.win
     #
 
-    def connect(self, *args):
-        """
-        connect(signal, handler, arguments)
+    #def connect(self, *args):
+        #"""
+        #connect(signal, handler, arguments)
 
-        Connects a signal from the view's window to the handler
-        specified."""
-        return apply(self.win.connect, args)
+        #Connects a signal from the view's window to the handler
+        #specified."""
+        #return apply(self.win.connect, args)
     
-    def connect_after(self, *args):
-        """
-        connect_after(signal, handler, arguments)
+    #def connect_after(self, *args):
+        #"""
+        #connect_after(signal, handler, arguments)
 
-        Connects (using connect_after) a signal from the view's window to the
-        handler specified."""
-        return apply(self.win.connect_after, args)
+        #Connects (using connect_after) a signal from the view's window to the
+        #handler specified."""
+        #return apply(self.win.connect_after, args)
 
     def set_transient_for(self, view):
         """

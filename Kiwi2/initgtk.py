@@ -37,6 +37,7 @@ except ImportError:
     raise ImportError, "Couldn't import required package PyGTK+ 2.x"
 
 import gtk
+import gobject
 
 from gtk import gtk_version
 from gtk import pygtk_version

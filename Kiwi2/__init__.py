@@ -51,3 +51,8 @@ def _warn(msg):
     stderr.write("Kiwi warning: "+msg+"\n")
 
 gladepath = []
+
+class ValueUnset:
+    """To differentiate from places where None is a valid default. Used
+    mainly in the Kiwi Proxy"""
+    pass
