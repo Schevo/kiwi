@@ -24,9 +24,6 @@
 
 """XXX"""
 
-import string
-from types import ListType, TupleType
-
 class BaseController:
     """
     A generic controller that can be attached to any View

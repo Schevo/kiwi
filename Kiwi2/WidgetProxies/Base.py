@@ -22,10 +22,7 @@
 # Author(s): Christian Reis <kiko@async.com.br>
 #
 
-import string
-from types import IntType, FloatType, StringType
-
-from Kiwi import USE_MX, ValueUnset
+from Kiwi2 import USE_MX, ValueUnset
 
 class ConversionError(Exception): pass
 
@@ -52,7 +49,7 @@ class WidgetProxy:
         self.proxy._update_model(self, state)
 
     def _connect(self, signal, handler, *args):
-        id = apply(self.widget.connect_after, (signal, handler) + args)
+        id = self.widget.connect_after(signal, handler, args)
         self.signal_ids.append(id)
 
     # Block and unblock handlers exist to avoid having the handlers loop
@@ -90,7 +87,7 @@ class MultiWidgetProxy(WidgetProxy):
         signals = self.signal_ids
         if not signals.has_key(widget):
             signals[widget] = []
-        id = apply(widget.connect_after, (signal, handler) + args)
+        id = widget.connect_after(signal, handler, args)
         self.signal_ids[widget].append(id)
 
     def _block_handlers(self, widget):
@@ -110,11 +107,11 @@ class MultiWidgetProxy(WidgetProxy):
 #
 
 class EditableProxy(WidgetProxy):
-    def set_numeric(self, bool=True):
-        self.converted = self.numeric = bool
+    def set_numeric(self, value=True):
+        self.converted = self.numeric = value
 
-    def set_datetime(self, bool=True):
-        self.converted = self.datetime = bool
+    def set_datetime(self, value=True):
+        self.converted = self.datetime = value
 
     def set_format(self, format):
         self.format = format
@@ -175,7 +172,7 @@ class EditableProxy(WidgetProxy):
     def _get_numeric(self, value=ValueUnset):
         if value is ValueUnset:
             value = self.read()
-        value = string.strip(str(value))
+        value = str(value).strip()
         # we don't have a complete number yet
         if value in ("-","+","",None):
             return 0
@@ -205,11 +202,11 @@ class EditableProxy(WidgetProxy):
 
         valuetype = type(value)
 
-        is_number = valuetype in (IntType, FloatType)
+        is_number = valuetype in (int, float)
         # When set_numeric, is_number is *usually* true, but if the
         # default widget value is being used you might get the
         # occasional string, and we allow it.
-        valid_type = valuetype in (IntType, FloatType, StringType)
+        valid_type = valuetype in (int, float, basestring)
 
         # Try DateTime first
         if USE_MX:
@@ -252,23 +249,23 @@ class EditableProxy(WidgetProxy):
 
     def _convert_decimals(self, value):
         separator = self.proxy._decimal_separator
-        if type(value) == StringType:
+        if isinstance(value, basestring):
             # only convert if necessary
-            if string.find(value, separator) > string.find(value, "."):
+            if value.find(separator) > value.find("."):
                 return value
         return self._do_decimal_swap(value)
 
     def _unconvert_decimals(self, value):
         separator = self.proxy._decimal_separator
-        if type(value) != StringType:
+        if not isinstance(value, basestring):
             return value
         # only unconvert if necessary
-        if string.find(value, ".") > string.find(value, separator):
+        if value.find(".") > value.find(separator):
             return value
         return self._do_decimal_swap(value)
 
     def _do_decimal_swap(self, value):
         trans = self.proxy._decimal_translator
         value = str(value)
-        return string.translate(value, trans)
+        return value.translate(trans)
 

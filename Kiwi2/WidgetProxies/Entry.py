@@ -22,9 +22,7 @@
 # Author(s): Christian Reis <kiko@async.com.br>
 #
 
-from types import IntType, FloatType, StringType
-
-from Kiwi.WidgetProxies.Base import EditableProxy
+from Kiwi2.WidgetProxies.Base import EditableProxy
 
 class EntryProxy(EditableProxy):
     def __init__(self, proxy, widget, attr):
@@ -47,7 +45,7 @@ class LabelProxy(EditableProxy):
         # No need to init EntryProxy -- no signals for label :-) 
 
     def read(self):
-        return self.widget.get()
+        return self.widget.get_text()
 
 class ComboProxy(EntryProxy):
     def __init__(self, proxy, widget, attr):

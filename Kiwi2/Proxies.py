@@ -22,27 +22,17 @@
 # Author(s): Christian Reis <kiko@async.com.br>
 #
 
-"""
-This module defines the Proxy classes, which are a special type of
-Delegate that connect the interface widgets to a Model instance. Proxies
-allow changes in the widgets to map transparently to changes in the
-model.
+"""This module defines the Proxy class, which is a facility that can be used
+to keep the state of a model object synchronized with a View.
 """
 
 import string, sys
-from types import StringType, ListType, TupleType, DictType
 
-from Kiwi import _warn, USE_MX, get_decimal_separator, ValueUnset
-from Kiwi.initgtk import gtk
+from Kiwi2 import _warn, get_decimal_separator, ValueUnset
+from Kiwi2 import standard_widgets
+from Kiwi2.initgtk import gtk
 
-from Kiwi.Controllers import BaseController
-from Kiwi.Views import SlaveView, GladeView, GladeSlaveView, BaseView
-from Kiwi.Delegates import SlaveDelegate, GladeSlaveDelegate, GladeDelegate, \
-                      Delegate
-
-from Kiwi.accessors import kgetattr, ksetattr, clear_attr_cache
-from Kiwi.WidgetProxies import standard_widgets, RadioGroup #, Entry
-#from Kiwi.Basic import Combo, AutoCombo
+from Kiwi2.accessors import kgetattr, ksetattr, clear_attr_cache
 
 #
 # Warning system
@@ -52,19 +42,19 @@ PROXY_WARNINGS = 1
 ATTR_WARNINGS = 0
 
 def set_proxy_warnings(state=True):
-    """
-    Enable warnings to be emitted from Proxies when incorrect (or very
+    """ Enable warnings to be emitted from Proxies when incorrect (or very
     unusual) use is detected. This should always be enabled, as it is a
-    good way of detecting programming errors."""
+    good way of detecting programming errors.
+    """
     global PROXY_WARNINGS
     PROXY_WARNINGS = state
 
 def set_attr_warnings(state=True):
-    """
-    Enables warnings for direct attribute access. If called, all direct
+    """ Enables warnings for direct attribute access. If called, all direct
     accesses done to the model instance will be warned. Use this to
     check for the completeness of your model accessor API, if you have
-    decided to define one."""
+    decided to define one.
+    """
     global ATTR_WARNINGS
     ATTR_WARNINGS = state
 
@@ -76,7 +66,7 @@ def _attrwarn(msg):
 # Abstract Class
 #
 
-class VirtualProxy:
+class OldVirtualProxy:
     """
     A Proxy is a class that `attaches' an instance to an interface's
     widgets, and transparently manipulates that instance's attributes as
@@ -136,165 +126,10 @@ class VirtualProxy:
         self._setup_widgets()
         self.model = model
 
-    # Called externally from special subclasses. Double-underscore
-    # protects "normal" subclasses.
-    def __initialize(self):
-        # Now that the widgets have been set up, update their contents
-        for name, proxy in self._attr_map.items():
-
-            if self.model is None:
-                # if we have no model, leave value unset so we pick up
-                # the widget default below.
-                value = ValueUnset
-            else:
-                # if we have a model, grab its value to update the widgets
-                self._register_proxy_in_model(name)
-                value = kgetattr(self.model, name, ValueUnset)
-
-            if value is ValueUnset:
-                # grab default in widget, converting it as necessary
-                if proxy.converted:
-                    value = proxy.read_converted(proxy.default)
-                else:
-                    value = proxy.default
-
-            update = getattr(self, "tweak_%s" % name, None) or \
-                     self.update
-            update(name, value)
-
-    def set_setter_error_handler(self, handler):
-        """
-        Sets a method that will be called if an update to a model
-        attribute raises an exception. The handler will receive the
-        following arguments, in order:
-
-            - Exception object
-            - model
-            - attribute name
-            - value attempted
-        """
-        self._setter_error_handler = handler
-
     def enable_conversion_errors(self):
         """XXX"""
         self._conversion_errors = True
 
-    def notify(self, name, value=ValueUnset):
-        """
-        Notifies the proxy that the named attribute has changed. Calls by
-        default tweak_foo if the name provided is "foo" and update_foo
-        exists. This should *only* be called by the FrameWork Model, not by an
-        end-user callback.
-
-            - name: the name of the attribute being changed
-            - value: what it was set to
-        """
-        func = getattr(self, "tweak_%s" % name, None)
-        if func:
-            # If value is unset, send in model value to tweak_%s
-            if value is ValueUnset:
-                value = kgetattr(self.model, name, ValueUnset)
-                if value is ValueUnset:
-                    raise ValueError, "model value for %s was unset" % name
-            func(name, value)
-        else:
-            self.update(name, value, block=True)
-
-    def proxy_updated(self, widgetproxy, value):
-        """
-        This is a hook that is called whenever the proxy updates the
-        model. Implement it in the inherited class to perform actions that
-        should be done each time the user changes something in the interface.
-        This hook by default does nothing.
-        """
-        pass
-
-    def update(self, name, value=ValueUnset, block=False):
-        """
-        Generic frontend function to update the contents of a widget based on
-        its name using the internal update functions. 
-
-            - name: the name of the attribute whose widget we wish to
-              updated.  If accessing a radiobutton, specify its group
-              name. 
-            - value specifies the value to set in the widget. If
-              unspecified, it defaults to the current model's value
-              (through an accessor, if it exists, or getattr). 
-            - block defines if we are to block cascading proxy updates
-              triggered by this update. You should use block if you are
-              calling update on *the same attribute that is currently
-              being updated*.
-
-              This means if you have hooked to a signal of the widget
-              associated to that attribute, and you call update() for
-              the *same attribute*, use block=True. And pray. 8). If
-              block is set to False, the normal update mechanism will
-              occur (the model being updated in the end, hopefully).
-        """
-
-        if value is ValueUnset:
-        # We want to obtain a value from our model
-            if self.model is None:
-                # We really want to avoid trying to update our UI if our
-                # model doesn't exist yet and no value was provided.
-                # update() is also called by user code, but it should be
-                # safe to return here since you shouldn't need to code
-                # around the lack of a model in your callbacks if you
-                # can help it.
-                return
-            value = kgetattr(self.model, name, ValueUnset)
-            if value is ValueUnset:
-                raise ValueError, "Tried to update %s to unset value" % name
-
-        widgetproxy = self._attr_map.get(name, None)
-
-        if not widgetproxy:
-            raise AttributeError, ("Called update for `%s', which isn't "
-                                   "attached to the proxy %s. Valid "
-                                   "attributes are: %s (you may have "
-                                   "forgetten to add `:' to the name in "
-                                   "the widgets list)" 
-                                   % (name, self, self._attr_map.keys()))
-
-        if block:
-            widgetproxy.block = True
-            widgetproxy.update(value)
-            widgetproxy.block = False
-        else:
-            widgetproxy.update(value)
-        return True
-
-    def new_model(self, new_model, relax_type=False):
-        """
-        Reuses the same proxy with another instance as model. Allows a
-        proxy interface to change model without the need to destroy and
-        recreate the UI (which would cause flashing, at least)
-        """
-        # unregister previous proxy
-        if self.model and hasattr(self.model, "unregister_proxy"):
-            self.model.unregister_proxy(self)
-
-        # the following isn't strictly necessary, but it currently works
-        # around a bug with reused ids in the attribute cache and also
-        # makes a lot of sense for most applications (don't want a huge
-        # eternal cache pointing to models that you're not using anyway)
-        clear_attr_cache()
-
-        if self.model is not None:
-            assert self.model.__class__
-            if not relax_type and type(new_model) != type(self.model) and \
-                not isinstance(new_model, self.model.__class__):
-                raise TypeError, "New model has wrong type %s, expected %s" \
-                                 % (type(new_model), type(self.model))
-
-        self.model = new_model
-
-        # During the initialization, the OptionMenu needs to preserve
-        # the original model value, which is why we use this ha^Wlock.
-        self._avoid_clobber = True
-        self.__initialize()
-        self._avoid_clobber = False
-    
     def refresh_optionmenu(self, attr_name, preserve_model_value=0):
         """
         Notifies the proxy that one or more menuitems of an optionmenu
@@ -307,7 +142,7 @@ class VirtualProxy:
               try to preserve the previous model value or just set it to
               the default in the new optionmenu list.
         """
-        if type(attr_name) is not StringType:
+        if not isinstance(attr_name, basestring):
             msg = "Expected the attribute name (a string), got %s instead"
             raise TypeError, msg % attr_name
         if not hasattr(self, "_attr_map"):
@@ -338,19 +173,18 @@ class VirtualProxy:
               the value specified in data; if not, it will be set to the
               button label.
         """
-        grouptype = type(group)
         if hasattr(self, "_attr_map"):
             raise AssertionError, ("group_radiobuttons() must be called "
                                    "before the constructor for *Proxy")
-        if grouptype in (ListType, TupleType):
+        if isinstance(group, (list, tuple)):
             tmp = {}
             for widget_name in group:
                 # ValueUnset is fixed in RadioGroup.__init__
                 tmp[widget_name] = ValueUnset
             group = tmp
-        elif grouptype != DictType:
-            msg = "group must be DictType or Sequence, found %s"
-            raise TypeError, msg % grouptype
+        elif not isinstance(group, dict):
+            msg = "group must be a Dictionary or Sequence, found %s"
+            raise TypeError, msg % type(group)
         # Finally initialize radiogroups. This is done here because it
         # has to be done before __init__(), and I'm not sure if doing it
         # in the class declaration is without its risks
@@ -358,15 +192,12 @@ class VirtualProxy:
         self._radiogroups[name] = group
 
     def set_datetime(self, widget_names):
-        if not USE_MX:
-            raise TypeError, \
-                "DateTime support is not available. Please install mxDateTime"
         if hasattr(self, "_attr_map"):
             raise AssertionError, ("set_datetime() must be called before "
                                    "the constructor for the base Proxy class")
-        if type(widget_names) == StringType:
+        if isinstance(widget_names, basestring):
             widget_names = [widget_names]
-        elif type(widget_names) not in (TupleType, ListType):
+        elif not isinstance(widget_names, (tuple, list)):
            raise TypeError, ("widget_names parameter to set_datetime "
                              "should be a string or a list of strings, "
                              "found '%s'" % (widget_names))
@@ -390,15 +221,15 @@ class VirtualProxy:
               in the case of datetime attributes, in the strftime() format.
         """
         # XXX: this function only really makes sense for Editables
-        if type(widget_names) == StringType:
+        if isinstance(widget_names, basestring):
             widget_names = [widget_names]
-        elif type(widget_names) not in (TupleType, ListType):
-           raise TypeError, ("widget_names parameter to set_format should "
+        elif not isinstance(widget_names, (tuple, list)):
+            raise TypeError, ("widget_names parameter to set_format should "
                              "be a string or a list of strings, found %r" 
-                             % (widget_names))
-        if type(format) != StringType:
-           raise TypeError, ("format parameter to set_format should "
-                             "be a string, found %r" % (format))
+                              % (widget_names))
+        if not isinstance(format, basestring):
+            raise TypeError, ("format parameter to set_format should "
+                              "be a string, found %r" % (format))
         # Check if setup_widgets has run
         if hasattr(self, "_attr_map"):
             raise AssertionError, ("set_format() must be called before "
@@ -415,7 +246,7 @@ class VirtualProxy:
         Changes the decimal separator for numeric types from the default dot
         (.) to another character.
         """
-        if type(char) != StringType or len(char) != 1:
+        if not isinstance(char, basestring) or len(char) != 1:
             raise ValueError, "Must be a single char, got %s" % char
         self._decimal_separator = char
         self._decimal_translator = string.maketrans(".%s" % char, 
@@ -434,9 +265,9 @@ class VirtualProxy:
         if hasattr(self, "_attr_map"):
             raise AssertionError, ("set_format() must be called before "
                                    "the constructor for the base Proxy class")
-        if type(widget_names) == StringType:
+        if isinstance(widget_names, basestring):
             widget_names = [widget_names]
-        elif type(widget_names) not in (TupleType, ListType):
+        elif not isinstance(widget_names, (tuple, list)):
            raise TypeError, ("widget_names parameter to set_format "
                              "should be a string or a list of strings, "
                              "found '%s'""" % (widget_names))
@@ -579,43 +410,213 @@ class VirtualProxy:
                               (repr(name), self)
         return getattr(self, name)
 
-    def _register_proxy_in_model(self, widget_name):
-        model = self.model
-        if not hasattr(model, "register_proxy_for_attribute"):
-            return
-        try:
-            model.register_proxy_for_attribute(widget_name, self)
-        except AttributeError:
-            msg = ("Failed to run register_proxy() on Model %s "
-                   "(that was supplied to  %s. \n"
-                   "(Hint: if this model also inherits from ZODB's "
-                   "Persistent class, this problem occurs if you haven't "
-                   "set __setstate__() up correctly.  __setstate__() "
-                   "should call Model.__init__() (and "
-                   "Persistent.__setstate__() of course) to reinitialize "
-                   "things properly.)")
-            raise TypeError, msg % ( model, self )
 
-    def _block_proxy_in_model(self, state):
-        model = self.model
-        if hasattr(model, "block_proxy"):
-            if state:
-                model.block_proxy(self)
-            else:
-                model.unblock_proxy(self)
+from Kiwi2.Widgets.WidgetProxy import WidgetProxyMixin
 
-    def _update_model(self, widgetproxy, value):
+def block_widget(widget):
+    """Blocks the signal handler of the 'content-changed' signal on widget"""
+    connection_id = widget.get_data('content-changed-id')
+    if connection_id:
+        widget.handler_block(connection_id)
+
+def unblock_widget(widget):
+    """Unblocks the signal handler of the 'content-changed' signal on widget"""
+    connection_id = widget.get_data('content-changed-id')
+    if connection_id:
+        widget.handler_unblock(connection_id)
+    
+class Proxy:
+    """ A Proxy is a class that 'attaches' an instance to an interface's
+    widgets, and transparently manipulates that instance's attributes as
+    the user alters the content of the widgets.
+
+    The Proxy takes the widget list and detects what widgets are to be
+    attached to the model by looking if it is a KiwiWidget and if it
+    has the model-attribute set.
+    """
+    _setter_error_handler = None
+    
+    def __init__(self, view, model=None, widgets=[]):
+        self.view = view
+        self.model = model
+        self._setup_widgets(widgets)
+        self._initialize_widgets()
+
+    # Public API
+    def proxy_updated(self, widgetproxy, value):
+        """ This is a hook that is called whenever the proxy updates the
+        model. Implement it in the inherited class to perform actions that
+        should be done each time the user changes something in the interface.
+        This hook by default does nothing.
+        """
+        pass
+
+    def set_setter_error_handler(self, handler):
+        """ Sets a method that will be called if an update to a model
+        attribute raises an exception. The handler will receive the
+        following arguments, in order:
+
+            - Exception object
+            - model
+            - attribute name
+            - value attempted
+        """
+        self._setter_error_handler = handler
+
+    def update(self, attribute, value=ValueUnset, block=False):
+        """ Generic frontend function to update the contents of a widget based
+        on its model attribute name using the internal update functions. 
+
+            - attribute: the name of the attribute whose widget we wish to
+              updated.  If accessing a radiobutton, specify its group
+              name. 
+            - value specifies the value to set in the widget. If
+              unspecified, it defaults to the current model's value
+              (through an accessor, if it exists, or getattr). 
+            - block defines if we are to block cascading proxy updates
+              triggered by this update. You should use block if you are
+              calling update on *the same attribute that is currently
+              being updated*.
+
+              This means if you have hooked to a signal of the widget
+              associated to that attribute, and you call update() for
+              the *same attribute*, use block=True. And pray. 8). If
+              block is set to False, the normal update mechanism will
+              occur (the model being updated in the end, hopefully).
+        """
+
+        if value is ValueUnset:
+        # We want to obtain a value from our model
+            if self.model is None:
+                # We really want to avoid trying to update our UI if our
+                # model doesn't exist yet and no value was provided.
+                # update() is also called by user code, but it should be
+                # safe to return here since you shouldn't need to code
+                # around the lack of a model in your callbacks if you
+                # can help it.
+                return
+            value = kgetattr(self.model, attribute, ValueUnset)
+            if value is ValueUnset:
+                raise ValueError, "Tried to update %s to unset value" % \
+                      attribute
+
+        widget = self._attr_map.get(attribute, None)
+
+        if widget is None:
+            raise AttributeError, ("Called update for `%s', which isn't "
+                                   "attached to the proxy %s. Valid "
+                                   "attributes are: %s (you may have "
+                                   "forgetten to add `:' to the name in "
+                                   "the widgets list)" 
+                                   % (attribute, self, self._attr_map.keys()))
+
+        if block:
+            block_widget(widget)
+            widget.update(value)
+            unblock_widget(widget)
+        else:
+            widget.update(value)
+        return True
+
+
+    def notify(self, attribute, value=ValueUnset):
+        """  Notifies the proxy that the named attribute has changed. Calls
+        tweak_foo by default if the attribute provided is "foo" and update_foo
+        exists. This should *only* be called by the FrameWork Model, not by an
+        end-user callback.
+
+            - name: the name of the attribute being changed
+            - value: what it was set to
+        """
+        func = getattr(self, "tweak_%s" % attribute, None)
+        if func:
+            # If value is unset, send in model value to tweak_%s
+            if value is ValueUnset:
+                value = kgetattr(self.model, attribute, ValueUnset)
+                if value is ValueUnset:
+                    raise ValueError, "model value for %s was unset" % name
+            func(attribute, value)
+        else:
+            self.update(attribute, value, block=True)
+
+    def new_model(self, new_model, relax_type=False):
+        """ Reuses the same proxy with another instance as model. Allows a
+        proxy interface to change model without the need to destroy and
+        recreate the UI (which would cause flashing, at least)
+        """
+        # unregister previous proxy
+        self._unregister_proxy_in_model()
+        
+        # the following isn't strictly necessary, but it currently works
+        # around a bug with reused ids in the attribute cache and also
+        # makes a lot of sense for most applications (don't want a huge
+        # eternal cache pointing to models that you're not using anyway)
+        clear_attr_cache()
+
+        if self.model is not None:
+            assert self.model.__class__
+            if not relax_type and type(new_model) != type(self.model) and \
+                not isinstance(new_model, self.model.__class__):
+                raise TypeError, "New model has wrong type %s, expected %s" \
+                                 % (type(new_model), type(self.model))
+
+        self.model = new_model
+
+#        # During the initialization, the OptionMenu needs to preserve
+#        # the original model value, which is why we use this ha^Wlock.
+#        self._avoid_clobber = True
+        self._initialize_widgets()
+#        self._avoid_clobber = False
+    
+
+    # Below are the guts
+    
+    def _setup_widgets(self, widgets):
+        """Connect to the 'content-changed' signal of all the Kiwi widgets
+        in the widgets list parameter.
+        @widgets is a list of widget names
+        """
+        self._attr_map = {}
+        for widget_name in widgets:
+            widget = getattr(self.view, widget_name, None)
+            if widget is None:
+                msg = "The widget %s was not found in the view %s"
+                raise AttributeError, msg % (widget_name, self.view)
+            
+            if not isinstance(widget, WidgetProxyMixin):
+                continue
+
+            attribute = widget.get_property('model-attribute')
+            if not attribute:
+                # we don't listen for changes in this widget because
+                # we don't know the model attribute
+                _warn("The widget %s is a KiwiWidget but does not have "
+                      "a model attribute set so it will not be eassociated "
+                      "with the model" % widget)
+                continue
+            
+            connection_id = widget.connect('content-changed',
+                                           self._on_widget__content_changed)
+            widget.set_data('content-changed-id', connection_id)
+
+            # save this widget in our map
+            self._attr_map[attribute] = widget
+
+    def _on_widget__content_changed(self, widget):
+        self._update_model(widget, widget.read())
+
+    def _update_model(self, widget, value):
         if self.model is None:
             # skip updates for model if there is none, right?
             return
 
-        attr_name = self._proxy_map.get(widgetproxy, None)
+        attr_name = widget.get_property('model-attribute')
         if not attr_name:
             raise AssertionError, \
-                "Couldn't find an attribute for widget %s" % widgetproxy.name
+                "The model-attribute is empty for widgett %s" % widget.name
 
-        if widgetproxy.converted:
-            value = widgetproxy.read_converted(value)
+#        if widgetproxy.converted:
+#            value = widgetproxy.read_converted(value)
 
         # XXX: one day we might want to queue and uniq updates?
         self._block_proxy_in_model(True)
@@ -627,105 +628,60 @@ class VirtualProxy:
                                            attr_name, value)
             else:
                 raise
+
         self._block_proxy_in_model(False)
 
         # Call global update hook 
-        self.proxy_updated(widgetproxy, value)
+        self.proxy_updated(widget, value)
 
-#
-# Concrete Classes
-#
+    def _block_proxy_in_model(self, state):
+        model = self.model
+        if hasattr(model, "block_proxy"):
+            if state:
+                model.block_proxy(self)
+            else:
+                model.unblock_proxy(self)
 
-class SlaveProxy(SlaveDelegate, VirtualProxy):
-    """
-    The SlaveProxy class defines a proxy that has its interface built
-    programatically, using PyGTK calls, and that is to be embedded in a
-    View or Delegate by using attach_slave. See documentation for
-    VirtualProxy for Proxy-related issues.
-    """
-    def __init__(self, model=None, toplevel=None, widgets=[]):
+    def _initialize_widgets(self):
+        """Update the contents of the widgets.
+
+        This should be called after _setup_widgets.
         """
-        Creates a new SlaveProxy. Parameters:
-            - model: the model instance to be attached to the proxy.
-        """
-        self.widgets = self._parse_widgets(widgets)
-        # None of the Proxies pass in widgets to their parent
-        # constructors because self.widgets is already set locally.
-        SlaveView.__init__(self, toplevel)
-        VirtualProxy.__init__(self, model)
-        BaseController.__init__(self, view=self)
-        self._VirtualProxy__initialize()
+        for attribute, widget in self._attr_map.items():
 
-class GladeSlaveProxy(GladeSlaveDelegate, VirtualProxy):
-    """
-    The GladeSlaveProxy class defines a proxy that has its interface built
-    from a Glade file. The contents of the container GtkWindow become the
-    toplevel widgets, and it is to be embedded in a View or Delegate by
-    using attach_slave. See documentation for VirtualProxy for Proxy-related
-    issues."""
-    def __init__(self, model=None, gladefile=None, container_name=None, 
-                 widgets=[]):
-        """
-        Creates new GladeSlaveProxy:
+            if self.model is None:
+                # if we have no model, leave value unset so we pick up
+                # the widget default below.
+                value = ValueUnset
+            else:
+                # if we have a model, grab its value to update the widgets
+                self._register_proxy_in_model(attribute)
+                value = kgetattr(self.model, attribute, ValueUnset)
 
-            - model: the model instance to be attached to the proxy.
-            - gladefile: the glade filename which holds the slave proxy. If not
-              supplied, the class attribute will be checked for.
-            - container_name: the name of the toplevel window in the glade file.
-              If not supplied, the gladefile name will be used.
-        """
-        self.widgets = self._parse_widgets(widgets)
-        GladeSlaveView.__init__(self, gladefile, container_name)
-        VirtualProxy.__init__(self, model)
-        BaseController.__init__(self, view=self)
-        self._VirtualProxy__initialize()
+            if value is ValueUnset:
+                # grab default in widget, converting it as necessary
+                value = widget.get_property('default-value')
 
-class Proxy(Delegate, VirtualProxy):
-    """
-    The Proxy class defines a proxy that has its interface built
-    programatically, using PyGTK calls. See documentation for
-    VirtualProxy.
-    """
-    def __init__(self, model=None, toplevel=None, delete_handler=None, 
-                 widgets=[]):
+            update = getattr(self, "tweak_%s" % attribute, None) or self.update
+            update(attribute, value)
 
-        """
-        Creates a new Proxy. Parameters:
-            - model: the model instance to be attached to the proxy.
-            - toplevel and delete_handler are the same as for BaseView.__init__
-        """
-        self.widgets = self._parse_widgets(widgets)
-        BaseView.__init__(self, toplevel, delete_handler)
-        VirtualProxy.__init__(self, model)
-        BaseController.__init__(self, view=self)
-        self._VirtualProxy__initialize()
+    def _register_proxy_in_model(self, attribute):
+        model = self.model
+        if not hasattr(model, "register_proxy_for_attribute"):
+            return
+        try:
+            model.register_proxy_for_attribute(attribute, self)
+        except AttributeError:
+            msg = ("Failed to run register_proxy() on Model %s "
+                   "(that was supplied to  %s. \n"
+                   "(Hint: if this model also inherits from ZODB's "
+                   "Persistent class, this problem occurs if you haven't "
+                   "set __setstate__() up correctly.  __setstate__() "
+                   "should call Model.__init__() (and "
+                   "Persistent.__setstate__() of course) to reinitialize "
+                   "things properly.)")
+            raise TypeError, msg % ( model, self )
 
-class GladeProxy(GladeDelegate, VirtualProxy):
-    """
-    GladeProxy is a proxy that uses a glade file as its interface
-    definition. See documentation for VirtualProxy.
-    """
-    def __init__(self, model=None, gladefile=None, toplevel_name=None,
-                 delete_handler=None, widgets=[]):
-        """
-        Creates a new GladeProxy. Parameters:
-
-            - model: the instance to be attached to the proxy
-            - gladefile: the glade file which contains the interface definition for
-              this proxy
-            - toplevel_name: the name of the toplevel widget this proxy will use;
-              this widget name must be defined in the gladefile
-            - delete_handler: a function to be called when the toplevel widget
-              (IOW, window) is deleted
-            - widgets: a list of widget names to be attached from glade to the proxy
-              instance. You can also use self.widgets or a class attribute.
-
-        See the documentation for GladeView if you are still confused.
-        """
-        # Make sure we have the right set of widgets
-        self.widgets = self._parse_widgets(widgets)
-        GladeView.__init__(self, gladefile, toplevel_name, delete_handler)
-        VirtualProxy.__init__(self, model)
-        BaseController.__init__(self, view=self)
-        self._VirtualProxy__initialize()
-
+    def _unregister_proxy_in_model(self):
+        if self.model and hasattr(self.model, "unregister_proxy"):
+            self.model.unregister_proxy(self)

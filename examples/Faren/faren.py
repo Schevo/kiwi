@@ -20,7 +20,8 @@ class FarenControl(Controllers.BaseController):
         self.view.farenheit.set_text("%.2f" % farenheit)
 
 widgets = ["quitbutton", "temperature", "celsius", "farenheit"]
-view = Views.GladeView("faren", delete_handler=quit_if_last, widgets=widgets)
+view = Views.BaseView(gladefile="faren", delete_handler=quit_if_last,
+                      widgets=widgets)
 ctl = FarenControl(view)
 view.show()
 gtk.main()

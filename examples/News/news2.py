@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from Kiwi2 import Delegates
-from Kiwi2.List import List, Column
+from Kiwi2.Widgets.List import List, Column
 from Kiwi2.initgtk import gtk
 
 class NewsItem:

@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 import os
-from Kiwi2.Delegates import GladeDelegate, GladeSlaveDelegate
-from Kiwi2.List import List, Column
+from Kiwi2 import utils
+from Kiwi2.Delegates import Delegate, SlaveDelegate
+from Kiwi2.Widgets.List import List, Column
 from Kiwi2.initgtk import gtk, quit_if_last
 class NewsItem:
     def __init__(self, title, author, url):
@@ -22,12 +23,12 @@ news = [
           "http://www.pigdog.org/auto/viva_la_musica/link/2678.html")
 ]
 
-class ListSlave(GladeSlaveDelegate):
+class ListSlave(SlaveDelegate):
     def __init__(self, parent):
         self.parent = parent
-        GladeSlaveDelegate.__init__(self, gladefile="news_list",
-                                    container_name="window_container",
-                                    widgets=["news_list"])
+        SlaveDelegate.__init__(self, gladefile="news_list",
+                               toplevel_name="window_container",
+                               widgets=["news_list"])
         self.news_list.add_list(news)
 
     def on_news_list__selection_change(self, *args):
@@ -38,7 +39,7 @@ class ListSlave(GladeSlaveDelegate):
     def on_news_list__double_click(self, the_list, selected_object):
         self.parent.ok.clicked()
                 
-class Shell(GladeDelegate):
+class Shell(Delegate):
     widgets = ["ok", "cancel", "header", "footer", "title"]
     def __init__(self):
         keyactions = {
@@ -46,14 +47,14 @@ class Shell(GladeDelegate):
             gtk.keysyms.b: self.on_cancel__clicked,
             }
 
-        GladeDelegate.__init__(self, "news_shell", delete_handler=quit_if_last,
-                               keyactions=keyactions)
+        Delegate.__init__(self, gladefile="news_shell",
+                          delete_handler=quit_if_last, keyactions=keyactions)
 
         # paint header and footer; they are eventboxes that hold a
         # label and buttonbox respectively
-        self.set_background(self.header,"white") 
-        self.set_background(self.footer,"#A0A0A0")
-        self.set_foreground(self.title, "blue")
+        utils.set_background(self.header, "white") 
+        utils.set_background(self.footer, "#A0A0A0")
+        utils.set_foreground(self.title,  "blue")
 
         self.slave = ListSlave(self) 
         self.attach_slave("placeholder", self.slave)
@@ -70,6 +71,9 @@ class Shell(GladeDelegate):
         self.hide_and_quit()
 
 url = None
+
+import pdb
+#pdb.run('Shell()')
 shell = Shell()
 shell.show()
 def get_url(view, result):

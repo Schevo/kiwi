@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 import os
 from Kiwi2 import Delegates
-from Kiwi2.List import List, Column
+from Kiwi2 import utils
+from Kiwi2.Widgets.List import List, Column
 from Kiwi2.initgtk import gtk, quit_if_last
 class NewsItem:
     def __init__(self, title, author, url):
@@ -27,17 +28,17 @@ my_columns = [ Column("title", sorted=True, tooltip="Title of article"),
                Column("url", title="Address", visible=False, 
                       tooltip="Address of article") ]
 
-class Shell(Delegates.GladeDelegate):
+class Shell(Delegates.Delegate):
     widgets = ["ok", "cancel", "header", "footer", "title"]
     def __init__(self):
-        Delegates.GladeDelegate.__init__(self, "news_shell", 
-                                         delete_handler=quit_if_last)
+        Delegates.Delegate.__init__(self, gladefile="news_shell", 
+                                    delete_handler=quit_if_last)
 
         # paint header and footer; they are eventboxes that hold a
         # label and buttonbox respectively
-        self.set_background(self.header,"white") 
-        self.set_background(self.footer,"#A0A0A0")
-        self.set_foreground(self.title, "blue")
+        utils.set_background(self.header, "white") 
+        utils.set_background(self.footer, "#A0A0A0")
+        utils.set_foreground(self.title, "blue")
 
         # Create the delegate and set it up
         kiwilist = List(my_columns, news)
@@ -46,7 +47,6 @@ class Shell(Delegates.GladeDelegate):
         slave = Delegates.SlaveDelegate(toplevel=kiwilist)
         
         self.attach_slave("placeholder", slave)
-        slave.show_all()
         slave.focus_toplevel() # Must be done after attach
         
         self.slave = slave
@@ -74,7 +74,7 @@ class Shell(Delegates.GladeDelegate):
 
 url = None
 shell = Shell()
-shell.show()
+shell.show_all()
 def get_url(view, result):
     global url
     url = result

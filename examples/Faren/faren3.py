@@ -2,12 +2,12 @@
 from Kiwi2 import Delegates
 from Kiwi2.initgtk import gtk, quit_if_last
 
-class Farenheit(Delegates.GladeDelegate):
+class Farenheit(Delegates.Delegate):
     widgets = ["quitbutton", "temperature", "celsius", "farenheit",
                "celsius_label" , "farenheit_label", "temperature_label"]
     def __init__(self):
-        Delegates.GladeDelegate.__init__(self, "faren", 
-                                         delete_handler=quit_if_last)
+        Delegates.Delegate.__init__(self, gladefile="faren", 
+                                    delete_handler=quit_if_last)
         # Make labels bold
         self.temperature_label.set_markup("<b>%s</b>" % \
                                           self.temperature_label.get_text())

@@ -3,9 +3,9 @@ from Kiwi2 import Views
 from Kiwi2.initgtk import gtk, quit_if_last
 
 widgets = ["the_label"]
-app = Views.GladeView(gladefile="hey", 
-                      delete_handler=quit_if_last, 
-                      widgets=widgets)
+app = Views.BaseView(gladefile="hey", 
+                     delete_handler=quit_if_last, 
+                     widgets=widgets)
 
 # the_label, a widget defined in glade, is 
 text = app.the_label.get_text()

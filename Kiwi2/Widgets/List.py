@@ -23,11 +23,21 @@
 
 
 from Kiwi2.accessors import kgetattr
-from Kiwi2 import ValueUnset, str2bool, str2enum, str2type
+from Kiwi2 import ValueUnset
+from Kiwi2.Widgets import str2bool
 from Kiwi2.initgtk import gtk, gobject
 
 # Minimum number of rows where we show busy cursor when sorting numeric columns
 MANY_ROWS = 1000
+
+def str2enum(value_name, enum_class):
+    for value, enum in enum_class.__enum_values__.items():
+        if value_name in (enum.value_name, enum.value_nick):
+            return enum
+
+def str2type(value, default_type=str):
+    type_map = {'str': str, 'int': int, 'float': float}
+    return type_map.get(value, default_type)
 
 class Column:
     """Specifies a column in a List"""
@@ -258,6 +268,10 @@ class List(gtk.ScrolledWindow):
         self.treeview = gtk.TreeView(self.model)
         self.treeview.show()
         self.add(self.treeview)
+
+        print 'INIT:'
+        print 'treeview:', self.treeview
+        print 'selection:', self.treeview.get_selection()
 
         self.treeview.set_rules_hint(True)
 
@@ -783,6 +797,9 @@ eview that needs to
         self.treeview.get_column(column_index).set_visible(visibility)
 
     def get_selection_mode(self):
+        print 'GET SELECTION MODE:'
+        print 'treeview:', self.treeview
+        print 'selection:', self.treeview.get_selection()
         return self.treeview.get_selection().get_mode()
     
     def set_selection_mode(self, mode):
@@ -806,7 +823,7 @@ eview that needs to
         - clear: a boolean that specifies whether or not to clear the list
         - restore_selection: a boolean that specifies whether or not to
         try and preserve the original selection in the list (provided that
-        at least some instances are still present in the new list.)
+        at least some instances are still present in the new list).
         - progress_handler: a callback function to be called while the list
         is being filled
 

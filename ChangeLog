@@ -1,3 +1,39 @@
+2005-03-10  Lorenzo Gil Sanchez  <lgs@sicem.biz>
+
+	* examples/* adapt examples to work with the new changes
+	
+	* Kiwi2/Controllers.py: don't use string module and ListType and
+	TupleType.
+
+	* Kiwi2/utils.py: put here some useful functions that are needed from 
+	several different places.
+
+	* Kiwi2/Widgets/List.py: 
+	* Kiwi2/Widgets/Entry.py: 
+	* Kiwi2/Widgets/Label.py: 
+	* Kiwi2/Widgets/__init__.py: 
+	* Kiwi2/Widgets/WidgetProxy.py: new module to keep the KiwiWidgets.
+	These widgets inherit from a gtk widget and from WidgetProxyMixin,
+	which provides the functionality to work together with the Proxy
+	Kiwi Framework class.
+
+	* Kiwi2/__init__.py: move some utility functions to utils.py and
+	better API of gladepath
+
+	* Kiwi2/Delegates.py: remove GladeDelegate and GladeSlaveDelegate and
+	put more arguments to Delegate and SlaveDelegate so we keep the
+	same functionality.
+
+	* Kiwi2/Views.py: remove GladeView and GladeSlaveView. Rename 
+	AbstractView to SlaveView so now we just have SlaveView and BaseView
+	and they now how to handle glade files if the user gives them the
+	apropiate constructor argument.
+	Also, add add_proxy method to the views and make them work with
+	proxies by composition.
+
+	* Kiwi2/Proxies.py: change the VirtualProxy class to be the only Proxy
+	class and work by composition of the View classes
+
 2005-03-07  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
 	* Kiwi2/List.py (List.__init__): fix a typo

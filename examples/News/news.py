@@ -36,7 +36,7 @@ class News(Views.SlaveView):
 
 news = News()
 
-shell = Views.GladeView("news_shell", delete_handler=quit_if_last)
+shell = Views.BaseView(gladefile="news_shell", delete_handler=quit_if_last)
 shell.attach_slave("placeholder", news)
 
 news.show_all()
