@@ -1,5 +1,10 @@
 2001-11-26  Daniel Saran R. da Cunha  <daniel@async.com.br>
 
+	* gazpacho-plugin/kiwi2.xml: 
+	* gazpacho-plugin/kiwi2.py (DataTypeAdaptor.create_editor): now the
+	data-type does not need custom setter (neither getters). This fix a
+	bug about Gazpacho not saving the data type properties.
+
 	* gazpacho-plugin/kiwi2.xml: disabled hadjustment and vadjustment
 	properties on the List since they are ScrollWindow properties that
 	do not make sense with the list.

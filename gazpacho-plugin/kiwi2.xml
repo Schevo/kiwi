@@ -2,7 +2,7 @@
 <glade-catalog name="kiwi2"
                library="kiwi2"
                libglade-module="Kiwi2.Widgets"
-               resource-path="/home/lgs/Kiwi2/gazpacho-plugin">
+               resource-path="/home/daniel/devel/Kiwi2/gazpacho-plugin">
   <glade-widget-classes>
     <glade-widget-class name="Kiwi2+Widgets+List+List"
                         generic-name="kiwilist"
@@ -35,8 +35,6 @@
                   name="Data Type"
                   translatable="False"
                   adaptor-class="DataTypeAdaptor">
-          <function name="get" type="ignore"/>
-          <function name="set" type="override"/>
 	  <function name="save" type="override"/>
           <editor>
             <function name="create" type="override"/>
@@ -60,8 +58,6 @@
                   name="Data Type"
                   translatable="False"
                   adaptor-class="DataTypeAdaptor">
-          <function name="get" type="ignore"/>
-          <function name="set" type="override"/>
 	  <function name="save" type="override"/>
           <editor>
             <function name="create" type="override"/>
@@ -91,8 +87,6 @@
                   name="Data Type"
                   translatable="False"
                   adaptor-class="DataTypeAdaptor">
-          <function name="get" type="ignore"/>
-          <function name="set" type="override"/>
 	  <function name="save" type="override"/>
           <editor>
             <function name="create" type="override"/>
@@ -119,8 +113,6 @@
                   name="Data Type"
                   translatable="False"
                   adaptor-class="DataTypeAdaptor">
-          <function name="get" type="ignore"/>
-          <function name="set" type="override"/>
 	  <function name="save" type="override"/>
           <editor>
             <function name="create" type="override"/>

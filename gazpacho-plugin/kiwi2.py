@@ -22,9 +22,6 @@ from gazpacho.util import get_bool_from_string_with_default
 from gazpacho.widget import get_widget_from_gtk_widget
 
 class DataTypeAdaptor(object):
-    def set(self, context, kiwiwidget, value):
-        kiwiwidget.set_property('data-type', value)
-
     def create_editor(self, context):
         model = gtk.ListStore(str, object)
         model.append((_('String'), str))
@@ -37,8 +34,7 @@ class DataTypeAdaptor(object):
         combo.add_attribute(renderer, 'text', 0)
         combo.set_active(0)
         combo.set_data('connection-id', -1)
-        return combo
-        
+        return combo        
     
     def update_editor(self, context, combo, kiwiwidget, proxy):
         connection_id = combo.get_data('connection-id')
@@ -80,6 +76,7 @@ class ColumnDefinitionsAdaptor(object):
         return button
 
     def update_editor(self, context, button, kiwilist, proxy):
+        print 'updating editor'
         connection_id = button.get_data('connection-id')
         if (connection_id != -1):
             button.disconnect(connection_id)
