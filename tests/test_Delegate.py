@@ -50,6 +50,20 @@ class Foo(X,Y,Delegates.Delegate):
     def on_bar__clicked(self, *args):
         self.y = "BAR in B"
 
+class ClickCounter(Delegates.Delegate):
+    """In this delegate we count the number of clicks we do"""
+    def __init__(self):
+        self.win = gtk.Window()
+        self.button = gtk.Button('Click me!')
+        self.win.add(self.button)
+        Delegates.Delegate.__init__(self, toplevel=self.win,
+                                    delete_handler=quit_if_last)
+
+        self.clicks = 0
+
+    def on_button__clicked(self, *args):
+        self.clicks += 1
+
 # this is the delay between each refresh of the screen in seconds
 delay = 0
 
@@ -65,7 +79,21 @@ class DelegateTest(TestCase):
         f.bar.clicked()
         refresh_gui(delay)
         self.assertEqual(f.y, "BAR in B")
-    
+
+    def testClickCounter(self):
+        global delay
+        clickcounter = ClickCounter()
+        clickcounter.show_all()
+        refresh_gui(delay)
+        
+        # one for the boys
+        clickcounter.button.clicked()
+        self.assertEqual(clickcounter.clicks, 1)
+
+        # one for the girls
+        clickcounter.button.clicked()
+        self.assertEqual(clickcounter.clicks, 2)
+        
 if __name__ == '__main__':
     import sys
     if len(sys.argv) == 2:

@@ -1,5 +1,8 @@
 2005-03-11  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
+	* tests/test_Delegate.py (DelegateTest.testButtons): add another test
+	to check if the callbacks are being called more than one time
+
 	* Kiwi2/Widgets/List.py: add two extra flags: _columns_created and
 	_columns_configured to avoid creating the columns several times
 
