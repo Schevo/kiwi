@@ -1,5 +1,11 @@
 2005-03-10  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
+	* Kiwi2/Widgets/List.py (List): 
+	* Kiwi2/Views.py (SlaveView): use Johan gsignal and gproperty functions
+	to make	the code more readable
+
+	* Kiwi2/Widgets/List.py: remove some print debugging stuff
+
 	* Kiwi2/Views.py (find_in_gladepath): fixed a typo
 
 	* examples/* adapt examples to work with the new changes

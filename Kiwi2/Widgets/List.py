@@ -26,6 +26,7 @@ from Kiwi2.accessors import kgetattr
 from Kiwi2 import ValueUnset
 from Kiwi2.Widgets import str2bool
 from Kiwi2.initgtk import gtk, gobject
+from Kiwi2.utils import gsignal, gproperty
 
 # Minimum number of rows where we show busy cursor when sorting numeric columns
 MANY_ROWS = 1000
@@ -225,32 +226,25 @@ class List(gtk.ScrolledWindow):
     """An enhanced version of GtkTreeView, which provides pythonic wrappers
     for accessing rows, and optional facilities for column sorting (with
     types) and column selection."""
-    __gsignals__ = {
-        'selection-change' : (gobject.SIGNAL_RUN_LAST, None, ()),
-        'double-click' : (gobject.SIGNAL_RUN_LAST, None, (object,)),
-        }
+    gsignal('selection-change')
+    gsignal('double-click', object)
 
-    __gproperties__ = {
-        # this property is used to serialize the columns of a List. The format
-        # is a big string with '^' as the column separator and '|' as the field
-        # separator
-        # Each column has the following fields:
-        #  - attribute: name of the model attribute this column shows
-        #  - title: the title that shows in the column header. Default to ''
-        #  - data_type: one of 'str', 'int', 'float', 'date'. Default to str
-        #  - visible: if this column is visible or not. Default to True
-        #  - justify: one of 'left', 'center', 'right'. Default to 'left'
-        #  - tooltip: the tooltip on the column header. Deafult to ''
-        #  - format: string format for numeric types. Deafult to ''
-        #  - width: the number of pixels for the widget. Default to 0, which
-        #    means autosize
-        #  - sorted: if the data is sorted by this column. Default to False
-        #  - order: one of 'ascending', 'descending' or ''. Default to ''
-        'column-definitions' : (str, 'ColumnDefinitions',
-                                'A string with the columns definitions',
-                                '',
-                                gobject.PARAM_READWRITE),
-        }
+    # this property is used to serialize the columns of a List. The format
+    # is a big string with '^' as the column separator and '|' as the field
+    # separator
+    # Each column has the following fields:
+    #  - attribute: name of the model attribute this column shows
+    #  - title: the title that shows in the column header. Default to ''
+    #  - data_type: one of 'str', 'int', 'float', 'date'. Default to str
+    #  - visible: if this column is visible or not. Default to True
+    #  - justify: one of 'left', 'center', 'right'. Default to 'left'
+    #  - tooltip: the tooltip on the column header. Deafult to ''
+    #  - format: string format for numeric types. Deafult to ''
+    #  - width: the number of pixels for the widget. Default to 0, which
+    #    means autosize
+    #  - sorted: if the data is sorted by this column. Default to False
+    #  - order: one of 'ascending', 'descending' or ''. Default to ''
+    gproperty('column-definitions', str, nick="ColumnDefinitions")
     
     def __init__(self, column_definitions=[],
                  instance_list=None,
@@ -268,10 +262,6 @@ class List(gtk.ScrolledWindow):
         self.treeview = gtk.TreeView(self.model)
         self.treeview.show()
         self.add(self.treeview)
-
-        print 'INIT:'
-        print 'treeview:', self.treeview
-        print 'selection:', self.treeview.get_selection()
 
         self.treeview.set_rules_hint(True)
 
@@ -797,9 +787,6 @@ eview that needs to
         self.treeview.get_column(column_index).set_visible(visibility)
 
     def get_selection_mode(self):
-        print 'GET SELECTION MODE:'
-        print 'treeview:', self.treeview
-        print 'selection:', self.treeview.get_selection()
         return self.treeview.get_selection().get_mode()
     
     def set_selection_mode(self, mode):

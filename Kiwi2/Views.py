@@ -30,6 +30,7 @@ are the base of Delegates and Proxies.
 import os, string, re, sys
 
 from Kiwi2 import _warn, get_gladepath
+from Kiwi2.utils import gsignal
 from Kiwi2.initgtk import _non_interactive, gtk, gobject, quit_if_last
 from Kiwi2.Proxies import Proxy
 
@@ -189,10 +190,8 @@ class SlaveView(gobject.GObject):
     gladefile = None
     gladename = None
 
-    __gsignals__ = {
-        # This signal is emited when the view wants to return a result value
-        'result' : (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, (object,))
-        }
+    # This signal is emited when the view wants to return a result value
+    gsignal("result", object)
     
     def __init__(self, toplevel=None, widgets=None, gladefile=None,
                  gladename=None, toplevel_name=None):
