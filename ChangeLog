@@ -1,3 +1,7 @@
+2005-04-06  Gustavo Rahal <gustavo@async.com.br>
+	
+	* some code refactor of last commit
+
 2005-04-05  Gustavo Rahal <gustavo@async.com.br>
 	
 	* Kiwi2/Widgets/Entry.py: fixed and improved input checking

@@ -30,12 +30,12 @@ class EntryTest(unittest.TestCase):
         entry.set_property("data-type", "float")
         if locale_dictionary["thousands_sep"] == ',':
             # correct value
-            entry.set_text("23,400.2")
-            self.assertEqual(entry.read(), 23400.2)
+            entry.set_text("23,400,000.2")
+            self.assertEqual(entry.read(), 23400000.2)
             self.assertEqual(entry._background_timeout_id, -1) 
             
             # wrong value
-            entry.set_text("23.400,2")
+            entry.set_text("23.400.000,2")
             self.assertEqual(entry.read(), None)
         
         
