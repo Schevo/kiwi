@@ -85,8 +85,7 @@ class KiwiListDelegate(SlaveDelegate):
     The KiwiListDelegate defines one public attribute: list, which is the
     KiwiList widget it holds.
     """
-    def __init__(self, columns, instance_list=None, mode=gtk.SELECTION_BROWSE,
-                 handler=None, doubleclick_handler=None):
+    def __init__(self, columns, instance_list=None, mode=gtk.SELECTION_BROWSE):
         """Creates a new KiwiListDelegate. Parameters:
             - columns specifies a list of Column instances, one for each column
             in the KiwiList. The Column defines how that particular column is
@@ -103,20 +102,10 @@ class KiwiListDelegate(SlaveDelegate):
             empty, and the columns won't be autosized or aligned by type; the
             first add_list() is called, these will be set up appropriately.
             
-            - handler should be a callback function that will be run when items
-            are selected in the list
-            
-            - unselect_handler should be a callback function to be run when rows
-            are unselected
-
-            - doubleclick_handler should be a callback function to be run when a
-            row is double-clicked
-            
             - mode is the selection mode the list is set to (defaulting nicely
             to SELECTION_BROWSE)
         """
-        self.list = KiwiList(columns, instance_list, mode,
-                             handler, doubleclick_handler)
+        self.list = KiwiList(columns, instance_list, mode)
 
         # Set up pixmaps for creation of clist
         #title_pixmaps = {}

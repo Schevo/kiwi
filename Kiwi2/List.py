@@ -24,7 +24,7 @@
 
 from Kiwi2.accessors import kgetattr
 from Kiwi2 import ValueUnset
-from Kiwi2.initgtk import gtk
+from Kiwi2.initgtk import gtk, gobject
 
 # Minimum number of rows where we show busy cursor when sorting numeric columns
 MANY_ROWS = 1000
@@ -173,57 +173,105 @@ class KiwiList(gtk.TreeView):
     """An enhanced version of GtkTreeView, which provides pythonic wrappers
     for accessing rows, and optional facilities for column sorting (with
     types) and column selection."""
-    def __init__(self, columns,
+    __gsignals__ = {
+        'selection-change' : (gobject.SIGNAL_RUN_LAST, None, ()),
+        'double-click' : (gobject.SIGNAL_RUN_LAST, None, (object,)),
+        }
+    
+    def __init__(self, column_definitions,
                  instance_list=None,
-                 mode=gtk.SELECTION_BROWSE,
-                 handler=None,
-                 doubleclick_handler=None):
+                 mode=gtk.SELECTION_BROWSE):
         """Create a new Kiwi TreeView.
         """
-        self._columns = list(columns)
+        self._column_definitions = list(column_definitions)
 
         self.model = gtk.ListStore(object)
+        self.model.set_sort_func(0, self._sort_function)
         gtk.TreeView.__init__(self, self.model)
         self.set_rules_hint(True)
 
-        has_types_information = True
+        # these tooltips are used for the columns
+        self._tooltips = gtk.Tooltips()
+
+        # convinience connections
+        id = self.get_selection().connect("changed",
+                                          self._on_selection__changed)
+        self._selection_changed_id = id
+        id = self.connect_after("row-activated",
+                                self._on_treeview__row_activated)
+        self._row_activated_id = id
+
+        # create a popup menu for showing or hiding columns
+        self._popup = gtk.Menu()
+
+        # get type information and crete the columns
+        
+        self._has_types_information = True
         # check if all the columns has the data_type set
-        for col in self._columns:
+        for col in self._column_definitions:
             if col.data_type is None:
-                has_types_information = False
+                self._has_types_information = False
                 break
             
         # if not, try to guess the data_types from the first instance
-        if not has_types_information:
+        if not self._has_types_information:
             if instance_list is not None:
                 instance_list = tuple(instance_list)
                 self._get_types(instance_list[0])
-                has_types_information = True
+                self._has_types_information = True
 
-        if has_types_information:
+        if self._has_types_information:
             self._create_columns()
 
-        # Post-initialization kiwiList setup
 
-        self._sort_column = self._which_sort(columns)
-        if self._sort_column is not None:
-            self.model.set_sort_func(0, self._sort_function)
+        # by default we are unordered. This index points to the column
+        # definition of the column that dictates the order, in case there is
+        # any
+        self._sort_column_definition = -1
         
-        autosize = True
-        for i, column in enumerate(self._columns):
+        self._setup()
+
+        if instance_list is not None:
+            self.freeze_notify()
+            self._load(instance_list)
+            self.thaw_notify()
+
+        if self._sort_column_definition_index != -1:
+            cd = self._column_definitions[self._sort_column_definition_index]
+            self.model.set_sort_column_id(0, cd.order)
+
+        # Set selection mode last to avoid spurious events
+        self.set_selection_mode(mode)
+
+
+    def _setup(self):
+        """Post initialize the KiwiList. This should be called everytime
+        a critical component is changed (like a column definition).
+        """
+        # are we sorted?
+        self._sort_column_definition_index = self._which_sort()
+        i = self._sort_column_definition_index
+        if i != -1:
             treeview_column = self.get_column(i)
+            treeview_column.set_sort_indicator(True)
+
+        # fine grain setup
+        self._setup_columns()
+        
+    def _setup_columns(self):
+        autosize = True
+        for i, column in enumerate(self._column_definitions):
+            treeview_column = self.get_column(i)
+            treeview_column.connect("clicked", self._on_column__clicked, i)
             if column.width is not None:
                 treeview_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
                 treeview_column.set_fixed_width(column.width)
                 autosize = False
-            #if column.tooltip is not None:
-                #tip = gtk.GtkTooltips()
-                #align = clist.get_column_widget(i)
-                #col = align['parent']
-                #if ktype(col) == gtk.GtkButtonType:
-                    #tip.set_tip(col, column.tooltip)
-                #else:
-                    #_warn("""Tried to set tooltip `%s' to column %d but found a 
+            if column.tooltip is not None:
+                widget = self._get_column_button(treeview_column)
+                if widget is not None:
+                    self._tooltips.set_tip(widget, column.tooltip)
+                    
 #%s where I expected a GtkButton""" % (column.tooltip, i, col))
             #if column.decimal_separator:
             ## XXX: This is a hack. I now see we need to keep the data model
@@ -237,37 +285,18 @@ class KiwiList(gtk.TreeView):
         # not touch the column. When typelist is not set,
         # add_instance/add_list have a chance to fix up the remaining
         # justification by looking at the first instance's data.
-        self._justify_columns(columns, typelist)
+#        self._justify_columns(columns, typelist)
 
         self._autosize = autosize
 
-        self._handler_sig = None
-        if handler:
-            self.set_select_handler(handler)
-   
-        self._doubleclick_handler_sig = None
-        if doubleclick_handler:
-            self.set_doubleclick_handler(doubleclick_handler)
-        
         #clist.enable_column_select()
-
-        if instance_list:
-            self.freeze_notify()
-            self._load(instance_list)
-            self.thaw_notify()
-
-        if self._sort_column is not None:
-            self.model.set_sort_column_id(0, self._sort_column.order)
-
-        # Set selection mode last to avoid spurious events
-        self.set_selection_mode(mode)
 
     # Columns handling
     def _get_types(self, instance):
         """Iterates through columns, using the type attribute when found or
         the type of the associated attribute from the sample instance provided.
         """
-        for c in self._columns:
+        for c in self._column_definitions:
             if c.data_type is not None:
                 continue
             # steal attribute from sample instance and use its type
@@ -285,16 +314,34 @@ class KiwiList(gtk.TreeView):
 
     def _create_columns(self):
         """Create the treeview columns"""
-        for col in self._columns:
-            treeview_column = gtk.TreeViewColumn(col.title)
-            renderer = self._create_best_renderer_for_type(col.data_type)
+        for i, col in enumerate(self._column_definitions):
+            treeview_column = gtk.TreeViewColumn()
+
+            # we need to set our own widget because otherwise
+            # _get_column_button won't work
+            label = gtk.Label(col.title)
+            label.show()
+            treeview_column.set_widget(label)
+            
+            renderer = self._create_best_renderer_for_type(col.data_type, i)
             treeview_column.pack_start(renderer)
-            treeview_column.set_cell_data_func(renderer, self._set_cell_data, col.attribute)
+            treeview_column.set_cell_data_func(renderer, self._set_cell_data,
+                                               col.attribute)
             self.append_column(treeview_column)
             treeview_column.set_visible(col.visible)
             treeview_column.set_resizable(True)
-            
-    def _create_best_renderer_for_type(self, data_type):
+            treeview_column.set_clickable(True)
+            treeview_column.set_reorderable(True)
+
+            # add a menuitem in the popup
+            menuitem = gtk.CheckMenuItem(col.title)
+            menuitem.set_active(col.visible)
+            menuitem.connect("activate", self._on_menuitem__activate,
+                             treeview_column)
+            menuitem.show()
+            self._popup.append(menuitem)
+
+    def _create_best_renderer_for_type(self, data_type, column_index):
         """Create the best CellRenderer for a given type.
         It also set the property of the renderer that depends on the model,
         in the renderer.
@@ -302,12 +349,19 @@ class KiwiList(gtk.TreeView):
         if data_type in (int, float):
             renderer = gtk.CellRendererText()
             renderer.set_data('renderer-property', 'text')
+            renderer.set_property('editable', True)
+            renderer.connect('edited', self._on_renderer__edited, column_index)
         elif data_type is bool:
             renderer = gtk.CellRendererToggle()
             renderer.set_data('renderer-property', 'active')
+            renderer.set_property('activatable', True)
+            renderer.connect('toggled', self._on_renderer__toggled,
+                             column_index)
         elif issubclass(data_type, basestring):
             renderer = gtk.CellRendererText()
             renderer.set_data('renderer-property', 'text')
+            renderer.set_property('editable', True)
+            renderer.connect('edited', self._on_renderer__edited, column_index)
         else:
             raise ValueError, "the type %s is not supported yet" % data_type
         
@@ -322,6 +376,33 @@ class KiwiList(gtk.TreeView):
         data = getattr(instance, model_attribute, None)
         cellrenderer.set_property(renderer_prop, data)
 
+    def _on_popup_button__clicked(self, button):
+        self._popup.popup(None, None, None, 0, 0)
+
+#        event.button, event.time)    
+
+    def _on_menuitem__activate(self, menuitem, treeview_column):
+        treeview_column.set_visible(menuitem.get_active())
+
+    def _on_renderer__edited(self, renderer, path, new_text, column_index):
+        row_iter = self.model.get_iter(path)
+        instance = self.model.get_value(row_iter, 0)
+        model_attribute = self._column_definitions[column_index].attribute
+        data_type = self._column_definitions[column_index].data_type
+        value = new_text
+        if data_type in (int, float):
+            value = data_type(new_text)
+        # XXX convert new_text to the proper data type
+
+        setattr(instance, model_attribute, value)
+        
+    def _on_renderer__toggled(self, renderer, path, column_index):
+        row_iter = self.model.get_iter(path)
+        instance = self.model.get_value(row_iter, 0)
+        value = not renderer.get_active()
+        model_attribute = self._column_definitions[column_index].attribute
+        setattr(instance, model_attribute, value)
+        
     # selection methods
     def _find_iter_from_data(self, instance):
         data_iter = self.model.get_iter_first()
@@ -335,38 +416,65 @@ class KiwiList(gtk.TreeView):
         self.set_cursor(self.model.get_path(row_iter))
                     
     # sorting methods
-    def _which_sort(self, columns):
-        """Return the first column with the sorted attribute set to True"""
-        for c in columns:
+    def _which_sort(self):
+        """Return the index of the first column with the sorted attribute
+        set to True.
+        """
+        for i, c in enumerate(self._column_definitions):
             if c.sorted:
-                return c
-        return None
+                return i
+        return -1
 
     def _sort_function(self, model, iter1, iter2):
         obj1 = model.get_value(iter1, 0)
         obj2 = model.get_value(iter2, 0)
-        attr = self._sort_column.attribute
+        cd = self._column_definitions[self._sort_column_definition_index]
+        attr = cd.attribute
         value1 = getattr(obj1, attr)
         value2 = getattr(obj2, attr)
         return cmp(value1, value2)
 
-    # handlers
-    def set_select_handler(self, handler):
-        """Sets a callback for row selection events"""
-        if self._handler_sig is not None:
-            raise RuntimeError, "You can't connect two select handlers"
-        selection = self.get_selection()
-        self._handler_sig = selection.connect("changed", handler)
-        
-    def set_doubleclick_handler(self, handler):
-        """Sets a callback for row double-click events"""
-        if self._doubleclick_handler_sig is not None:
-            raise RuntimeError, "You can't connect two doubleclick handlers"
-        # Using connect_after ensures that selection is already correct
-        # when our handler is called.
-        sig = self.connect_after("row-activated", handler)
-        self._doubleclick_handler_sig = sig
+    def _on_column__clicked(self, treeview_column, column_index):
+        if self._sort_column_definition_index == -1:
+            # this mean we are not sorting at all
+            return
 
+        old_column = self.get_column(self._sort_column_definition_index)
+        old_column.set_sort_indicator(False)
+        
+        # reverse the old order or start with SORT_DESCENDING if there was no
+        # previous order
+        self._sort_column_definition_index = column_index
+        cd = self._column_definitions[column_index]
+
+        # maybe it's the first time this column is ordered
+        if cd.order is None:
+            cd.order = gtk.SORT_DESCENDING
+
+        # reverse the order
+        old_order = cd.order
+        if old_order == gtk.SORT_ASCENDING:
+            new_order = gtk.SORT_DESCENDING
+        else:
+            new_order = gtk.SORT_ASCENDING
+        cd.order = new_order
+
+        # cosmetic changes
+        treeview_column.set_sort_indicator(True)
+        treeview_column.set_sort_order(new_order)
+
+        # This performs the actual ordering
+        self.model.set_sort_column_id(0, new_order)
+
+    # handlers
+    def _on_selection__changed(self, selection):
+        self.emit('selection-change')
+
+    def _on_treeview__row_activated(self, treeview, path, view_column):
+        row_iter = self.model.get_iter(path)
+        selected_obj = self.model.get_value(row_iter, 0)
+        self.emit('double-click', selected_obj)
+        
     # Python virtual methods
     def __getitem__(self, arg):
         if isinstance(arg, int):
@@ -403,6 +511,22 @@ class KiwiList(gtk.TreeView):
             self.columns_autosize()
             self._autosize = False
 
+    # hacks
+    def _get_column_button(self, column):
+        """Return the button widget of a particular TreeViewColumn.
+
+        This hack is needed since that widget is private of the TreeView but
+        we need access to them for Tooltips, right click menus, ...
+
+        Use this function at your own risk
+        """
+        button = column.get_widget()
+        assert button is not None, "You must call column.set_widget() before calling _get_column_button"
+        while not isinstance(button, gtk.Button):
+            button = button.get_parent()
+
+        return button
+    
     #
     # Public API
     #
@@ -416,10 +540,10 @@ class KiwiList(gtk.TreeView):
         old_mode = self.get_selection_mode()
         self.set_selection_mode(gtk.SELECTION_SINGLE)
         
-        if not self._typelist:
-            self._typelist = self._get_types(instance, self._columns)
-            clist.set_typelist(self._typelist)
-            self._justify_columns(self._columns, self._typelist)
+##         if not self._typelist:
+##             self._typelist = self._get_types(instance, self._column_definitions)
+##             clist.set_typelist(self._typelist)
+##             self._justify_columns(self._column_definitions, self._typelist)
 
         row_iter = self.model.append((instance,))
         if self._autosize:
@@ -427,11 +551,9 @@ class KiwiList(gtk.TreeView):
 
         # Avoid spurious selection or signal emissions when swapping
         # selection mode
-        if self._handler_sig:
-            self.handler_block(self._handler_sig)
+        self.handler_block(self._row_activated_id)
         self.set_selection_mode(old_mode)
-        if self._handler_sig:
-            self.handler_unblock(self._handler_sig)
+        self.handler_unblock(self._row_activated_id)
 
         if select:
             self._select_and_focus_row(row_iter)
@@ -510,12 +632,14 @@ class KiwiList(gtk.TreeView):
             row_iter = self.model.get_iter_first()
             self._select_and_focus_row(row_iter)
             
-        clist.thaw_notify()
+        self.thaw_notify()
         return ret
+
+gobject.type_register(KiwiList)
 
 if __name__ == '__main__':
     win = gtk.Window()
-    win.set_default_size(300, 300)
+    win.set_default_size(300, 150)
     win.connect('destroy', gtk.main_quit)
 
     class Person:
@@ -523,13 +647,13 @@ if __name__ == '__main__':
             self.name, self.age, self.city, self.single = name, age, city, single
 
     columns = (
-        Column('name'),
+        Column('name', sorted=True, tooltip='What about a stupid tooltip?'),
         Column('age'),
         Column('city', visible=True),
         Column('single', title='Single?')
         )
     
-    data = (Person('Evandro', 23, 'Bello Horizonte', False),
+    data = (Person('Evandro', 23, 'Belo Horizonte', False),
             Person('Daniel', 22, 'Sao Carlos', False),
             Person('Henrique', 21, 'Sao Carlos', True),
             Person('Gustavo', 23, 'San Jose do Santos', True),
@@ -542,11 +666,31 @@ if __name__ == '__main__':
     # add an extra person
     l.add_instance(Person('Nando', 29, 'Santos', False))
 
-    # change an existing one
-    l[1] = Person('Daniel', 23, 'Sao Carlos', False)
-    l[1].city = 'Sao Paulo'
+    sw = gtk.ScrolledWindow()
+    sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+    sw.add(l)
+
+    hack = {}
+    def find_vertical_scrollbar(widget, hack):
+        if isinstance(widget, gtk.VScrollbar):
+            hack['scrollbar'] = widget
+            
+    sw.forall(find_vertical_scrollbar, hack)
+
+    scrollbar = hack['scrollbar']
+
+#    button = l.get_
+    def fix_vertical_scrollbar(scrollbar):
+        alloc = scrollbar.get_allocation()
+        print alloc.x, alloc.y, alloc.width, alloc.height
+        new_alloc = gtk.gdk.Rectangle(alloc.x, alloc.y + 20,
+                                      alloc.width,
+                                      alloc.height - 20)
+        scrollbar.size_allocate(new_alloc)
+            
+    gobject.idle_add(fix_vertical_scrollbar, scrollbar)
     
-    win.add(l)
+    win.add(sw)
     win.show_all()
     
     gtk.main()

@@ -40,24 +40,26 @@ class Shell(Delegates.GladeDelegate):
 #        self.title.set_color("blue") 
 
         # Create the delegate and set it up
-        slave = Delegates.KiwiListDelegate(my_columns, news, 
-                                           handler=self.news_selected)
+        slave = Delegates.KiwiListDelegate(my_columns, news)
+        slave.list.connect('selection-change', self.news_selected)
+        slave.list.connect('double-click', self.double_click)
         self.attach_slave("placeholder", slave)
         slave.show_all()
         slave.focus_toplevel() # Must be done after attach
         
         self.slave = slave
     
-    def news_selected(self, treeselection, *args):
+    def news_selected(self, the_list):
         # only one item can be selected in mode SELECTION_BROWSE
-        model, iter = treeselection.get_selected()
-        if iter is not None:
-            item = self.slave[iter]
+        item = self.slave.get_selected()[0]
         print "%s %s %s\n" % (item.title, item.author, item.url)
 
+    def double_click(self, the_list, selected_object):
+        self.emit('result', selected_object.url)
+        self.hide_and_quit()
+        
     def on_ok__clicked(self, *args):
         item = self.slave.get_selected()[0]
-        self.retval = item.url
         self.emit('result', item.url)
         self.hide_and_quit()
 
