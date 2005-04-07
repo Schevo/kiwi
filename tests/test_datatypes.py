@@ -46,9 +46,11 @@ class DataTypesTest(unittest.TestCase):
         self.assertEqual(datatypes.str2date("12-02-1979"), birthdate)
 
         # test some invalid dates
-        self.assertRaises(ValueError, datatypes.str2date, "40-10-2005")
+        self.assertRaises(datatypes.ValidationError,
+                          datatypes.str2date, "40-10-2005")
         # february only have 28 days
-        self.assertRaises(ValueError, datatypes.str2date, "30-02-2005")
+        self.assertRaises(datatypes.ValidationError,
+                          datatypes.str2date, "30-02-2005")
         
     def testdate2str(self):
         locale.setlocale(locale.LC_TIME, 'es_ES')

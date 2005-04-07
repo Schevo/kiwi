@@ -93,19 +93,7 @@
                 </child>
             </object>
         </child>
-    </object>
-    <widget class="GtkWindow" id="window1">
-        <property name="title" translatable="True"></property>
-        <property name="role"></property>
-        <property name="events">all-events-mask | button-motion-mask | button-press-mask | button-release-mask | button1-motion-mask | button2-motion-mask | button3-motion-mask | enter-notify-mask | exposure-mask | focus-change-mask | key-press-mask | key-release-mask | leave-notify-mask | pointer-motion-hint-mask | pointer-motion-mask | property-change-mask | proximity-in-mask | proximity-out-mask | scroll-mask | structure-mask | substructure-mask | visibility-notify-mask</property>
-        <child>
-            <widget class="GtkVBox" id="vbox1">
-                <property name="events">all-events-mask | button-motion-mask | button-press-mask | button-release-mask | button1-motion-mask | button2-motion-mask | button3-motion-mask | enter-notify-mask | exposure-mask | focus-change-mask | key-press-mask | key-release-mask | leave-notify-mask | pointer-motion-hint-mask | pointer-motion-mask | property-change-mask | proximity-in-mask | proximity-out-mask | scroll-mask | structure-mask | substructure-mask | visibility-notify-mask</property>
-                <property name="visible">True</property>
-                <child>
-                    <widget class="GtkMenuBar" id="menubar1">
-                        <property name="events">all-events-mask | button-motion-mask | button-press-mask | button-release-mask | button1-motion-mask | button2-motion-mask | button3-motion-mask | enter-notify-mask | exposure-mask | focus-change-mask | key-press-mask | key-release-mask | leave-notify-mask | pointer-motion-hint-mask | pointer-motion-mask | property-change-mask | proximity-in-mask | proximity-out-mask | scroll-mask | structure-mask | substructure-mask | visibility-notify-mask</property>
-                        <property name="ui"><![CDATA[
+	<ui id="initial-state"><![CDATA[<ui>
         <menubar action="menubar1" name="menubar1">
         <menu action="FileMenu" name="FileMenu">
         <menuitem action="New" name="New"/>
@@ -121,18 +109,6 @@
         <menuitem action="Paste" name="Paste"/>
         </menu>
         </menubar>
-        ]]></property>
-                        <property name="visible">True</property>
-                    </widget>
-                    <packing>
-                        <property name="expand">False</property>
-                    </packing>
-                </child>
-                <child>
-                    <widget class="GtkToolbar" id="toolbar1">
-                        <property name="toolbar_style">both</property>
-                        <property name="events">all-events-mask | button-motion-mask | button-press-mask | button-release-mask | button1-motion-mask | button2-motion-mask | button3-motion-mask | enter-notify-mask | exposure-mask | focus-change-mask | key-press-mask | key-release-mask | leave-notify-mask | pointer-motion-hint-mask | pointer-motion-mask | property-change-mask | proximity-in-mask | proximity-out-mask | scroll-mask | structure-mask | substructure-mask | visibility-notify-mask</property>
-                        <property name="ui"><![CDATA[
         <toolbar action="toolbar1" name="toolbar1">
         <toolitem action="New" name="New"/>
         <toolitem action="Open" name="Open"/>
@@ -142,7 +118,25 @@
         <toolitem action="Cut" name="Cut"/>
         <toolitem action="Paste" name="Paste"/>
         </toolbar>
-        ]]></property>
+        </ui>]]></ui>
+    </object>
+    <widget class="GtkWindow" id="window1">
+        <property name="title" translatable="True"></property>
+        <property name="role"></property>
+        <child>
+            <widget class="GtkVBox" id="vbox1">
+                <property name="visible">True</property>
+                <child>
+                    <widget class="GtkMenuBar" id="menubar1" constructor="initial-state">
+                        <property name="visible">True</property>
+                    </widget>
+                    <packing>
+                        <property name="expand">False</property>
+                    </packing>
+                </child>
+                <child>
+                    <widget class="GtkToolbar" id="toolbar1" constructor="initial-state">
+                        <property name="toolbar_style">both</property>
                         <property name="visible">True</property>
                     </widget>
                     <packing>

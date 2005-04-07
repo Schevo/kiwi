@@ -1,3 +1,10 @@
+2005-04-07  Lorenzo Gil Sanchez  <lgs@sicem.biz>
+
+	* tests/actions.glade: updated the format of the glade file
+
+	* tests/test_datatypes.py (DataTypesTest.teststr2date): update the
+	exceptions that are raised when the dates are wrong
+
 2005-04-06  Gustavo Rahal <gustavo@async.com.br>
 	
 	* some code refactor of last commit
