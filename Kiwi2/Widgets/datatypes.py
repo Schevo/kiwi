@@ -40,7 +40,7 @@ def set_date_format(format):
             raise TypeError("Format should be a string, found a %s" % \
                             type(format))
         date_format = format
-        readable_date_format = get_readable_date_format()
+        readable_date_format = _get_readable_date_format()
     
 def str2date(value):
     "Convert a string to a date"

@@ -496,9 +496,6 @@ class Proxy:
                 # can help it.
                 return
             value = kgetattr(self.model, attribute, ValueUnset)
-            if value is ValueUnset:
-                raise ValueError("Tried to update %s to unset value" %
-                                 attribute)
 
         widget = self._attr_map.get(attribute, None)
 
@@ -665,10 +662,11 @@ class Proxy:
                 # if we have a model, grab its value to update the widgets
                 self._register_proxy_in_model(attribute)
                 value = kgetattr(self.model, attribute, ValueUnset)
-
-            if value is ValueUnset:
-                # grab default in widget, converting it as necessary
-                value = widget.get_property('default-value')
+                if value is ValueUnset:
+                    # get the default value from the widget if it has any
+                    defvalue = widget.get_default_value()
+                    if defvalue is not None:
+                        value = defvalue
 
             update = getattr(self, "tweak_%s" % attribute, None) or self.update
             update(attribute, value)

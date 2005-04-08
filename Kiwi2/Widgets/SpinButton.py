@@ -25,7 +25,7 @@
 from Kiwi2.initgtk import gtk, gobject
 from Kiwi2.Widgets.WidgetProxy import WidgetProxyMixin, implementsIProxy
 from Kiwi2.utils import gsignal, gproperty
-
+from Kiwi2 import ValueUnset
 
 class SpinButton(gtk.SpinButton, WidgetProxyMixin):
     implementsIProxy()
@@ -41,7 +41,7 @@ class SpinButton(gtk.SpinButton, WidgetProxyMixin):
         WidgetProxyMixin.set_data_type(self, data_type)
         if self._data_type not in (int, float):
             self._data_type = old_datatype
-            raise TypeError, "SpinButtons only accept integer or float values"
+            raise TypeError("SpinButtons only accept integer or float values")
         
     def do_value_changed(self):
         self.emit('content-changed')
@@ -53,6 +53,9 @@ class SpinButton(gtk.SpinButton, WidgetProxyMixin):
     def update(self, data):
         # first, trigger some basic validation
         WidgetProxyMixin.update(self, data)
-        self.set_value(data)
+        if data is not ValueUnset:
+            self.set_value(data)
+        else:
+            self.set_value("")
 
 gobject.type_register(SpinButton)

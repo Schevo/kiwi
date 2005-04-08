@@ -22,10 +22,10 @@
 # Author(s): Christian Reis <kiko@async.com.br>
 #
 
+from Kiwi2 import ValueUnset
 from Kiwi2.initgtk import gtk, gobject
 from Kiwi2.Widgets.WidgetProxy import WidgetProxyMixin, implementsIProxy
 from Kiwi2.utils import gsignal, gproperty
-
 
 class RadioButton(gtk.RadioButton, WidgetProxyMixin):
     implementsIProxy()

@@ -25,7 +25,7 @@
 from Kiwi2.initgtk import gtk, gobject
 from Kiwi2.Widgets.WidgetProxy import WidgetProxyMixin, implementsIProxy
 from Kiwi2.utils import gsignal, gproperty, set_foreground
-from Kiwi2 import _warn
+from Kiwi2 import _warn, ValueUnset
 
 class Label(gtk.Label, WidgetProxyMixin):
     implementsIProxy()
@@ -43,8 +43,9 @@ class Label(gtk.Label, WidgetProxyMixin):
     def update(self, data):
         # first, trigger some basic validation
         WidgetProxyMixin.update(self, data)
-        
-        self.set_text(self.type2str(data))
+
+        if data is not ValueUnset:
+            self.set_text(self.type2str(data))
 
     #def _attribute_string(self):
         #self.attr_str = '<span style="italic" weight="bold" size=xx-small>'

@@ -22,7 +22,7 @@
 # Author(s): Christian Reis <kiko@async.com.br>
 #
 
-from Kiwi2 import _warn
+from Kiwi2 import _warn, ValueUnset
 from Kiwi2.initgtk import gobject
 from Kiwi2.Widgets import datatypes
 
@@ -37,19 +37,15 @@ class WidgetProxyMixin(object):
 
     def __init__(self, data_type=str, model_attribute=None,
                  default_value=None):
-        self._default_value = default_value
-        if default_value is None:
-            self._default_value_set = False
-        else:
-            self._default_value_set = True            
-
         # we need initial values so this variables always exist
+        self._default_value = None
         self._data_type = None
         self._model_attribute = None
         
         # now we setup the variables with our parameters
         self.set_data_type(data_type)
         self.set_model_attribute(model_attribute)
+        self.set_default_value(default_value)
         
     def update(self, data):
         """Set the content of the widget with @data.
@@ -60,10 +56,9 @@ class WidgetProxyMixin(object):
             msg = "You must set the data type before updating a Kiwi widget"
             raise TypeError(msg)
 
-        if data is None:
-            _warn("Trying to set a widget with data None. This probably means "
-                  "that the model has not been initialized")
-            
+        if data is ValueUnset:
+            return
+        
         elif not isinstance(data, self._data_type):
             raise TypeError("%s: Data is supposed to be a %s but it is %s: %s" \
                             % (self.name, self._data_type, type(data), data))
@@ -121,9 +116,6 @@ class WidgetProxyMixin(object):
         else:
             self._data_type = data_type
 
-        if not self._default_value_set:
-            self._default_value = datatypes.default_values[self._data_type]
-
     def get_model_attribute(self):
         return self._model_attribute
 
@@ -134,11 +126,10 @@ class WidgetProxyMixin(object):
         return self._default_value
 
     def set_default_value(self, value):
-        if not isinstance(value, self._data_type):
-            raise TypeError("The default value should be of type %s, found "
-                            "%s" % (self._data_type, type(value)))
-        self._default_value = value
-        self._default_value_set = True
+        if isinstance(value, basestring):
+            self._default_value = self.str2type(value)
+        else:
+            self._default_value = value
     
     def str2type(self, data):
         """Convert a string to our data type.

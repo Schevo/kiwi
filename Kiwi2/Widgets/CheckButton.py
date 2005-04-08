@@ -25,6 +25,7 @@
 from Kiwi2.initgtk import gtk, gobject
 from Kiwi2.Widgets.WidgetProxy import WidgetProxyMixin, implementsIProxy
 from Kiwi2.utils import gsignal
+from Kiwi2 import ValueUnset
 
 class CheckButton(gtk.CheckButton, WidgetProxyMixin):
     implementsIProxy()
@@ -52,6 +53,7 @@ class CheckButton(gtk.CheckButton, WidgetProxyMixin):
     def update(self, data):
         # first, trigger some basic validation
         WidgetProxyMixin.update(self, data)
-        self.set_active(data)
+        if data is not ValueUnset:
+            self.set_active(data)
 
 gobject.type_register(CheckButton)

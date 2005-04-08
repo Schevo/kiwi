@@ -22,6 +22,7 @@
 # Author(s): Christian Reis <kiko@async.com.br>
 #
 
+from Kiwi2 import ValueUnset
 from Kiwi2.initgtk import gtk, gobject
 from Kiwi2.Widgets.WidgetProxy import WidgetProxyMixin, implementsIProxy
 from Kiwi2.utils import gsignal
@@ -162,7 +163,7 @@ class ComboBox(gtk.ComboBox, ComboProxyMixin):
 
     def update(self, data):
         # We dont need validation because the user always choose a valid value
-        if data is not None:
+        if data is not ValueUnset:
             self.select_item_by_data(data)
 
     def prefill(self, itemdata, sort=False):
@@ -212,7 +213,10 @@ class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin):
     def update(self, data):
         # first, trigger some basic validation
         WidgetProxyMixin.update(self, data)
-        self.child.set_text(self.type2str(data))
+        if value is ValueUnset:
+            self.child.set_text("")
+        else:
+            self.child.set_text(self.type2str(data))
 
     def prefill(self, itemdata, sort=False, clear_entry=False):
         super(ComboBoxEntry, self).prefill(itemdata, sort)

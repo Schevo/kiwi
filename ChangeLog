@@ -1,5 +1,19 @@
 2005-04-07  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
+	* Kiwi2/Widgets/ComboBox.py: 
+	* Kiwi2/Widgets/CheckButton.py: 
+	* Kiwi2/Widgets/RadioButton.py: 
+	* Kiwi2/Widgets/Label.py: 
+	* Kiwi2/Widgets/Entry.py: 
+	* Kiwi2/Widgets/WidgetProxy.py: 
+	* Kiwi2/Widgets/SpinButtonpy: make the widgets play nicely
+	with ValueUnset
+
+	* Kiwi2/Widgets/datatypes.py (set_date_format): fix a typo
+
+	* Kiwi2/Proxies.py (Proxy._initialize_widgets): allow to call
+	update on the widgets with ValueUnset
+
 	* tests/actions.glade: updated the format of the glade file
 
 	* tests/test_datatypes.py (DataTypesTest.teststr2date): update the
