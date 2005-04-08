@@ -24,6 +24,7 @@
 
 import time
 
+from Kiwi2 import ValueUnset
 from Kiwi2.initgtk import gtk, gobject
 from Kiwi2.Widgets.WidgetProxy import WidgetProxyMixin, implementsIProxy
 from Kiwi2.Widgets.datatypes import ValidationError
@@ -179,11 +180,11 @@ class Entry(gtk.Entry, WidgetProxyMixin):
         return data
 
     def update(self, data):
-        if data is None:
+        WidgetProxyMixin.update(self, data)
+
+        if data is ValueUnset:
             self.set_text("")
         else:
-            WidgetProxyMixin.update(self, data)
-        
             self.set_text(self.type2str(data))
 
     def set_text(self, text):
