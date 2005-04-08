@@ -411,7 +411,7 @@ class OldVirtualProxy:
         return getattr(self, name)
 
 
-from Kiwi2.Widgets.WidgetProxy import WidgetProxyMixin
+from Kiwi2.Widgets import WidgetProxy
 
 def block_widget(widget):
     """Blocks the signal handler of the 'content-changed' signal on widget"""
@@ -580,7 +580,7 @@ class Proxy:
                 raise AttributeError("The widget %s was not "
                                      "found in the view %s" % (widget_name, self.view))
             
-            if not isinstance(widget, WidgetProxyMixin):
+            if not isinstance(widget, WidgetProxy.MixIn):
                 continue
 
             data_type = widget.get_property('data-type')
@@ -596,7 +596,7 @@ class Proxy:
                       "a model attribute set so it will not be eassociated "
                       "with the model" % widget)
                 continue
-            
+             
             connection_id = widget.connect('content-changed',
                                            self._on_widget__content_changed)
             widget.set_data('content-changed-id', connection_id)

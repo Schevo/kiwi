@@ -23,12 +23,13 @@
 #
 
 from Kiwi2 import _warn, ValueUnset
-from Kiwi2.initgtk import gobject
+from Kiwi2.initgtk import gtk, gobject
 from Kiwi2.Widgets import datatypes
+from Kiwi2.utils import gsignal, gproperty
 
 import sys
 
-class WidgetProxyMixin(object):
+class MixIn(object):
     """This class is a mixin that provide a common interface for KiwiWidgets.
 
     Usually the Proxy class need to set and get data from the widgets. It also
@@ -153,9 +154,84 @@ class WidgetProxyMixin(object):
         assert isinstance(data, self._data_type)
         return datatypes.converters[datatypes.TO_STR][self._data_type](data)
 
+class MixInSupportMandatory(MixIn):
+    """Class used by some Kiwi Widgets that need to support mandatory input.
+    
+    If you need to create a Kiwi Widget with mandatory input support, use this
+    class instead of WidgetProxyMinIn. Mandatory support provides a way to 
+    warn the user when input is necessary.
+    """
+    
+    MANDATORY_ICON = gtk.STOCK_FILE
+    
+    def __init__(self, data_type=str, model_attribute=None,
+                 default_value=None):
+        MixIn.__init__(self, data_type, model_attribute,
+                                  default_value)
+        self._mandatory = False
+        self._draw_mandatory_icon = False
+        
+        self._draw_widget = None
+        self._draw_gdk_window = None
+    
+    def set_drawing_windows(self, widget, gdk_window):
+        """Set the widget and the gdk window to draw the icon.
+        
+        Sometimes the widget and gdk window to draw are not so obvious
+        so we let the Kiwi Widget decide where to draw.
+        """
+        self._draw_widget = widget
+        self._draw_gdk_window = gdk_window
+    
+    def get_mandatory(self):
+        """Checks if the Kiwi Widget is set to mandatory"""
+        return self._mandatory
+    
+    def set_mandatory(self, mandatory):
+        """Sets the Kiwi Widget as mandatory, in other words, the widget needs 
+        to provide data to the widget 
+        """
+        self._mandatory = mandatory
+        self._draw_mandatory_icon = mandatory
+        self.queue_draw()
+    
+    def _draw_icon(self, widget=None, gdk_window=None, icon=MANDATORY_ICON):
+        """Draw an icon on a specified widget"""
+        if widget is None:
+            if self._draw_widget is None:
+                _warn("Can't draw icon. %s widget needs to specify"
+                " a widget to the draw function. If you want to"
+                " draw the mandatory icon call set_drawing_window()"
+                " with the correct parameters" % self.get_name())
+                return
+            else:
+                widget = self._draw_widget
+                gdk_window = self._draw_gdk_window
+        
+        
+        pixbuf = widget.render_icon(icon, gtk.ICON_SIZE_MENU)
+        pixbuf_width = pixbuf.get_width()
+        pixbuf_height = pixbuf.get_height()
+        
+        widget_x, widget_y, widget_width, widget_height = widget.get_allocation()            
+        icon_x_pos = widget_x + widget_width - pixbuf_width
+        icon_y_pos = widget_y + widget_height - pixbuf_height
+        
+        area_window = gdk_window.get_children()[0]
+        gdk_window_width, gdk_window_height = area_window.get_size()
+    
+        draw_icon_x = gdk_window_width - pixbuf_width
+        draw_icon_y = (gdk_window_height - pixbuf_height)/2
+        area_window.draw_pixbuf(None, pixbuf, 0, 0, draw_icon_x,
+                                     draw_icon_y, pixbuf_width,
+                                     pixbuf_height)
+        
+        return (icon_x_pos, icon_y_pos, pixbuf_width, pixbuf_height)        
+
 def implementsIProxy():
-    """Add a content-changed signal and a data-type, default-value and
-    model-attribute properties to the class where this functions is called.
+    """Add a content-changed signal and a data-type, default-value, 
+    model-attribute properties to the class where this 
+    functions is called.
     """
     frame = sys._getframe(1)
     try:
@@ -181,3 +257,14 @@ def implementsIProxy():
                               gobject.PARAM_READWRITE)
     dic['default-value'] = (object, 'default-value', 'Default Value',
                             gobject.PARAM_READABLE)
+
+def implementsIMandatoryProxy():
+    frame = sys._getframe(1)
+    try:
+        local_namespace = frame.f_locals
+    finally:
+        del frame
+
+    dic = local_namespace['__gproperties__']
+    dic['mandatory'] = (bool, 'mandatory', 'Mandatory', False,
+                        gobject.PARAM_READWRITE)

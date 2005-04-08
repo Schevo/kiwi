@@ -26,9 +26,9 @@ import time
 
 from Kiwi2 import ValueUnset
 from Kiwi2.initgtk import gtk, gobject
-from Kiwi2.Widgets.WidgetProxy import WidgetProxyMixin, implementsIProxy
+from Kiwi2.Widgets import WidgetProxy
 from Kiwi2.Widgets.datatypes import ValidationError
-from Kiwi2.utils import gsignal, set_background, merge_colors
+from Kiwi2.utils import gsignal, gproperty, set_background, merge_colors
 
 ERROR_COLOR = "#ffa5a5"
 GOOD_COLOR = "white"
@@ -36,7 +36,7 @@ GOOD_COLOR = "white"
 # amount of time until we complain if the data is wrong (seconds)
 COMPLAIN_DELAY = 1
 
-class Entry(gtk.Entry, WidgetProxyMixin):
+class Entry(gtk.Entry, WidgetProxy.MixInSupportMandatory):
     """The Kiwi Entry widget has many special features that extend the basic gtk entry.
     
     First of all, as every Kiwi Widget, it implements the Proxy protocol. As the users 
@@ -49,13 +49,16 @@ class Entry(gtk.Entry, WidgetProxyMixin):
     the information on how to fill these entries is displayed according to the 
     current locale.
     """
-    implementsIProxy()
+    WidgetProxy.implementsIProxy()
+    WidgetProxy.implementsIMandatoryProxy()
+    
     gsignal('changed', 'override')
+    # mandatory widgets need to have this signal connected
     gsignal('expose-event', 'override')
     
     def __init__(self):
         gtk.Entry.__init__(self)
-        WidgetProxyMixin.__init__(self)
+        WidgetProxy.MixInSupportMandatory.__init__(self)
 
         # this flag means the data in the entry does not validate
         self._invalid_data = False
@@ -70,69 +73,47 @@ class Entry(gtk.Entry, WidgetProxyMixin):
         # id for idle that checks the cursor position
         self._get_cursor_position_id = -1
         # id for the idle that check if we should complain
-        self._complain_checker_id = -1
+        self._complaint_checker_id = -1
 
         self._error_tooltip = ErrorTooltip(self)
-        
+
         # stores the position of the information icon
         self._info_icon_position = False
         
+        # state variables
         self._draw_error_icon = False
         self._show_error_tooltip = False
         self._error_tooltip_visible = False
         
+    def _check_entry(self):
+        if len(self.get_text()) == 0 and self._mandatory:
+            self._draw_mandatory_icon = True
+        else:
+            self._draw_mandatory_icon = False
         
     def do_changed(self):
         """Called when the content of the entry changes.
 
-        Set's an internal variable the stores the last time the user
+        Sets an internal variable that stores the last time the user
         changed the entry
         """
+        
         self._last_change_time = time.time()
 
+        self._check_entry()
+            
         self.emit('content-changed')
         self.chain()
     
-    def do_expose_event(self, event):
-        """This method is called by the expose-event signal.
-
-        This signal is emmited when the window is redrawn. If the data on the
-        entry is wrong the information icon is drawn together.
-        """
-        result = self.chain(event)
-        if not self._draw_error_icon:
-            return result
-        
-        pixbuf = self.render_icon(gtk.STOCK_DIALOG_INFO, gtk.ICON_SIZE_MENU)
-        pixbuf_width = pixbuf.get_width()
-        pixbuf_height = pixbuf.get_height()
-        
-        entry_x, entry_y, entry_width, entry_height = self.get_allocation()            
-        icon_x_pos = entry_x + entry_width - pixbuf_width
-        icon_y_pos = entry_y + entry_height - pixbuf_height
-        
-        text_area_window = self.window.get_children()[0]
-        width, height = text_area_window.get_size()
-        text_area_window.draw_pixbuf(None, pixbuf, 0, 0, width - pixbuf_width,
-                                     (height - pixbuf_height)/2, pixbuf_width,
-                                     pixbuf_height)
-        kiwi_entry_name = self.get_name()
-        
-        icon_x_range = range(icon_x_pos, icon_x_pos + pixbuf_width)
-        icon_y_range = range(icon_y_pos, icon_y_pos + pixbuf_height)
-        self._info_icon_position = [icon_x_pos, icon_x_range, icon_y_pos, icon_y_range]
-        
-        return result 
-                
     def _get_cursor_position(self):
         """If the input is wrong (as consequence the icon is been displayed),
-        this method reads the cursor position and checks if it's on top
+        this method reads the mouse cursor position and checks if it's on top of
+        the information icon
         """
-        try:
-            icon_x, icon_x_range, icon_y, icon_y_range = self._info_icon_position
-        except TypeError:
-            # still no icon been displayed
+        if not self._info_icon_position:
             return True
+        
+        icon_x, icon_x_range, icon_y, icon_y_range = self._info_icon_position
         
         toplevel = self.get_toplevel()
         pointer_x, pointer_y = toplevel.get_pointer()
@@ -171,27 +152,28 @@ class Entry(gtk.Entry, WidgetProxyMixin):
                 self._invalid_data = True
                 self._validation_error_message = str(e)
                 self._error_tooltip.set_error_text(self._validation_error_message)
-                if self._complain_checker_id == -1:
-                    self._complain_checker_id = \
-                        gobject.idle_add(self._check_for_complains)
+                if self._complaint_checker_id == -1:
+                    self._complaint_checker_id = \
+                        gobject.idle_add(self._check_for_complaints)
                     self._get_cursor_position_id = \
                         gobject.timeout_add(200, self._get_cursor_position)
             data = None
         return data
 
     def update(self, data):
-        WidgetProxyMixin.update(self, data)
+        WidgetProxy.MixInSupportMandatory.update(self, data)
 
         if data is ValueUnset:
             self.set_text("")
         else:
+            WidgetProxy.MixInSupportMandatory.update(self, data)      
             self.set_text(self.type2str(data))
 
     def set_text(self, text):
         gtk.Entry.set_text(self, text)
         self.emit('content-changed')
 
-    def _check_for_complains(self):
+    def _check_for_complaints(self):
         """Check for existing complaints and when to start complaining is case
         the input is wrong
         """
@@ -214,7 +196,7 @@ class Entry(gtk.Entry, WidgetProxyMixin):
         
         self._show_error_tooltip = True
         self._draw_error_icon = True
-        self.queue_draw()
+        #self.queue_draw()
         t_id = gobject.timeout_add(100, merge_colors(self, GOOD_COLOR, ERROR_COLOR).next)
         self._background_timeout_id = t_id
         
@@ -228,16 +210,44 @@ class Entry(gtk.Entry, WidgetProxyMixin):
         # if we are complaining
         if self._background_timeout_id != -1:
             gobject.source_remove(self._background_timeout_id)
-            gobject.source_remove(self._complain_checker_id)
+            gobject.source_remove(self._complaint_checker_id)
             # before removing the get_cursor_position idle we need to be sure
             # that the tooltip is not been displayed
             self._error_tooltip.disappear()
             gobject.source_remove(self._get_cursor_position_id)
             self._background_timeout_id = -1
-            self._complain_checker_id = -1
+            self._complaint_checker_id = -1
         set_background(self, GOOD_COLOR)
         self._draw_error_icon = False
        
+       
+    def do_expose_event(self, event):
+        """Draw information icon and the mandatory icon"""
+        
+        result = self.chain(event)
+        
+        if self._draw_widget is None:
+            # need to be defined so the _draw_icon knows where to draw
+            # It needs to be called hear because before the window is not defined
+            self.set_drawing_windows(self, self.window)
+        
+        
+        if self._draw_error_icon:
+            icon_x_pos, icon_y_pos, pixbuf_width, pixbuf_height = \
+                      self._draw_icon(self, self.window, gtk.STOCK_DIALOG_INFO)
+            
+            kiwi_entry_name = self.get_name()
+            
+            icon_x_range = range(icon_x_pos, icon_x_pos + pixbuf_width)
+            icon_y_range = range(icon_y_pos, icon_y_pos + pixbuf_height)
+            self._info_icon_position = \
+                [icon_x_pos, icon_x_range, icon_y_pos, icon_y_range]        
+        
+        elif self._draw_mandatory_icon:
+            self._draw_icon(self, self.window)
+        
+        return result 
+              
 gobject.type_register(Entry)
     
 class ErrorTooltip(gtk.Window):

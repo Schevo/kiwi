@@ -1,3 +1,13 @@
+2005-04-08  Gustavo Rahal <gustavo@async.com.br>
+
+	* Kiwi2/Widgets/ComboBox.py:
+    * Kiwi2/Widgets/Entry.py:
+    * Kiwi2/Widgets/SpinButtonpy: added mandatory input capabilities
+    * Kiwi2/Widgets/WidgetProxy.py: renamed class WidgetProxyMinin to MixIn and created a new class named MixInSupportMandatory for Kiwi Widgets that needs to be set as mandatory
+    * Kiwi2/Widgets/RadioButton.py:
+    * Kiwi2/Widgets/Label.py:
+    * Kiwi2/Widgets/CheckButton.py: class renaming
+
 2005-04-07  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
 	* Kiwi2/Widgets/ComboBox.py: 

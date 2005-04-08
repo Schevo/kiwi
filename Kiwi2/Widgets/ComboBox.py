@@ -24,20 +24,20 @@
 
 from Kiwi2 import ValueUnset
 from Kiwi2.initgtk import gtk, gobject
-from Kiwi2.Widgets.WidgetProxy import WidgetProxyMixin, implementsIProxy
-from Kiwi2.utils import gsignal
+from Kiwi2.Widgets import WidgetProxy
+from Kiwi2.utils import gsignal, gproperty
 
 (COL_COMBO_LABEL,
  COL_COMBO_DATA) = range(2)
 
-class ComboProxyMixin(WidgetProxyMixin):
+
+class ComboProxyMixin(WidgetProxy.MixInSupportMandatory):
     """Our combos always have one model with two columns, one for the string
     that is displayed and one for the object it cames from.
     """
     def __init__(self):
         """Call this constructor after the Combo one"""
-        WidgetProxyMixin.__init__(self)
-
+        WidgetProxy.MixInSupportMandatory.__init__(self)
         model = gtk.ListStore(str, object)
         self.set_model(model)
 
@@ -141,7 +141,7 @@ class ComboProxyMixin(WidgetProxyMixin):
 
     
 class ComboBox(gtk.ComboBox, ComboProxyMixin):
-    implementsIProxy()
+    WidgetProxy.implementsIProxy()
     gsignal('changed', 'override')
     
     def __init__(self):
@@ -151,6 +151,9 @@ class ComboBox(gtk.ComboBox, ComboProxyMixin):
         renderer = gtk.CellRendererText()
         self.pack_start(renderer)
         self.add_attribute(renderer, 'text', 0)
+        
+        self._mandatory = True
+        self._draw_mandatory_icon = True
 
     def do_changed(self):
         self.emit('content-changed')
@@ -191,20 +194,66 @@ class ComboBox(gtk.ComboBox, ComboProxyMixin):
                 #the user only prefilled the combo with strings
                 return model.get_value(iter, COL_COMBO_LABEL)
             return data    
- 
+    
 gobject.type_register(ComboBox)
 
 class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin):
-    implementsIProxy()
+    redrawing = False
+    WidgetProxy.implementsIProxy()
+    WidgetProxy.implementsIMandatoryProxy()
+    # mandatory widgets need to have this signal connected
+    gsignal('expose-event', 'override')
+    # mandatory widgets need to have this property set
+    #gproperty('mandatory', bool, default=False, nick="Mandatory")
     
     def __init__(self):
         gtk.ComboBoxEntry.__init__(self)
         ComboProxyMixin.__init__(self)
 
         self.set_text_column(0)
+        #l = []
+        #self.get_parent().forall(lambda x: l.append(x.get_name()))
+        #print l
+        self.child.connect('expose-event', self._on_entry__expose_event)        
         self.child.connect('changed', self._on_entry__changed)
+        self.child.connect('focus-out-event', self._on_entry__focus_out)
+        self.child.connect('focus-in-event', self._on_entry__focus_in)
+        
+    def _on_entry__focus_out(self, widget, event):
+        self._check_entry()
+        
+    def _on_entry__focus_in(self, widget, event):
+        self._check_entry()
 
+    def _on_entry__expose_event(self, widget, event):
+        return False
+        if not self.redrawing:
+            self.redrawing = True
+            self.queue_draw()
+            self.redrawing = False
+        
+    def do_expose_event(self, event):
+        """Check WidgetProxy.MixInSupportMandatory.do_expose_event doc
+        to know why this methos is been overriden.
+        """
+        result = self.chain(event)
+        
+        self.set_drawing_windows(self, self.child.window)
+        
+        if self._draw_mandatory_icon:
+            self._draw_icon()
+        return result
+
+    def _check_entry(self):
+        if len(self.child.get_text()) == 0 and self._mandatory:
+            self._draw_mandatory_icon = True
+            self.queue_draw()
+        else:
+            self._draw_mandatory_icon = False
+            self.queue_draw()
+    
     def _on_entry__changed(self, entry):
+        self._check_entry()
         self.emit('content-changed')
         
     def read(self):
@@ -212,11 +261,12 @@ class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin):
 
     def update(self, data):
         # first, trigger some basic validation
-        WidgetProxyMixin.update(self, data)
+        WidgetProxy.MixIn.update(self, data)
         if value is ValueUnset:
             self.child.set_text("")
         else:
             self.child.set_text(self.type2str(data))
+        self._check_entry()
 
     def prefill(self, itemdata, sort=False, clear_entry=False):
         super(ComboBoxEntry, self).prefill(itemdata, sort)
@@ -233,5 +283,8 @@ class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin):
         """Removes all items from list and erases entry"""
         ComboProxyMixin.clear(self)
         self.child.set_text("")
-        
+    
 gobject.type_register(ComboBoxEntry)
+
+
+

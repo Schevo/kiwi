@@ -62,7 +62,7 @@ def gproperty(name, type, default=None, nick=None,
         elif type == float:
             default = 0.0
         elif type == bool:
-            default = true
+            default = True
             
     dict[name] = (type, name, nick, default, flags)
 

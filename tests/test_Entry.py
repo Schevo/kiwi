@@ -19,7 +19,6 @@ class EntryTest(unittest.TestCase):
         entry.set_text("string")
         self.assertEqual(entry.read(), None)
         self.assertNotEqual(entry._complain_checker_id, -1)
-        #print entry._complain_checker_id
         
         # now let's put proper data
         entry.set_text("10/05/1952")

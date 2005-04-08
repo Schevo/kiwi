@@ -23,16 +23,16 @@
 #
 
 from Kiwi2.initgtk import gtk, gobject
-from Kiwi2.Widgets.WidgetProxy import WidgetProxyMixin, implementsIProxy
+from Kiwi2.Widgets import WidgetProxy
 from Kiwi2.utils import gsignal, gproperty, set_foreground
 from Kiwi2 import _warn, ValueUnset
 
-class Label(gtk.Label, WidgetProxyMixin):
-    implementsIProxy()
+class Label(gtk.Label, WidgetProxy.MixIn):
+    WidgetProxy.implementsIProxy()
     
     def __init__(self):
         gtk.Label.__init__(self)
-        WidgetProxyMixin.__init__(self)
+        WidgetProxy.MixIn.__init__(self)
         self.set_use_markup(True)
         self._attr_dic = {"style":None, "weight":None, "size":None}
         self._size_list = ('xx-small', 'x-small', 'small', 'medium', 'large', 'x-large', 'xx-large')
@@ -42,13 +42,10 @@ class Label(gtk.Label, WidgetProxyMixin):
 
     def update(self, data):
         # first, trigger some basic validation
-        WidgetProxyMixin.update(self, data)
+        WidgetProxy.MixIn.update(self, data)
 
         if data is not ValueUnset:
             self.set_text(self.type2str(data))
-
-    #def _attribute_string(self):
-        #self.attr_str = '<span style="italic" weight="bold" size=xx-small>'
     
     def _apply_attributes(self):
         # join the attributes
