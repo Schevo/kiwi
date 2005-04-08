@@ -20,3 +20,5 @@ form = Form()
 proxy = form.add_proxy(person, ['name', 'age', 'birthdate', 'height'])
 form.show_all()
 gtk.main()
+
+print person.name, person.age, person.birthdate, person.height
