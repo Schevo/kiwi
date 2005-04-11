@@ -36,17 +36,8 @@ class WizardStep:
 
 class PluggableWizard(Delegate):
     """ Wizard controller and view class """
-    #gladefile = 'Wizard'
-    #widgets = ['message',
-               #'header',
-               #'top_separator',
-               #'cancel_button',
-               ###'finish_button',
-               #'back_button',
-               #'next_button']
     retval = None
     def __init__(self, title, first_step, size=None):
-        #_AbstractDialog.__init__(self, delete_handler=self.cancel)
         self._create_gui()
         Delegate.__init__(self, delete_handler=quit_if_last, toplevel=self.wizard)
         self.set_title(title)
@@ -111,11 +102,9 @@ class PluggableWizard(Delegate):
         self.current = step
         if step.header:
             self.header_lbl.show()
-            #self.top_separator.show()
             self.header_lbl.set_text(step.header)
         else:
             self.header_lbl.hide()
-            #self.top_separator.hide()
         self.update_view()
         self.current.post_init()
         return None
@@ -147,7 +136,6 @@ class PluggableWizard(Delegate):
         self.previous_btn.set_sensitive(True)
 
     def enable_finish(self):
-        #self.finish_button.set_sensitive(True)
         self.next_btn.set_label(gtk.STOCK_APPLY)
         self.wizard_finished = True
     
@@ -156,9 +144,6 @@ class PluggableWizard(Delegate):
 
     def disable_back(self):
         self.previous_btn.set_sensitive(False)
-
-    #def disable_finish(self):
-        #self.finish_button.set_sensitive(False)
         
     def disable_finish(self):
         self.next_btn.set_label(gtk.STOCK_GO_FORWARD)
@@ -169,9 +154,6 @@ class PluggableWizard(Delegate):
             
     def on_previous_btn__clicked(self, *args):
         self.change_step(self.current.previous_step())
- 
-    #def on_finish_button__clicked(self, *args):
-        #self.finish()
 
     def on_cancel_btn__clicked(self, *args):
         self.cancel()

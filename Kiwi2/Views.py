@@ -47,12 +47,10 @@ def find_in_gladepath(filename):
     if not isinstance(gladepath, (tuple, list)):
         msg ="gladepath should be a list or tuple, found %s"
         raise ValueError(msg % type(gladepath))
-    print gladepath
     if os.sep in filename or not gladepath:
         if os.path.isfile(filename):
             return filename
         else:
-            print filename
             raise IOError("%s not found" % filename)
 
     for path in gladepath:

@@ -1,4 +1,4 @@
-2005-04-08  Gustavo Rahal <gustavo@async.com.br>
+2005-04-11  Gustavo Rahal <gustavo@async.com.br>
 
 	* Kiwi2/Widgets/CheckButton: fixed minor name mistake
 	* Kiwi2/examples/survey.py: renamed survey object
