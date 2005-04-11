@@ -83,7 +83,7 @@ def get_gladepath():
 imagepath = ''
 
 if os.environ.has_key ('KIWI_IMAGE_PATH'):
-    imagepath = string.split(os.environ['KIWI_IMAGE_PATH'])    
+    imagepath = string.split(os.environ['KIWI_IMAGE_PATH'])
 
 def set_imagepath(path):
     global imagepath

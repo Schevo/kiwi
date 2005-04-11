@@ -47,11 +47,12 @@ def find_in_gladepath(filename):
     if not isinstance(gladepath, (tuple, list)):
         msg ="gladepath should be a list or tuple, found %s"
         raise ValueError(msg % type(gladepath))
-
+    print gladepath
     if os.sep in filename or not gladepath:
         if os.path.isfile(filename):
             return filename
         else:
+            print filename
             raise IOError("%s not found" % filename)
 
     for path in gladepath:
@@ -264,6 +265,8 @@ class SlaveView(gobject.GObject):
         # grab the accel groups
         self._accel_groups = gtk.accel_groups_from_object(self.toplevel)
 
+        self.slaves = {}
+
     def _init_glade_adaptor(self):
         """Special init code that subclasses may want to override."""
         self.glade_adaptor = GazpachoWidgetTree(self, self.gladefile,
@@ -445,20 +448,118 @@ class SlaveView(gobject.GObject):
     #
     # Slave handling
     #
-
     def attach_slave(self, name, slave):
-        if self.glade_adaptor is None:
-            msg = ("You can't attach slaves if you are not using a glade file "
-                   "in your View")
-            raise ValueError(msg)
-        
+        """Attaches a slaveview to the current view, substituting the
+        widget specified by name.  the widget specified *must* be a
+        eventbox; its child widget will be removed and substituted for
+        the specified slaveview's toplevel widget::
+
+         .-----------------------. the widget that is indicated in the diagram
+         |window/view (self.view)| as placeholder will be substituted for the 
+         |  .----------------.   | slaveview's toplevel.
+         |  | eventbox (name)|   |  .-----------------.
+         |  |.--------------.|      |slaveview (slave)| 
+         |  || placeholder  <----.  |.---------------.|
+         |  |'--------------'|    \___ toplevel      ||
+         |  '----------------'   |  ''---------------'|
+         '-----------------------'  '-----------------'
+
+        the original way of attachment (naming the *child* widget
+        instead of the eventbox) is still supported for compatibility
+        reasons but will print a warning.
+        """
+        if not isinstance(slave, SlaveView):
+            _warn("slave specified must be a SlaveView, found %s" % slave)
+
+        if not hasattr(slave, "get_toplevel"):
+            raise TypeError("Slave does not have a get_toplevel method")
+
+        shell = slave.get_toplevel()
+
+        if isinstance(shell, gtk.Window): # view with toplevel window
+            new_widget = shell.get_child()
+            shell.remove(new_widget) # remove from window to allow reparent
+        else: # slaveview
+            new_widget = shell
+
+        # if our widgets are in a glade file get the placeholder from them
+        # or take it from the view itself otherwise
+        if self.glade_adaptor:
+            placeholder = self.glade_adaptor.get_widget(name)
         else:
-            self.glade_adaptor.attach_slave(name, slave) # delegation powered
-    
+            placeholder = getattr(self, name, None)
+            
+        if not placeholder:
+            raise attributeerror(
+                  "slave container widget `%s' not found" % name)
+        parent = placeholder.get_parent()
+
+        if slave._accel_groups:
+            # take care of accelerator groups; attach to parent window if we
+            # have one; if embedding a slave into another slave, store its
+            # accel groups; otherwise complain if we're dropping the accelerators
+            win = parent.get_toplevel()
+            if isinstance(win, gtk.Window):
+                # use idle_add to be sure we attach the groups as late
+                # as possible and avoid reattaching groups -- see
+                # comment in _attach_groups.
+                gtk.idle_add(self._attach_groups, win, slave._accel_groups)
+            elif isinstance(self, SlaveView):
+                self._accel_groups.extend(slave._accel_groups)
+            else:
+                _warn("attached slave %s to parent %s, but parent lacked "
+                      "a window and was not a slave view" % (slave, self))
+            slave._accel_groups = []
+
+        if isinstance(placeholder, gtk.EventBox):
+            # standard mechanism
+            child = placeholder.get_child()
+            if child is not None:
+                placeholder.remove(child)
+            placeholder.add(new_widget)
+        elif isinstance(parent, gtk.EventBox):
+            # backwards compatibility
+            _warn("attach_slave's api has changed: read docs, update code!")
+            parent.remove(placeholder)
+            parent.add(new_widget)
+        else:
+            raise typeerror(
+                "widget to be replaced must be wrapped in eventbox")
+     
+        # call slave's callback
+        slave.on_attach(self)
+
+        if self.slaves.has_key(name):
+            # I prefer to don't emit a raise here because it's really
+            # possible to change a certain slave in runtime.
+            _warn("You already have a slave %s attached" % name)
+        self.slaves[name] = slave
+
+        # return placeholder we just removed
+        return placeholder
+
+    def _attach_groups(self, win, accel_groups):
+        # get groups currently attached to the window; we use them
+        # to avoid reattaching an accelerator to the same window, which
+        # generates messages like:
+        #
+        # gtk-critical **: file gtkaccelgroup.c: line 188
+        # (gtk_accel_group_attach): assertion `g_slist_find
+        # (accel_group->attach_objects, object) == null' failed.
+        #
+        # interestingly, this happens many times with notebook,
+        # because libglade creates and attaches groups in runtime to
+        # its toplevel window.
+        current_groups = gtk.accel_groups_from_object(win)
+        for group in accel_groups:
+            if group in current_groups:
+                # skip group already attached
+                continue
+            win.add_accel_group(group)
+
     def get_slave(self, holder):
-        if (self.glade_adaptor.slaves and 
-            self.glade_adaptor.slaves.has_key(holder)):
-            return self.glade_adaptor.slaves[holder]
+        if self.slaves.has_key(holder):
+            return self.slaves[holder]
         raise AttributeError, "Unknown slave for holder: %s" % holder
 
 
@@ -719,7 +820,6 @@ class GazpachoWidgetTree(GladeAdaptor):
         
         self.widgets = widgets
         self.gladefile = gladefile
-        self.slaves = {}
         
     def get_widget(self, name):
         """Retrieves the named widget from the View (or glade tree)"""
@@ -737,108 +837,4 @@ class GazpachoWidgetTree(GladeAdaptor):
         return self.tree.get_widgets()
 
     def signal_autoconnect(self, dic):
-        self.tree.signal_autoconnect(dic)
-        
-    def attach_slave(self, name, slave):
-        """Attaches a slaveview to the current view, substituting the
-        widget specified by name.  the widget specified *must* be a
-        eventbox; its child widget will be removed and substituted for
-        the specified slaveview's toplevel widget::
-
-         .-----------------------. the widget that is indicated in the diagram
-         |window/view (self.view)| as placeholder will be substituted for the 
-         |  .----------------.   | slaveview's toplevel.
-         |  | eventbox (name)|   |  .-----------------.
-         |  |.--------------.|      |slaveview (slave)| 
-         |  || placeholder  <----.  |.---------------.|
-         |  |'--------------'|    \___ toplevel      ||
-         |  '----------------'   |  ''---------------'|
-         '-----------------------'  '-----------------'
-
-        the original way of attachment (naming the *child* widget
-        instead of the eventbox) is still supported for compatibility
-        reasons but will print a warning.
-        """
-        if not isinstance(slave, SlaveView):
-            _warn("slave specified must be a SlaveView, found %s" % slave)
-
-        if not hasattr(slave, "get_toplevel"):
-            raise TypeError("Slave does not have a get_toplevel method")
-
-        shell = slave.get_toplevel()
-
-        if isinstance(shell, gtk.Window): # view with toplevel window
-            new_widget = shell.get_child()
-            shell.remove(new_widget) # remove from window to allow reparent
-        else: # slaveview
-            new_widget = shell
-
-        placeholder  = self.get_widget(name)
-
-        if not placeholder:
-            raise attributeerror(
-                  "slave container widget `%s' not found" % name)
-        parent = placeholder.get_parent()
-
-        if slave._accel_groups:
-            # take care of accelerator groups; attach to parent window if we
-            # have one; if embedding a slave into another slave, store its
-            # accel groups; otherwise complain if we're dropping the accelerators
-            win = parent.get_toplevel()
-            if isinstance(win, gtk.Window):
-                # use idle_add to be sure we attach the groups as late
-                # as possible and avoid reattaching groups -- see
-                # comment in _attach_groups.
-                gtk.idle_add(self._attach_groups, win, slave._accel_groups)
-            elif isinstance(self.view, SlaveView):
-                self.view._accel_groups.extend(slave._accel_groups)
-            else:
-                _warn("attached slave %s to parent %s, but parent lacked "
-                      "a window and was not a slave view" % (slave, self))
-            slave._accel_groups = []
-
-        if isinstance(placeholder, gtk.EventBox):
-            # standard mechanism
-            child = placeholder.get_child()
-            if child is not None:
-                placeholder.remove(child)
-            placeholder.add(new_widget)
-        elif isinstance(parent, gtk.EventBox):
-            # backwards compatibility
-            _warn("attach_slave's api has changed: read docs, update code!")
-            parent.remove(placeholder)
-            parent.add(new_widget)
-        else:
-            raise typeerror(
-                "widget to be replaced must be wrapped in eventbox")
-     
-        # call slave's callback
-        slave.on_attach(self)
-
-        if self.slaves.has_key(name):
-            # I prefer to don't emit a raise here because it's really
-            # possible to change a certain slave in runtime.
-            raise _warn("You already have a slave %s attached" % name)
-        self.slaves[name] = slave
-
-        # return placeholder we just removed
-        return placeholder
-
-    def _attach_groups(self, win, accel_groups):
-        # get groups currently attached to the window; we use them
-        # to avoid reattaching an accelerator to the same window, which
-        # generates messages like:
-        #
-        # gtk-critical **: file gtkaccelgroup.c: line 188
-        # (gtk_accel_group_attach): assertion `g_slist_find
-        # (accel_group->attach_objects, object) == null' failed.
-        #
-        # interestingly, this happens many times with notebook,
-        # because libglade creates and attaches groups in runtime to
-        # its toplevel window.
-        current_groups = gtk.accel_groups_from_object(win)
-        for group in accel_groups:
-            if group in current_groups:
-                # skip group already attached
-                continue
-            win.add_accel_group(group)
+        self.tree.signal_autoconnect(dic)        

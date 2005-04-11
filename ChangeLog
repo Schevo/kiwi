@@ -1,5 +1,12 @@
 2005-04-08  Gustavo Rahal <gustavo@async.com.br>
 
+	* Kiwi2/Widgets/CheckButton: fixed minor name mistake
+	* Kiwi2/examples/survey.py: renamed survey object
+	* Kiwi2/Views.py: added support for non-glade files to be slaves
+	* Kiwi2/Widgets/Wizard.py: wizard interface is not a glade file anymore
+
+2005-04-08  Gustavo Rahal <gustavo@async.com.br>
+
 	* Kiwi2/Widgets/ComboBox.py:
     * Kiwi2/Widgets/Entry.py:
     * Kiwi2/Widgets/SpinButtonpy: added mandatory input capabilities

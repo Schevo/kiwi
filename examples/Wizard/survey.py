@@ -77,7 +77,6 @@ class ProgrammingLangStep(WizardStep, ProgrammingLangSlave):
     def on_cb_perl__toggled(self, *args):
         self.wizard.enable_next()
     
-            
     def next_step(self):
         # called when next button is clicked
         return EmploymentStatusStep(self.wizard, previous=self)
@@ -110,7 +109,7 @@ class ThankYouStep(WizardStep, ThankYouSlave):
 
 
 if __name__ == "__main__":
-    teste = ITSurvey()
-    teste.show_all()
+    survey = ITSurvey()
+    survey.show_all()
     gtk.main()
         

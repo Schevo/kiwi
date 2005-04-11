@@ -39,7 +39,7 @@ class CheckButton(gtk.CheckButton, WidgetProxy.MixIn):
     
     def set_data_type(self, data_type):
         if data_type == bool or data_type is None:
-            WidgetsProxy.MixIn.set_data_type(self, data_type)
+            WidgetProxy.MixIn.set_data_type(self, data_type)
         else:
             raise TypeError, "CheckButtons only accept boolean values"
 
