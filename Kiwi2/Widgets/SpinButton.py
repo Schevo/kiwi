@@ -70,10 +70,10 @@ class SpinButton(gtk.SpinButton, WidgetProxy.MixInSupportMandatory):
     def update(self, data):
         # first, trigger some basic validation
         WidgetProxy.MixInSupportMandatory.update(self, data)
-        if data is not ValueUnset:
+        if data is not ValueUnset and data is not None:
             self.set_value(data)
         else:
-            self.set_value("")
+            self.set_text("")
     
     def do_expose_event(self, event):
         """Check WidgetProxy.MixInSupportMandatory.do_expose_event doc

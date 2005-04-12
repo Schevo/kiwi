@@ -163,7 +163,7 @@ class Entry(gtk.Entry, WidgetProxy.MixInSupportMandatory):
     def update(self, data):
         WidgetProxy.MixInSupportMandatory.update(self, data)
 
-        if data is ValueUnset:
+        if data is ValueUnset or data is None:
             self.set_text("")
         else:
             WidgetProxy.MixInSupportMandatory.update(self, data)      

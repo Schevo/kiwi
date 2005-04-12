@@ -53,7 +53,7 @@ class CheckButton(gtk.CheckButton, WidgetProxy.MixIn):
     def update(self, data):
         # first, trigger some basic validation
         MixIn.update(self, data)
-        if data is not ValueUnset:
+        if data is not ValueUnset and data is not None:
             self.set_active(data)
 
 gobject.type_register(CheckButton)

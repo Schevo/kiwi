@@ -44,7 +44,7 @@ class Label(gtk.Label, WidgetProxy.MixIn):
         # first, trigger some basic validation
         WidgetProxy.MixIn.update(self, data)
 
-        if data is not ValueUnset:
+        if data is not ValueUnset and data is not None:
             self.set_text(self.type2str(data))
     
     def _apply_attributes(self):

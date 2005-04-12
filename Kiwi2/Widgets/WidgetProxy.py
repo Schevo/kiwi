@@ -51,13 +51,12 @@ class MixIn(object):
     def update(self, data):
         """Set the content of the widget with @data.
 
-        The type of @data should match the data-type property
+        The type of @data should match the data-type property. The two
+        exceptions to this rule is ValueUnset and None. When the proxy
+        call ourselves with these values we just do nothing. This probably
+        means that the model is not initialized.
         """
-        if self._data_type is None:
-            msg = "You must set the data type before updating a Kiwi widget"
-            raise TypeError(msg)
-
-        if data is ValueUnset:
+        if data is ValueUnset or data is None:
             return
         
         elif not isinstance(data, self._data_type):
