@@ -166,7 +166,7 @@ class ComboBox(gtk.ComboBox, ComboProxyMixin):
 
     def update(self, data):
         # We dont need validation because the user always choose a valid value
-        if data is not ValueUnset:
+        if data is not ValueUnset and data is not None:
             self.select_item_by_data(data)
 
     def prefill(self, itemdata, sort=False):
