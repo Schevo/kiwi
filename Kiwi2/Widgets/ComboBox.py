@@ -286,7 +286,7 @@ class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin):
     def update(self, data):
         # first, trigger some basic validation
         WidgetProxy.Mixin.update(self, data)
-        if data is ValueUnset:
+        if data is ValueUnset or data is None:
             self.child.set_text("")
         else:
             self.child.set_text(self.type2str(data))
