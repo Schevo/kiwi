@@ -22,70 +22,86 @@
 # Author(s): Christian Reis <kiko@async.com.br>
 #
 
+import time
+
 from Kiwi2.initgtk import gtk, gobject
 from Kiwi2.Widgets import WidgetProxy
 from Kiwi2.utils import gsignal, gproperty
 from Kiwi2 import ValueUnset
 
-class SpinButton(gtk.SpinButton, WidgetProxy.MixInSupportMandatory):
+class SpinButton(gtk.SpinButton, WidgetProxy.MixinSupportValidation):
     WidgetProxy.implementsIProxy()
     WidgetProxy.implementsIMandatoryProxy()
 
-    # the value-changed signal is not emitted when you type a value
-    # (instead of using the arrows) so we use the changed signal
-    # inherited from gtk.Entry
-    gsignal('changed', 'override')
-    
+    gsignal('value-changed', 'override')
     # mandatory widgets need to have this signal connected
     gsignal('expose-event', 'override')
     
     
     def __init__(self):
         # since the default data_type is str we need to set it to int or float for spinbuttons
-        WidgetProxy.MixInSupportMandatory.__init__(self, data_type=int)
+        WidgetProxy.MixinSupportValidation.__init__(self, data_type=int)
         gtk.SpinButton.__init__(self)
-    
-    def _check_entry(self):
-        if len(self.get_text()) == 0 and self._mandatory:
-            self._draw_mandatory_icon = True
-        else:
-            self._draw_mandatory_icon = False
-    
+        
     def set_data_type(self, data_type):
+        """Overriden from super class. Since spinbuttons should
+        only accept float or int numbers we need to make a special
+        treatment.
+        """
         old_datatype = self._data_type
-        WidgetProxy.MixInSupportMandatory.set_data_type(self, data_type)
+        WidgetProxy.MixinSupportValidation.set_data_type(self, data_type)
         if self._data_type not in (int, float):
             self._data_type = old_datatype
             raise TypeError("SpinButtons only accept integer or float values")
         
-    def do_changed(self):
-        self._check_entry()
+    def do_value_changed(self):
+
+        self._last_change_time = time.time()        
         
+        if len(self.get_text()) == 0 and self._mandatory:
+            self._draw_mandatory_icon = True
+        else:
+            self._draw_mandatory_icon = False
+            
         self.emit('content-changed')
         self.chain()
 
     def read(self):
-        return self.get_value()
+        text = self.get_value()
+        data = self._check_data(self.type2str(text))
+
+        return data
 
     def update(self, data):
         # first, trigger some basic validation
-        WidgetProxy.MixInSupportMandatory.update(self, data)
+        WidgetProxy.MixinSupportValidation.update(self, data)
+        
         if data is not ValueUnset and data is not None:
             self.set_value(data)
         else:
             self.set_text("")
-    
-    def do_expose_event(self, event):
-        """Check WidgetProxy.MixInSupportMandatory.do_expose_event doc
-        to know why this methos is been overriden.
-        """
-        result = self.chain(event)
+
+    def _draw_icon(self, icon):
+        """Draw an icon"""
         
-        self.set_drawing_windows(self, self.window)
+        widget = self
+        gdk_window = self.window
         
-        if self._draw_mandatory_icon:
-            self._draw_icon()
-        return result
-    
+        pixbuf, pixbuf_width, pixbuf_height = self._render_icon(icon)
+        
+        widget_x, widget_y, widget_width, widget_height = widget.get_allocation()            
+        icon_x_pos = widget_x + widget_width - pixbuf_width
+        icon_y_pos = widget_y + widget_height - pixbuf_height
+        
+        area_window = gdk_window.get_children()[0]
+        gdk_window_width, gdk_window_height = area_window.get_size()
+        
+        draw_icon_x = gdk_window_width - pixbuf_width
+        draw_icon_y = (gdk_window_height - pixbuf_height)/2
+        area_window.draw_pixbuf(None, pixbuf, 0, 0, draw_icon_x,
+                                     draw_icon_y, pixbuf_width,
+                                     pixbuf_height)
+        
+        return (icon_x_pos, icon_y_pos, pixbuf_width, pixbuf_height)
     
 gobject.type_register(SpinButton)

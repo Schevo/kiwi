@@ -27,12 +27,12 @@ from Kiwi2.Widgets import WidgetProxy
 from Kiwi2.utils import gsignal, gproperty, set_foreground
 from Kiwi2 import _warn, ValueUnset
 
-class Label(gtk.Label, WidgetProxy.MixIn):
+class Label(gtk.Label, WidgetProxy.Mixin):
     WidgetProxy.implementsIProxy()
     
     def __init__(self):
         gtk.Label.__init__(self)
-        WidgetProxy.MixIn.__init__(self)
+        WidgetProxy.Mixin.__init__(self)
         self.set_use_markup(True)
         self._attr_dic = {"style":None, "weight":None, "size":None}
         self._size_list = ('xx-small', 'x-small', 'small', 'medium', 'large', 'x-large', 'xx-large')
@@ -42,7 +42,7 @@ class Label(gtk.Label, WidgetProxy.MixIn):
 
     def update(self, data):
         # first, trigger some basic validation
-        WidgetProxy.MixIn.update(self, data)
+        WidgetProxy.Mixin.update(self, data)
 
         if data is not ValueUnset and data is not None:
             self.set_text(self.type2str(data))

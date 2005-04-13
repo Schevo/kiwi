@@ -24,84 +24,58 @@
 
 import time
 
-from Kiwi2 import ValueUnset
 from Kiwi2.initgtk import gtk, gobject
 from Kiwi2.Widgets import WidgetProxy
-from Kiwi2.Widgets.datatypes import ValidationError
-from Kiwi2.utils import gsignal, gproperty
+from Kiwi2.utils import gsignal, gproperty, set_foreground
+from Kiwi2 import _warn, ValueUnset
 
-
-class Entry(gtk.Entry, WidgetProxy.MixinSupportValidation):
-    """The Kiwi Entry widget has many special features that extend the basic gtk entry.
-    
-    First of all, as every Kiwi Widget, it implements the Proxy protocol. As the users 
-    types the entry can interact with the application model automaticly. 
-    Kiwi Entry also implements intresting UI additions. If the input data does not match
-    the data type of the entry the background nicely fades to a light red color. 
-    As the background changes an information icon appears. When the user
-    passes the mouse over the infomation icon a tooltip is displayed informing the
-    user how to correctly fill the entry. When dealing with date and float data-type
-    the information on how to fill these entries is displayed according to the 
-    current locale.
-    """
+class TextView(gtk.TextView, WidgetProxy.MixinSupportValidation):
     WidgetProxy.implementsIProxy()
     WidgetProxy.implementsIMandatoryProxy()
     
-    gsignal('changed', 'override')
     # mandatory widgets need to have this signal connected
     gsignal('expose-event', 'override')
     
     def __init__(self):
-        gtk.Entry.__init__(self)
         WidgetProxy.MixinSupportValidation.__init__(self)
-
+        gtk.TextView.__init__(self)
         
-    def do_changed(self):
-        """Called when the content of the entry changes.
-
-        Sets an internal variable that stores the last time the user
-        changed the entry
-        """
+        self.textbuffer = gtk.TextBuffer()
+        self.set_buffer(self.textbuffer)
         
+        self.connect("key-release-event", self._key_release_event)
+        
+    def _key_release_event(self, *args):
         self._last_change_time = time.time()
-        
-        if len(self.get_text()) == 0 and self._mandatory:
+        self.emit('content-changed')
+
+    def read(self):
+        start = self.textbuffer.get_start_iter()
+        end = self.textbuffer.get_end_iter()
+        text = self.textbuffer.get_text(start, end)
+
+        if text == "" and self._mandatory:
             self._draw_mandatory_icon = True
         else:
             self._draw_mandatory_icon = False
         
-            
-        self.emit('content-changed')
-        self.chain()
-        
-    def read(self):
-        """Called after each caracter is typed. If the input is wrong start 
-        complaining
-        """
-        text = self.get_text()
         data = self._check_data(text)
-        
         return data
 
-    
     def update(self, data):
+        # first, trigger some basic validation
         WidgetProxy.MixinSupportValidation.update(self, data)
 
-        if data is ValueUnset or data is None:
-            self.set_text("")
+        if data is ValueUnset:
+            self.textbuffer.set_text("")
         else:
-            self.set_text(self.type2str(data))
+            self.textbuffer.set_text(self.type2str(data))
 
-    def set_text(self, text):
-        gtk.Entry.set_text(self, text)
-        self.emit('content-changed')
-
-    
     def _draw_icon(self, icon):
         """Draw an icon"""
         
         widget = self
-        gdk_window = self.window
+        gdk_window = self.get_window(gtk.TEXT_WINDOW_TEXT)
         
         pixbuf, pixbuf_width, pixbuf_height = self._render_icon(icon)
         
@@ -109,18 +83,17 @@ class Entry(gtk.Entry, WidgetProxy.MixinSupportValidation):
         icon_x_pos = widget_x + widget_width - pixbuf_width
         icon_y_pos = widget_y + widget_height - pixbuf_height
         
-        area_window = gdk_window.get_children()[0]
+        area_window = gdk_window
         gdk_window_width, gdk_window_height = area_window.get_size()
         
-        draw_icon_x = gdk_window_width - pixbuf_width
-        draw_icon_y = (gdk_window_height - pixbuf_height)/2
+        draw_icon_x = (gdk_window_width - pixbuf_width) / 2
+        draw_icon_y = (gdk_window_height - pixbuf_height) / 2
         area_window.draw_pixbuf(None, pixbuf, 0, 0, draw_icon_x,
                                      draw_icon_y, pixbuf_width,
                                      pixbuf_height)
         
         return (icon_x_pos, icon_y_pos, pixbuf_width, pixbuf_height)
-    
-    
-              
-gobject.type_register(Entry)
-    
+
+
+
+gobject.type_register(TextView)

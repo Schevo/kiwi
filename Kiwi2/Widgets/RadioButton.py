@@ -27,13 +27,13 @@ from Kiwi2.initgtk import gtk, gobject
 from Kiwi2.Widgets import WidgetProxy
 from Kiwi2.utils import gsignal, gproperty
 
-class RadioButton(gtk.RadioButton, WidgetProxy.MixIn):
+class RadioButton(gtk.RadioButton, WidgetProxy.Mixin):
     WidgetProxy.implementsIProxy()
     gsignal('toggled', 'override')
     gproperty('data-value', str, nick='Data Value')
 
     def __init__(self):
-        WidgetProxy.MixIn.__init__(self)
+        WidgetProxy.Mixin.__init__(self)
         gtk.RadioButton.__init__(self)
     
     def do_toggled(self):
@@ -47,7 +47,7 @@ class RadioButton(gtk.RadioButton, WidgetProxy.MixIn):
 
     def update(self, data):
         # first, trigger some basic validation
-        WidgetProxy.MixIn.update(self, data)
+        WidgetProxy.Mixin.update(self, data)
         if data is None or data is ValueUnset:
             return
         data = self.type2str(data)

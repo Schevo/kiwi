@@ -1,3 +1,24 @@
+2005-04-13  Gustavo Rahal <gustavo@async.com.br>
+
+	* Kiwi2/Widgets/TextView.py: added Kiwi TextView Widget
+	* Kiwi2/Widgets/ComboBox.py: fixed mandatory icon display
+	* Kiwi2/Widgets/CheckButton.py: renamed MixinSupportMandatory to 
+	MixinSupportValidation
+	* Kiwi2/Widgets/RadioButton.py: same as CheckButton
+	* Kiwi2/Widgets/__init__.py: added Kiwi TextView Widget 
+	* Kiwi2/Widgets/Entry.py: moved validation code to
+	WidgetProxy.MixinSupportValidation
+	* Kiwi2/Widgets/SpinButton.py: code reorganization to support
+	custom validation
+	* Kiwi2/Widgets/WidgetProxy.py: added custom validation code to the
+	MixinSupportValidation class.
+	* gazpacho-plugin/pixmaps/kiwitextview.png: added icon
+	* gazpacho-plugin/kiwi2.xml: added kiwitextview
+	* examples/PersonalInformation/personalinformation.py: added custom
+	validation examples
+	* examples/PersonalInformation/personalinformation.glade: added more
+	widgets for custom validation examples
+
 2005-04-11  Gustavo Rahal <gustavo@async.com.br>
 
 	* Kiwi2/Widgets/CheckButton: fixed minor name mistake
@@ -10,7 +31,7 @@
 	* Kiwi2/Widgets/ComboBox.py:
     * Kiwi2/Widgets/Entry.py:
     * Kiwi2/Widgets/SpinButtonpy: added mandatory input capabilities
-    * Kiwi2/Widgets/WidgetProxy.py: renamed class WidgetProxyMinin to MixIn and created a new class named MixInSupportMandatory for Kiwi Widgets that needs to be set as mandatory
+    * Kiwi2/Widgets/WidgetProxy.py: renamed class WidgetProxyMinin to Mixin and created a new class named MixinSupportMandatory for Kiwi Widgets that needs to be set as mandatory
     * Kiwi2/Widgets/RadioButton.py:
     * Kiwi2/Widgets/Label.py:
     * Kiwi2/Widgets/CheckButton.py: class renaming

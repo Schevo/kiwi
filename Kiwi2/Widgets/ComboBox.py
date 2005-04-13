@@ -31,13 +31,13 @@ from Kiwi2.utils import gsignal, gproperty
  COL_COMBO_DATA) = range(2)
 
 
-class ComboProxyMixin(WidgetProxy.MixInSupportMandatory):
+class ComboProxyMixin(WidgetProxy.MixinSupportValidation):
     """Our combos always have one model with two columns, one for the string
     that is displayed and one for the object it cames from.
     """
     def __init__(self):
         """Call this constructor after the Combo one"""
-        WidgetProxy.MixInSupportMandatory.__init__(self)
+        WidgetProxy.MixinSupportValidation.__init__(self)
         model = gtk.ListStore(str, object)
         self.set_model(model)
 
@@ -198,26 +198,29 @@ class ComboBox(gtk.ComboBox, ComboProxyMixin):
 gobject.type_register(ComboBox)
 
 class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin):
-    redrawing = False
     WidgetProxy.implementsIProxy()
     WidgetProxy.implementsIMandatoryProxy()
+    
+    # WE CANNOT CONNECT THIS SIGNAL DIRECTLY TO THE COMBO BOX
+    # BECAUSE WE GET CRASHES. ANOTHER REASON IS THAT IT DOESN'T
+    # MAKE SENSE SINCE WE WANT TO MONITOR THE ENTRY OF THE
+    # COMBO NOT THE COMBO BOX IT SELF.
     # mandatory widgets need to have this signal connected
-    gsignal('expose-event', 'override')
-    # mandatory widgets need to have this property set
-    #gproperty('mandatory', bool, default=False, nick="Mandatory")
+    #gsignal('expose-event', 'override')
     
     def __init__(self):
         gtk.ComboBoxEntry.__init__(self)
         ComboProxyMixin.__init__(self)
 
         self.set_text_column(0)
-        #l = []
-        #self.get_parent().forall(lambda x: l.append(x.get_name()))
-        #print l
-        self.child.connect('expose-event', self._on_entry__expose_event)        
+        # here we connect the expose-event signal directly to the entry
+        self.child.connect('expose-event', self._on_entry__expose_event)
+        #self.connect('expose-event', self._on_entry__expose_event)
+        
         self.child.connect('changed', self._on_entry__changed)
         self.child.connect('focus-out-event', self._on_entry__focus_out)
         self.child.connect('focus-in-event', self._on_entry__focus_in)
+        
         
     def _on_entry__focus_out(self, widget, event):
         self._check_entry()
@@ -226,23 +229,44 @@ class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin):
         self._check_entry()
 
     def _on_entry__expose_event(self, widget, event):
-        return False
-        if not self.redrawing:
-            self.redrawing = True
-            self.queue_draw()
-            self.redrawing = False
-        
-    def do_expose_event(self, event):
-        """Check WidgetProxy.MixInSupportMandatory.do_expose_event doc
-        to know why this methos is been overriden.
+        """We are almost copying the code of do_expose_event
+        because we cannot call.
         """
-        result = self.chain(event)
+        if self._draw_error_icon:
+            icon_x_pos, icon_y_pos, pixbuf_width, pixbuf_height = \
+                      self._draw_icon(INFO_ICON)
+            
+            kiwi_entry_name = self.get_name()
+            
+            icon_x_range = range(icon_x_pos, icon_x_pos + pixbuf_width)
+            icon_y_range = range(icon_y_pos, icon_y_pos + pixbuf_height)
+            self._info_icon_position = \
+                [icon_x_pos, icon_x_range, icon_y_pos, icon_y_range]
+            
+        elif self._draw_mandatory_icon:
+            self._draw_icon(gtk.STOCK_FILE)
+    
+    def _draw_icon(self, icon):
+        """Draw an icon"""
+        widget = self
+        gdk_window = self.child.window
         
-        self.set_drawing_windows(self, self.child.window)
+        pixbuf, pixbuf_width, pixbuf_height = self._render_icon(icon)
         
-        if self._draw_mandatory_icon:
-            self._draw_icon()
-        return result
+        widget_x, widget_y, widget_width, widget_height = widget.get_allocation()            
+        icon_x_pos = widget_x + widget_width - pixbuf_width
+        icon_y_pos = widget_y + widget_height - pixbuf_height
+        
+        area_window = gdk_window.get_children()[0]
+        gdk_window_width, gdk_window_height = area_window.get_size()
+        
+        draw_icon_x = gdk_window_width - pixbuf_width
+        draw_icon_y = (gdk_window_height - pixbuf_height)/2
+        area_window.draw_pixbuf(None, pixbuf, 0, 0, draw_icon_x,
+                                     draw_icon_y, pixbuf_width,
+                                     pixbuf_height)
+        
+        return (icon_x_pos, icon_y_pos, pixbuf_width, pixbuf_height)
 
     def _check_entry(self):
         if len(self.child.get_text()) == 0 and self._mandatory:
@@ -261,8 +285,8 @@ class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin):
 
     def update(self, data):
         # first, trigger some basic validation
-        WidgetProxy.MixIn.update(self, data)
-        if value is ValueUnset:
+        WidgetProxy.Mixin.update(self, data)
+        if data is ValueUnset:
             self.child.set_text("")
         else:
             self.child.set_text(self.type2str(data))

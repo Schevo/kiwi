@@ -22,14 +22,17 @@
 # Author(s): Christian Reis <kiko@async.com.br>
 #
 
+import sys
+import time
+
 from Kiwi2 import _warn, ValueUnset
 from Kiwi2.initgtk import gtk, gobject
 from Kiwi2.Widgets import datatypes
-from Kiwi2.utils import gsignal, gproperty
+from Kiwi2.utils import gsignal, gproperty, set_background, merge_colors
+from Kiwi2.Widgets.datatypes import ValidationError
 
-import sys
 
-class MixIn(object):
+class Mixin(object):
     """This class is a mixin that provide a common interface for KiwiWidgets.
 
     Usually the Proxy class need to set and get data from the widgets. It also
@@ -153,34 +156,62 @@ class MixIn(object):
         assert isinstance(data, self._data_type)
         return datatypes.converters[datatypes.TO_STR][self._data_type](data)
 
-class MixInSupportMandatory(MixIn):
-    """Class used by some Kiwi Widgets that need to support mandatory input.
+
+ERROR_COLOR = "#ffa5a5"
+GOOD_COLOR = "white"
+
+MANDATORY_ICON = gtk.STOCK_FILE
+INFO_ICON = gtk.STOCK_DIALOG_INFO
+
+# amount of time until we complain if the data is wrong (seconds)
+COMPLAIN_DELAY = 1
+
+
+class MixinSupportValidation(Mixin):
+    """Class used by some Kiwi Widgets that need to support mandatory 
+    input and validation features such as custom validation and data-type
+    validation.
     
-    If you need to create a Kiwi Widget with mandatory input support, use this
-    class instead of WidgetProxyMinIn. Mandatory support provides a way to 
-    warn the user when input is necessary.
+    Mandatory support provides a way to warn the user when input is necessary.
+    The validatation feature provides a way to check the data entered and to
+    display information about what is wrong.
     """
-    
-    MANDATORY_ICON = gtk.STOCK_FILE
     
     def __init__(self, data_type=str, model_attribute=None,
                  default_value=None):
-        MixIn.__init__(self, data_type, model_attribute,
+        Mixin.__init__(self, data_type, model_attribute,
                                   default_value)
         self._mandatory = False
         self._draw_mandatory_icon = False
         
         self._draw_widget = None
         self._draw_gdk_window = None
-    
-    def set_drawing_windows(self, widget, gdk_window):
-        """Set the widget and the gdk window to draw the icon.
         
-        Sometimes the widget and gdk window to draw are not so obvious
-        so we let the Kiwi Widget decide where to draw.
-        """
-        self._draw_widget = widget
-        self._draw_gdk_window = gdk_window
+        self._error_tooltip = ErrorTooltip(self)
+        
+        # this flag means the data in the entry does not validate
+        self._invalid_data = False
+
+        # this is the last time the user changed the entry
+        self._last_change_time = None
+
+        self._validation_error_message = ""
+        
+        # id that paints the background red
+        self._background_timeout_id = -1
+        # id for idle that checks the cursor position
+        self._get_cursor_position_id = -1
+        # id for the idle that check if we should complain
+        self._complaint_checker_id = -1
+
+
+        # stores the position of the information icon
+        self._info_icon_position = False
+        
+        # state variables
+        self._draw_error_icon = False
+        self._show_error_tooltip = False
+        self._error_tooltip_visible = False
     
     def get_mandatory(self):
         """Checks if the Kiwi Widget is set to mandatory"""
@@ -194,38 +225,181 @@ class MixInSupportMandatory(MixIn):
         self._draw_mandatory_icon = mandatory
         self.queue_draw()
     
-    def _draw_icon(self, widget=None, gdk_window=None, icon=MANDATORY_ICON):
-        """Draw an icon on a specified widget"""
-        if widget is None:
-            if self._draw_widget is None:
-                _warn("Can't draw icon. %s widget needs to specify"
-                " a widget to the draw function. If you want to"
-                " draw the mandatory icon call set_drawing_window()"
-                " with the correct parameters" % self.get_name())
-                return
-            else:
-                widget = self._draw_widget
-                gdk_window = self._draw_gdk_window
+    def _set_icons_position(self):
+        """Define the position of the info and mandatory icon.
         
+        Should be overriden by the Kiwi Widget
+        """
+
+    def do_expose_event(self, event):
+        """Expose-event signal are triggered when a redraw of the widget
+        needs to be done.
         
-        pixbuf = widget.render_icon(icon, gtk.ICON_SIZE_MENU)
+        Draws information and mandatory icons when necessary
+        """
+        result = self.chain(event)
+        
+        if self._draw_error_icon:
+            icon_x_pos, icon_y_pos, pixbuf_width, pixbuf_height = \
+                      self._draw_icon(INFO_ICON)
+            
+            kiwi_entry_name = self.get_name()
+            
+            icon_x_range = range(icon_x_pos, icon_x_pos + pixbuf_width)
+            icon_y_range = range(icon_y_pos, icon_y_pos + pixbuf_height)
+            self._info_icon_position = \
+                [icon_x_pos, icon_x_range, icon_y_pos, icon_y_range]
+            
+        elif self._draw_mandatory_icon:
+            self._draw_icon(MANDATORY_ICON)
+        
+        return result
+
+    def _check_data(self, text):
+        """Checks if the data is valid.
+        
+        Validates data-type and custom validation.
+        text - needs to be a string
+        returns the widget data-type
+        """
+        try:
+            data = self.str2type(text)
+            # this signal calls the on_widgetname__validate method of the 
+            # view class and gets the exception (if any).
+            error = self.emit("validate", data)
+            if error:
+                raise error
+            # if the data is good we don't wait for the idle to inform
+            # the user
+            self._stop_complaining()
+        except ValidationError, e:
+            if not self._invalid_data:
+                self._invalid_data = True
+                self._validation_error_message = str(e)
+                self._error_tooltip.set_error_text(self._validation_error_message)
+                if self._complaint_checker_id == -1:
+                    self._complaint_checker_id = \
+                        gobject.idle_add(self._check_for_complaints)
+                    self._get_cursor_position_id = \
+                        gobject.timeout_add(200, self._get_cursor_position)
+            data = None
+        return data
+
+    def _check_for_complaints(self):
+        """Check for existing complaints and when to start complaining is case
+        the input is wrong
+        """
+        if self._last_change_time is None:
+            # the user has not started to type
+            return True
+        
+        now = time.time()
+        elapsed_time = now - self._last_change_time
+        
+        if elapsed_time < COMPLAIN_DELAY:
+            return True
+        
+        if not self._invalid_data:
+            return True
+        
+        # if we are already complaining, don't complain again
+        if self._background_timeout_id != -1:
+            return True
+        
+        self._show_error_tooltip = True
+        self._draw_error_icon = True
+        #self.queue_draw()
+        t_id = gobject.timeout_add(100, merge_colors(self, GOOD_COLOR, ERROR_COLOR).next)
+        self._background_timeout_id = t_id
+        
+        return True # call back us again please
+        
+    def _stop_complaining(self):
+        """If the input is corrected this method stop some activits that
+        where necessary while complaining"""
+        self._invalid_data = False
+        # if we are complaining
+        if self._background_timeout_id != -1:
+            gobject.source_remove(self._background_timeout_id)
+            gobject.source_remove(self._complaint_checker_id)
+            # before removing the get_cursor_position idle we need to be sure
+            # that the tooltip is not been displayed
+            self._error_tooltip.disappear()
+            gobject.source_remove(self._get_cursor_position_id)
+            self._background_timeout_id = -1
+            self._complaint_checker_id = -1
+        set_background(self, GOOD_COLOR)
+        self._draw_error_icon = False
+
+    def _get_cursor_position(self):
+        """If the input is wrong (as consequence the icon is been displayed),
+        this method reads the mouse cursor position and checks if it's on top of
+        the information icon
+        """
+        if not self._info_icon_position:
+            return True
+        
+        icon_x, icon_x_range, icon_y, icon_y_range = self._info_icon_position
+        
+        toplevel = self.get_toplevel()
+        pointer_x, pointer_y = toplevel.get_pointer()
+        
+        if pointer_x not in icon_x_range or pointer_y not in icon_y_range:
+            self._error_tooltip.disappear()
+            return True
+        
+        if self._error_tooltip.visible():
+            return True
+            
+        gdk_window = toplevel.window
+        window_x, window_y = gdk_window.get_origin()
+        entry_x, entry_y, entry_width, entry_height = self.get_allocation()
+        tooltip_width, tooltip_height = self._error_tooltip.get_size()
+        x = window_x + entry_x + entry_width - tooltip_width/2
+        y = window_y + entry_y - entry_height
+        self._error_tooltip.display(x, y)
+        self._error_tooltip_visible = True 
+                
+        return True
+
+    def _render_icon(self, icon):
+        pixbuf = self.render_icon(icon, gtk.ICON_SIZE_MENU)
         pixbuf_width = pixbuf.get_width()
         pixbuf_height = pixbuf.get_height()
         
-        widget_x, widget_y, widget_width, widget_height = widget.get_allocation()            
-        icon_x_pos = widget_x + widget_width - pixbuf_width
-        icon_y_pos = widget_y + widget_height - pixbuf_height
+        return (pixbuf, pixbuf_width, pixbuf_height)
+
+
+class ErrorTooltip(gtk.Window):
+    """Small tooltip window that popup when the user click on top of the error (information) icon"""
+    def __init__(self, widget):
+        gtk.Window.__init__(self, gtk.WINDOW_POPUP)
         
-        area_window = gdk_window.get_children()[0]
-        gdk_window_width, gdk_window_height = area_window.get_size()
+        self._widget = widget
+        
+        eventbox = gtk.EventBox()
+        set_background(eventbox, "#fcffcd")
+
+        alignment = gtk.Alignment()
+        alignment.set_border_width(4)
+        self.label = gtk.Label()
+        alignment.add(self.label)
+        eventbox.add(alignment)
+        self.add(eventbox)
+
+    def set_error_text(self, text):
+        self.label.set_text(text)
     
-        draw_icon_x = gdk_window_width - pixbuf_width
-        draw_icon_y = (gdk_window_height - pixbuf_height)/2
-        area_window.draw_pixbuf(None, pixbuf, 0, 0, draw_icon_x,
-                                     draw_icon_y, pixbuf_width,
-                                     pixbuf_height)
+    def display(self, x, y):
+        self.move(x, y)
+        self.show_all()
         
-        return (icon_x_pos, icon_y_pos, pixbuf_width, pixbuf_height)        
+    def visible(self):
+        return self.get_property("visible")
+    
+    def disappear(self):
+        self.hide()
+
 
 def implementsIProxy():
     """Add a content-changed signal and a data-type, default-value, 
@@ -244,6 +418,13 @@ def implementsIProxy():
         dic = local_namespace['__gsignals__']
 
     dic['content-changed'] = (gobject.SIGNAL_RUN_LAST, None, ())
+    
+    # the line below is used for triggering custom validation.
+    # if you want a custom validation on a widget make a method on the
+    # view class for each widget that you want to validate.
+    # the method signature is:
+    # def on_widgetname__validate(self, widget, data)
+    dic['validate'] = (gobject.SIGNAL_RUN_LAST, object, (object,))
 
     if not '__gproperties__' in local_namespace:
         dic = local_namespace['__gproperties__'] = {}

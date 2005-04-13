@@ -580,7 +580,7 @@ class Proxy:
                 raise AttributeError("The widget %s was not "
                                      "found in the view %s" % (widget_name, self.view))
             
-            if not isinstance(widget, WidgetProxy.MixIn):
+            if not isinstance(widget, WidgetProxy.Mixin):
                 continue
 
             data_type = widget.get_property('data-type')

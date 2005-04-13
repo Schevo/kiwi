@@ -185,6 +185,31 @@
         
      </properties>
     </glade-widget-class>
+    
+    <glade-widget-class name="Kiwi2+Widgets+TextView+TextView"
+                        generic-name="kiwitextview"
+                        title="Kiwi TextView">
+      
+      <properties>
+
+    	<property id="model-attribute"
+                  name="Model Attribute"
+                  translatable="False" />
+                  
+        <property id="data-type"
+                  name="Data Type"
+                  translatable="False"
+                  adaptor-class="DataTypeAdaptor">
+              <function name="save" type="override"/>
+                <editor>
+                  <function name="create" type="override"/>
+                  <function name="update" type="override"/>
+                </editor>
+        </property>
+        
+     </properties>
+    </glade-widget-class>
+    
 
 </glade-widget-classes>
 
@@ -197,6 +222,7 @@
     <glade-widget-class-ref name="Kiwi2+Widgets+CheckButton+CheckButton"/>
     <glade-widget-class-ref name="Kiwi2+Widgets+RadioButton+RadioButton"/>
     <glade-widget-class-ref name="Kiwi2+Widgets+SpinButton+SpinButton"/>
+    <glade-widget-class-ref name="Kiwi2+Widgets+TextView+TextView"/>
 
   </glade-widget-group>
   
