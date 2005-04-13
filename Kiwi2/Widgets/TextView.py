@@ -45,6 +45,7 @@ class TextView(gtk.TextView, WidgetProxy.MixinSupportValidation):
         
         self.connect("key-release-event", self._key_release_event)
         
+    
     def _key_release_event(self, *args):
         self._last_change_time = time.time()
         self.emit('content-changed')
@@ -54,12 +55,12 @@ class TextView(gtk.TextView, WidgetProxy.MixinSupportValidation):
         end = self.textbuffer.get_end_iter()
         text = self.textbuffer.get_text(start, end)
 
-        if text == "" and self._mandatory:
+        if len(text.split()) == 0 and self._mandatory:
             self._draw_mandatory_icon = True
         else:
             self._draw_mandatory_icon = False
         
-        data = self._check_data(text)
+        data = self._validate_data(text)
         return data
 
     def update(self, data):
@@ -71,21 +72,39 @@ class TextView(gtk.TextView, WidgetProxy.MixinSupportValidation):
         else:
             self.textbuffer.set_text(self.type2str(data))
 
+    def do_expose_event(self, event):
+        """Expose-event signal are triggered when a redraw of the widget
+        needs to be done.
+        
+        Draws information and mandatory icons when necessary
+        """        
+        result = self.chain(event)
+        
+        # set this attributes so the draw icon method knows where to draw
+        self._widget = self
+        self._gdk_window = self.get_window(gtk.TEXT_WINDOW_TEXT)
+        
+        self._define_icons_to_draw()
+        
+        return result
+
+
     def _draw_icon(self, icon):
-        """Draw an icon"""
+        """Overrides super class method because we need to
+        change position and area window to draw
+        """
         
-        widget = self
-        gdk_window = self.get_window(gtk.TEXT_WINDOW_TEXT)
+        widget = self._widget
+        gdk_window = self._gdk_window
         
-        pixbuf, pixbuf_width, pixbuf_height = self._render_icon(icon)
+        icon_x_pos, icon_y_pos, pixbuf, pixbuf_width, pixbuf_height = \
+        self._render_icon(icon, widget)
         
-        widget_x, widget_y, widget_width, widget_height = widget.get_allocation()            
-        icon_x_pos = widget_x + widget_width - pixbuf_width
-        icon_y_pos = widget_y + widget_height - pixbuf_height
-        
+        # line below differ from super class _draw_icon
         area_window = gdk_window
         gdk_window_width, gdk_window_height = area_window.get_size()
         
+        # the two lines below differ from super class _draw_icon
         draw_icon_x = (gdk_window_width - pixbuf_width) / 2
         draw_icon_y = (gdk_window_height - pixbuf_height) / 2
         area_window.draw_pixbuf(None, pixbuf, 0, 0, draw_icon_x,

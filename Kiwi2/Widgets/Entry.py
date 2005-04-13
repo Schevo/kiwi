@@ -54,8 +54,12 @@ class Entry(gtk.Entry, WidgetProxy.MixinSupportValidation):
     def __init__(self):
         gtk.Entry.__init__(self)
         WidgetProxy.MixinSupportValidation.__init__(self)
-
+        self.connect("expose-event", self._set_icon_draw_info)
         
+    def _set_icon_draw_info(self, widget, event):
+        self._widget = self
+        self._gdk_window = self.window
+    
     def do_changed(self):
         """Called when the content of the entry changes.
 
@@ -70,7 +74,6 @@ class Entry(gtk.Entry, WidgetProxy.MixinSupportValidation):
         else:
             self._draw_mandatory_icon = False
         
-            
         self.emit('content-changed')
         self.chain()
         
@@ -79,11 +82,10 @@ class Entry(gtk.Entry, WidgetProxy.MixinSupportValidation):
         complaining
         """
         text = self.get_text()
-        data = self._check_data(text)
+        data = self._validate_data(text)
         
         return data
 
-    
     def update(self, data):
         WidgetProxy.MixinSupportValidation.update(self, data)
 
@@ -95,32 +97,22 @@ class Entry(gtk.Entry, WidgetProxy.MixinSupportValidation):
     def set_text(self, text):
         gtk.Entry.set_text(self, text)
         self.emit('content-changed')
-
-    
-    def _draw_icon(self, icon):
-        """Draw an icon"""
         
-        widget = self
-        gdk_window = self.window
+    def do_expose_event(self, event):
+        """Expose-event signal are triggered when a redraw of the widget
+        needs to be done.
         
-        pixbuf, pixbuf_width, pixbuf_height = self._render_icon(icon)
+        Draws information and mandatory icons when necessary
+        """        
+        result = self.chain(event)
         
-        widget_x, widget_y, widget_width, widget_height = widget.get_allocation()            
-        icon_x_pos = widget_x + widget_width - pixbuf_width
-        icon_y_pos = widget_y + widget_height - pixbuf_height
+        # set this attributes so the draw icon method knows where to draw
+        self._widget = self
+        self._gdk_window = self.window
         
-        area_window = gdk_window.get_children()[0]
-        gdk_window_width, gdk_window_height = area_window.get_size()
+        self._define_icons_to_draw()
         
-        draw_icon_x = gdk_window_width - pixbuf_width
-        draw_icon_y = (gdk_window_height - pixbuf_height)/2
-        area_window.draw_pixbuf(None, pixbuf, 0, 0, draw_icon_x,
-                                     draw_icon_y, pixbuf_width,
-                                     pixbuf_height)
-        
-        return (icon_x_pos, icon_y_pos, pixbuf_width, pixbuf_height)
-    
-    
+        return result
               
 gobject.type_register(Entry)
     

@@ -201,11 +201,9 @@ class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin):
     WidgetProxy.implementsIProxy()
     WidgetProxy.implementsIMandatoryProxy()
     
-    # WE CANNOT CONNECT THIS SIGNAL DIRECTLY TO THE COMBO BOX
-    # BECAUSE WE GET CRASHES. ANOTHER REASON IS THAT IT DOESN'T
-    # MAKE SENSE SINCE WE WANT TO MONITOR THE ENTRY OF THE
-    # COMBO NOT THE COMBO BOX IT SELF.
-    # mandatory widgets need to have this signal connected
+    # it doesn't make sense to connect to this signal
+    # because we want to monitor the entry of the combo
+    # not the combo box itself.
     #gsignal('expose-event', 'override')
     
     def __init__(self):
@@ -215,58 +213,20 @@ class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin):
         self.set_text_column(0)
         # here we connect the expose-event signal directly to the entry
         self.child.connect('expose-event', self._on_entry__expose_event)
-        #self.connect('expose-event', self._on_entry__expose_event)
         
         self.child.connect('changed', self._on_entry__changed)
-        self.child.connect('focus-out-event', self._on_entry__focus_out)
-        self.child.connect('focus-in-event', self._on_entry__focus_in)
         
+        # HACK! we force a queue_draw because when the window is displayed
+        # the icon is not drawn. Anyway, it also saved us the focus-in-event
+        # and focus-out-event, so it was a good trade
+        gobject.idle_add(self.queue_draw)
         
-    def _on_entry__focus_out(self, widget, event):
-        self._check_entry()
-        
-    def _on_entry__focus_in(self, widget, event):
-        self._check_entry()
-
     def _on_entry__expose_event(self, widget, event):
-        """We are almost copying the code of do_expose_event
-        because we cannot call.
-        """
-        if self._draw_error_icon:
-            icon_x_pos, icon_y_pos, pixbuf_width, pixbuf_height = \
-                      self._draw_icon(INFO_ICON)
-            
-            kiwi_entry_name = self.get_name()
-            
-            icon_x_range = range(icon_x_pos, icon_x_pos + pixbuf_width)
-            icon_y_range = range(icon_y_pos, icon_y_pos + pixbuf_height)
-            self._info_icon_position = \
-                [icon_x_pos, icon_x_range, icon_y_pos, icon_y_range]
-            
-        elif self._draw_mandatory_icon:
-            self._draw_icon(gtk.STOCK_FILE)
-    
-    def _draw_icon(self, icon):
-        """Draw an icon"""
-        widget = self
-        gdk_window = self.child.window
+        # set this attributes so the draw icon method knows where to draw
+        self._widget = self.child
+        self._gdk_window = self.child.window
         
-        pixbuf, pixbuf_width, pixbuf_height = self._render_icon(icon)
-        
-        widget_x, widget_y, widget_width, widget_height = widget.get_allocation()            
-        icon_x_pos = widget_x + widget_width - pixbuf_width
-        icon_y_pos = widget_y + widget_height - pixbuf_height
-        
-        area_window = gdk_window.get_children()[0]
-        gdk_window_width, gdk_window_height = area_window.get_size()
-        
-        draw_icon_x = gdk_window_width - pixbuf_width
-        draw_icon_y = (gdk_window_height - pixbuf_height)/2
-        area_window.draw_pixbuf(None, pixbuf, 0, 0, draw_icon_x,
-                                     draw_icon_y, pixbuf_width,
-                                     pixbuf_height)
-        
-        return (icon_x_pos, icon_y_pos, pixbuf_width, pixbuf_height)
+        self._define_icons_to_draw()
 
     def _check_entry(self):
         if len(self.child.get_text()) == 0 and self._mandatory:
@@ -307,6 +267,7 @@ class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin):
         """Removes all items from list and erases entry"""
         ComboProxyMixin.clear(self)
         self.child.set_text("")
+        
     
 gobject.type_register(ComboBoxEntry)
 

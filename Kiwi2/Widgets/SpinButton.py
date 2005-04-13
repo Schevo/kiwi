@@ -68,7 +68,7 @@ class SpinButton(gtk.SpinButton, WidgetProxy.MixinSupportValidation):
 
     def read(self):
         text = self.get_value()
-        data = self._check_data(self.type2str(text))
+        data = self._validate_data(self.type2str(text))
 
         return data
 
@@ -80,28 +80,22 @@ class SpinButton(gtk.SpinButton, WidgetProxy.MixinSupportValidation):
             self.set_value(data)
         else:
             self.set_text("")
-
-    def _draw_icon(self, icon):
-        """Draw an icon"""
+            
+            
+    def do_expose_event(self, event):
+        """Expose-event signal are triggered when a redraw of the widget
+        needs to be done.
         
-        widget = self
-        gdk_window = self.window
+        Draws information and mandatory icons when necessary
+        """        
+        result = self.chain(event)
         
-        pixbuf, pixbuf_width, pixbuf_height = self._render_icon(icon)
+        # set this attributes so the draw icon method knows where to draw
+        self._widget = self
+        self._gdk_window = self.window
         
-        widget_x, widget_y, widget_width, widget_height = widget.get_allocation()            
-        icon_x_pos = widget_x + widget_width - pixbuf_width
-        icon_y_pos = widget_y + widget_height - pixbuf_height
+        self._define_icons_to_draw()
         
-        area_window = gdk_window.get_children()[0]
-        gdk_window_width, gdk_window_height = area_window.get_size()
-        
-        draw_icon_x = gdk_window_width - pixbuf_width
-        draw_icon_y = (gdk_window_height - pixbuf_height)/2
-        area_window.draw_pixbuf(None, pixbuf, 0, 0, draw_icon_x,
-                                     draw_icon_y, pixbuf_width,
-                                     pixbuf_height)
-        
-        return (icon_x_pos, icon_y_pos, pixbuf_width, pixbuf_height)
+        return result
     
 gobject.type_register(SpinButton)

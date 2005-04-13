@@ -1,29 +1,46 @@
 #!/usr/bin/env python
 from utils import refresh_gui
 
-from Kiwi2.Widgets import Entry
+from Kiwi2.Widgets import Entry, datatypes
 
 import unittest
-import datetime
 import time
-import locale
 
+import datetime
 class EntryTest(unittest.TestCase):
+    def set_locale(self):
+        
+        date_format = datatypes.date_format
+        
+        table = {'%y': '89', 
+                 '%Y': '1989',
+                 '%m': '08',
+                 '%d': '15'}
+        
+        tmp = date_format
+        for code in table.keys():
+            tmp = tmp.replace(code, table[code])
+        
+        self.date_format = tmp
+        
     def testValidDataType(self):
         
-        locale_dictionary = locale.localeconv()
+        self.set_locale()
         
         entry = Entry()
         entry.set_property("data-type", "date")
         # let's make the entry complain!
         entry.set_text("string")
         self.assertEqual(entry.read(), None)
-        self.assertNotEqual(entry._complain_checker_id, -1)
+        self.assertNotEqual(entry._complaint_checker_id, -1)
         
         # now let's put proper data
-        entry.set_text("10/05/1952")
-        self.assertEqual(entry.read(), datetime.date(1952, 10, 5))
+        entry.set_text(self.date_format)
+        date = datatypes.date2str(entry.read())
+        self.assertEqual(date, self.date_format)
         self.assertEqual(entry._background_timeout_id, -1)
+        
+        locale_dictionary = datatypes.locale_dictionary
         
         # now change the data-type and do it again
         entry.set_property("data-type", "float")
