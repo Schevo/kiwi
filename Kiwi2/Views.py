@@ -33,6 +33,7 @@ from Kiwi2 import _warn, get_gladepath, get_imagepath
 from Kiwi2.utils import gsignal
 from Kiwi2.initgtk import _non_interactive, gtk, gobject, quit_if_last
 from Kiwi2.Proxies import Proxy
+from Kiwi2.Widgets import WidgetProxy
 
 #
 # Gladepath handling
@@ -235,10 +236,10 @@ class SlaveView(gobject.GObject):
         self.toplevel_name = toplevel_name or self.toplevel_name
         self.toplevel = toplevel or self.toplevel
         self.widgets = widgets or self.widgets or []
-	
-	# stores the function that will be called when widgets 
-	# validity is checked
-	self._validate_function = None
+        
+        # stores the function that will be called when widgets 
+        # validity is checked
+        self._validate_function = None
         
         for reserved in ["widgets", "toplevel", "gladefile",
                          "gladename", "tree", "model", "controller"]:
@@ -271,22 +272,22 @@ class SlaveView(gobject.GObject):
 
 
     def check_widgets_validity(self):
-	"""Checks if there are widgets with invalid data.
-	Calls the registered validate function
-	"""
-	if self._validate_function is None:
-	    return
+        """Checks if there are widgets with invalid data.
+        Calls the registered validate function
+        """
+        if self._validate_function is None:
+            return
         valid = True
-	for widget_name in self.widgets:
-	    widget = self.get_widget(widget_name)
-	    if hasattr(widget, "_valid_data"):
-		if not widget._valid_data:
-		    valid = False
-	
-	self._validate_function(valid)
+        for widget_name in self.widgets:
+            widget = self.get_widget(widget_name)
+            if isinstance(widget, WidgetProxy.MixinSupportValidation):
+                if not widget._valid_data:
+                    valid = False
+        
+        self._validate_function(valid)
 
     def register_validate_function(self, function):
-	self._validate_function = function
+        self._validate_function = function
 
     def _init_glade_adaptor(self):
         """Special init code that subclasses may want to override."""

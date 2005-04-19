@@ -24,10 +24,11 @@
 
 import time
 
-import gtk.keysyms
+import gobject
+import gtk
+import gtk.keysyms 
 
 from Kiwi2 import ValueUnset
-from Kiwi2.initgtk import gtk, gobject
 from Kiwi2.Widgets import WidgetProxy
 from Kiwi2.utils import gsignal, gproperty
 from Kiwi2.Widgets.datatypes import ValidationError
@@ -152,15 +153,15 @@ class ComboProxyMixin:
         return items
 
     def get_selected_label(self):
-        model = self.get_model()
         iter = self.get_active_iter()
         if iter:
+            model = self.get_model()
             return model.get_value(iter, COL_COMBO_LABEL)
 
     def get_selected_data(self):
-        model = self.get_model()
         iter = self.get_active_iter()
         if iter:
+            model = self.get_model()
             data = model.get_value(iter, COL_COMBO_DATA)
             if data is None:
                 #the user only prefilled the combo with strings
@@ -236,7 +237,7 @@ class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin,
         
         self.set_events(gtk.gdk.KEY_RELEASE_MASK)
         self.connect("key-release-event", self._on_key_release)
-        self.child.connect("focus-out-event", self._on_entry_focus_out)
+        self.child.connect("focus-out-event", self._on_child_entry_focus_out)
     
         self._list_writable = False
         # this attributes stores the info on were to draw icons and paint
@@ -257,7 +258,7 @@ class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin,
         if text not in items.keys():
             self.append_item(text)
                 
-    def _on_entry_focus_out(self, widget, event):
+    def _on_child_entry_focus_out(self, widget, event):
         if self._list_writable:
             self._add_text_to_combo_list()
         self.emit('content-changed')

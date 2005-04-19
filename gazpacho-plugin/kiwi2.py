@@ -31,6 +31,7 @@ class DataTypeAdaptor(object):
         model.append((_('Float'), float))
         model.append((_('Boolean'), bool))
         model.append((_('Date'), date))
+        model.append((_('Object'), object))
         combo = gtk.ComboBox(model)
         renderer = gtk.CellRendererText()
         combo.pack_start(renderer)

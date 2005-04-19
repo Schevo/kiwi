@@ -1,3 +1,15 @@
+2005-04-19  Gustavo Rahal <gustavo@async.com.br>
+
+	* Kiwi2/View.py:
+	* Kiwi2/Widgets/ComboBox.py:
+	* Kiwi2/Widgets/TextView.py
+	* Kiwi2/Widgets/List.py:
+	* Kiwi2/Widgets/Entry.py
+	* Kiwi2/Widgets/SpinButton.py:
+	* Kiwi2/Widgets/WidgetProxy.py: code clean up
+	* gazpacho-plugin/kiwi2.py: added support for object data-type
+	* Kiwi2/Widgets/datatype.py: added support for object data-type
+
 2005-04-19  Daniel Saran R. da Cunha  <daniel@async.com.br>
 
 	* Kiwi2/Widgets/ComboBox.py (ComboBoxEntry): Now ComboBoxEntry works

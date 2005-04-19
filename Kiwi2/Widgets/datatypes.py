@@ -110,7 +110,7 @@ def str2float(value):
     except ValueError:
         raise ValidationError("This field requires a number")
     
-supported_types = (str, int, float, bool, date)
+supported_types = (str, int, float, bool, date, object)
 
 supported_types_names = map(lambda t: t.__name__, supported_types)
 
@@ -123,6 +123,7 @@ converters = {
         float: locale.str,
         bool: str,
         date: date2str,
+        object: lambda v: v
         },
     FROM_STR: {
         str: lambda v: v,
@@ -130,6 +131,7 @@ converters = {
         float: str2float,
         bool: str2bool,
         date: str2date,
+        object: lambda v: v
         }
     }
 
@@ -139,4 +141,5 @@ default_values = {
     float: 0.0,
     bool: True,
     date: None,
+    object: None,
     }

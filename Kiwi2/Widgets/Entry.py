@@ -55,7 +55,7 @@ class Entry(gtk.Entry, WidgetProxy.MixinSupportValidation):
         gtk.Entry.__init__(self)
         WidgetProxy.MixinSupportValidation.__init__(self)
         
-        # this attributes stores the info on were to draw icons and paint
+        # this attribute stores the info on where to draw icons and paint
         # the background
         self._widget_to_draw = self
     
@@ -103,12 +103,13 @@ class Entry(gtk.Entry, WidgetProxy.MixinSupportValidation):
         
         Draws information and mandatory icons when necessary
         """
-        result = gtk.Entry.do_expose_event(self, event)
-        # the line below was replace by the line above because of changes
-        # in pygtk 2.6
-        #result = self.chain(event)
+        # due to changes on pygtk 2.6 we have to make some ajustments here
+        if gtk.pygtk_version < (2,6):
+            self.do_expose_event = self.chain
         
-        # this attributes stores the info on were to draw icons and paint
+        result = gtk.Entry.do_expose_event(self, event)
+
+        # this attribute stores the info on where to draw icons and paint
         # the background
         # it's been defined here because it's when we have gdk window available
         self._gdkwindow_to_draw = self.window

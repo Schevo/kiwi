@@ -32,6 +32,9 @@ from Kiwi2.utils import gsignal, gproperty, set_background, merge_colors
 from Kiwi2.Widgets.datatypes import ValidationError
 
 
+MERGE_COLORS_DELAY = 100
+CURSOR_POS_CHECKING_DELAY = 200
+
 class Mixin(object):
     """This class is a mixin that provide a common interface for KiwiWidgets.
 
@@ -262,20 +265,19 @@ class MixinSupportValidation(Mixin):
         return data
 
     def _validation_error(self, e):
-        if not self._invalid_data:
-            self._invalid_data = True
-            self._validation_error_message = str(e)
-            self._error_tooltip.set_error_text(self._validation_error_message)
-            if self._complaint_checker_id == -1:
-                self._complaint_checker_id = \
-                    gobject.idle_add(self._check_for_complaints)
-                self._get_cursor_position_id = \
-                    gobject.timeout_add(200, self._get_cursor_position)
-        self._valid_data = False
-        # check if the remaining widgets are ok
-        self.owner.check_widgets_validity()
-        data = None
-        return data
+        if self._invalid_data:
+            self._valid_data = False
+            # check if the remaining widgets are ok
+            self.owner.check_widgets_validity()
+        
+        self._invalid_data = True
+        self._validation_error_message = str(e)
+        self._error_tooltip.set_error_text(self._validation_error_message)
+        if self._complaint_checker_id == -1:
+            self._complaint_checker_id = \
+                gobject.idle_add(self._check_for_complaints)
+            self._get_cursor_position_id = \
+                gobject.timeout_add(CURSOR_POS_CHECKING_DELAY, self._get_cursor_position)
 
     def _check_for_complaints(self):
         """Check for existing complaints and when to start complaining is case
@@ -303,7 +305,7 @@ class MixinSupportValidation(Mixin):
         self.queue_draw()
         func = merge_colors(self._widget_to_draw, 
                             GOOD_COLOR, ERROR_COLOR).next
-        t_id = gobject.timeout_add(100, func)
+        t_id = gobject.timeout_add(MERGE_COLORS_DELAY, func)
         self._background_timeout_id = t_id
         
         return True # call back us again please
@@ -357,9 +359,6 @@ class MixinSupportValidation(Mixin):
         return True
 
     def _draw_icon(self):
-        widget = self._widget_to_draw
-        gdk_window = self._gdkwindow_to_draw
-        
         if self._draw_mandatory_icon:
             icon = MANDATORY_ICON
         elif self._draw_info_icon:
@@ -367,21 +366,16 @@ class MixinSupportValidation(Mixin):
         else:
             return
             
-        iconx, icony, pixbuf, pixw, pixh = self._render_icon(icon, widget)
-           
-        area_window = gdk_window.get_children()[0]
-        winw, winh = area_window.get_size()
-            
-        area_window.draw_pixbuf(None, pixbuf, 0, 0, 
-                                winw - pixw, (winh - pixh)/2, 
-                                pixw, pixh)
-                                        
+        iconx, icony, pixbuf, pixw, pixh = \
+             self._render_icon(icon, self._widget_to_draw)
+        
+        self._draw_pixbuf(iconx, icony, pixbuf, pixw, pixh)
+        
         if self._draw_info_icon:
             iconx_range = range(iconx, iconx + pixw)
             icony_range = range(icony, icony + pixh)
             self._info_icon_position = \
-                [iconx, iconx_range, icony, icony_range]
-            
+                (iconx, iconx_range, icony, icony_range)
 
     def _render_icon(self, icon, widget):
         pixbuf = self.render_icon(icon, gtk.ICON_SIZE_MENU)
@@ -392,7 +386,15 @@ class MixinSupportValidation(Mixin):
         iconx = widget_x + widget_w - pixw
         icony = widget_y + widget_h - pixh
         
-        return (iconx, icony, pixbuf, pixw, pixh)
+        return iconx, icony, pixbuf, pixw, pixh
+
+    def _draw_pixbuf(self, iconx, icony, pixbuf, pixw, pixh):
+        area_window = self._gdkwindow_to_draw.get_children()[0]
+        winw, winh = area_window.get_size()
+            
+        area_window.draw_pixbuf(None, pixbuf, 0, 0, 
+                                winw - pixw, (winh - pixh)/2, 
+                                pixw, pixh)
 
 
 class ErrorTooltip(gtk.Window):

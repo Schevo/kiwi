@@ -48,10 +48,10 @@ class TextView(gtk.TextView, WidgetProxy.MixinSupportValidation):
         
         self.connect("key-release-event", self._key_release_event)
         
-        # this attribute stores the info on were to draw icons and paint
+        # this attribute stores the info on where to draw icons and paint
         # the background
         # although we have our own draw method we still need to 
-        # set this attributes because it is used to paint the background
+        # set this attribute because it is used to paint the background
         self._widget_to_draw = self
     
     def _key_release_event(self, *args):
@@ -86,46 +86,29 @@ class TextView(gtk.TextView, WidgetProxy.MixinSupportValidation):
         
         Draws information and mandatory icons when necessary
         """
-        result = gtk.TextView.do_expose_event(self, event)
-        # the line below was replace by the line above because of changes
-        # in pygtk 2.6
-        #result = self.chain(event)
+        # due to changes on pygtk 2.6 we have to make some ajustments here
+        if gtk.pygtk_version < (2,6):
+            self.do_expose_event = self.chain
         
-        # this attribute stores the info on were to draw icons and paint
+        result = gtk.TextView.do_expose_event(self, event)
+        
+        # this attribute stores the info on where to draw icons and paint
         # the background
         # although we have our own draw method we still need to 
-        # set this attributes because it is used to paint the background
+        # set this attribute because it is used to paint the background
         self._gdkwindow_to_draw = self.get_window(gtk.TEXT_WINDOW_TEXT)
         
-        self._draw_icon(self, self.get_window(gtk.TEXT_WINDOW_TEXT))
+        self._draw_icon()
         
         return result
-
-    def _draw_icon(self, widget, gdk_window):
-        """Overrides super class method because we need to
-        change position and area window to draw
-        """
-        if self._draw_info_icon:
-            icon = INFO_ICON
-        elif self._draw_mandatory_icon:
-            icon = MANDATORY_ICON
-        else:
-            return
-        
-        iconx, icony, pixbuf, pixw, pixh = self._render_icon(icon, widget)
-        
-        area_window = gdk_window
+    
+    def _draw_pixbuf(self, iconx, icony, pixbuf, pixw, pixh):
+        area_window = self._gdkwindow_to_draw
         winw, winh = area_window.get_size()
         
         area_window.draw_pixbuf(None, pixbuf, 0, 0, 
                                 (winw - pixw) / 2, (winh - pixh) / 2,
                                 pixw, pixh)
-        
-        if self._draw_info_icon:
-            icon_x_range = range(iconx, iconx + pixw)
-            icon_y_range = range(icony, icony + pixh)
-            self._info_icon_position = \
-                [iconx, iconx_range, icony, icon_y_range]
         
 
 gobject.type_register(TextView)

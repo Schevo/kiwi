@@ -634,13 +634,10 @@ eview that needs to
                 stop = len(self.model)
                 start = 0
                 
-            items = []
-            for item in range(start, stop):
-                items.append(self.model[arg][item])
-            return items
+            return [self.model[arg][item] for item in range(start, stop)]
         else:
-            raise ValueError("the index is not an intenger, an iter nor a slice object")
-        
+            raise TypeError("argument arg must be int, gtk.Treeiter or "
+                            "slice, not %s" % type(arg))
         return item
 
     def __setitem__(self, arg, item):
@@ -649,7 +646,8 @@ eview that needs to
         elif isinstance(arg, gtk.TreeIter):
             self.model.set_value(arg, 0, item)
         else:
-            raise ValueError("the index is not an intenger neither a iter")
+            raise TypeError("argument arg must be int or gtk.Treeiter,"
+                            " not %s" % type(arg))
             
     def __len__(self):
         return len(self.model)
