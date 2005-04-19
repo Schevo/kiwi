@@ -29,6 +29,9 @@ from Kiwi2.Widgets import WidgetProxy
 from Kiwi2.utils import gsignal, gproperty, set_foreground
 from Kiwi2 import _warn, ValueUnset
 
+MANDATORY_ICON = gtk.STOCK_EDIT
+INFO_ICON = gtk.STOCK_DIALOG_INFO
+
 class TextView(gtk.TextView, WidgetProxy.MixinSupportValidation):
     WidgetProxy.implementsIProxy()
     WidgetProxy.implementsIMandatoryProxy()
@@ -45,6 +48,11 @@ class TextView(gtk.TextView, WidgetProxy.MixinSupportValidation):
         
         self.connect("key-release-event", self._key_release_event)
         
+        # this attribute stores the info on were to draw icons and paint
+        # the background
+        # although we have our own draw method we still need to 
+        # set this attributes because it is used to paint the background
+        self._widget_to_draw = self
     
     def _key_release_event(self, *args):
         self._last_change_time = time.time()
@@ -55,7 +63,7 @@ class TextView(gtk.TextView, WidgetProxy.MixinSupportValidation):
         end = self.textbuffer.get_end_iter()
         text = self.textbuffer.get_text(start, end)
 
-        if len(text.split()) == 0 and self._mandatory:
+        if not text.strip() and self._mandatory:
             self._draw_mandatory_icon = True
         else:
             self._draw_mandatory_icon = False
@@ -77,42 +85,47 @@ class TextView(gtk.TextView, WidgetProxy.MixinSupportValidation):
         needs to be done.
         
         Draws information and mandatory icons when necessary
-        """        
-        result = self.chain(event)
+        """
+        result = gtk.TextView.do_expose_event(self, event)
+        # the line below was replace by the line above because of changes
+        # in pygtk 2.6
+        #result = self.chain(event)
         
-        # set this attributes so the draw icon method knows where to draw
-        self._widget = self
-        self._gdk_window = self.get_window(gtk.TEXT_WINDOW_TEXT)
+        # this attribute stores the info on were to draw icons and paint
+        # the background
+        # although we have our own draw method we still need to 
+        # set this attributes because it is used to paint the background
+        self._gdkwindow_to_draw = self.get_window(gtk.TEXT_WINDOW_TEXT)
         
-        self._define_icons_to_draw()
+        self._draw_icon(self, self.get_window(gtk.TEXT_WINDOW_TEXT))
         
         return result
 
-
-    def _draw_icon(self, icon):
+    def _draw_icon(self, widget, gdk_window):
         """Overrides super class method because we need to
         change position and area window to draw
         """
+        if self._draw_info_icon:
+            icon = INFO_ICON
+        elif self._draw_mandatory_icon:
+            icon = MANDATORY_ICON
+        else:
+            return
         
-        widget = self._widget
-        gdk_window = self._gdk_window
+        iconx, icony, pixbuf, pixw, pixh = self._render_icon(icon, widget)
         
-        icon_x_pos, icon_y_pos, pixbuf, pixbuf_width, pixbuf_height = \
-        self._render_icon(icon, widget)
-        
-        # line below differ from super class _draw_icon
         area_window = gdk_window
-        gdk_window_width, gdk_window_height = area_window.get_size()
+        winw, winh = area_window.get_size()
         
-        # the two lines below differ from super class _draw_icon
-        draw_icon_x = (gdk_window_width - pixbuf_width) / 2
-        draw_icon_y = (gdk_window_height - pixbuf_height) / 2
-        area_window.draw_pixbuf(None, pixbuf, 0, 0, draw_icon_x,
-                                     draw_icon_y, pixbuf_width,
-                                     pixbuf_height)
+        area_window.draw_pixbuf(None, pixbuf, 0, 0, 
+                                (winw - pixw) / 2, (winh - pixh) / 2,
+                                pixw, pixh)
         
-        return (icon_x_pos, icon_y_pos, pixbuf_width, pixbuf_height)
-
-
+        if self._draw_info_icon:
+            icon_x_range = range(iconx, iconx + pixw)
+            icon_y_range = range(icony, icony + pixh)
+            self._info_icon_position = \
+                [iconx, iconx_range, icony, icon_y_range]
+        
 
 gobject.type_register(TextView)

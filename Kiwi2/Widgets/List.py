@@ -146,7 +146,6 @@ class Column:
         # XXX: validate bizarre option combinations
         # Tip: when adding items here, remember to update
         # CListDelegate.dump_column_code()
-
     def ensure_decimal_translator(self):
         sep = self.decimal_separator
         if sep:
@@ -369,13 +368,12 @@ class List(gtk.ScrolledWindow):
         
     def _create_column(self, col_definition, col_index):
         treeview_column = gtk.TreeViewColumn()
-
         # we need to set our own widget because otherwise
         # __get_column_button won't work
+
         label = gtk.Label(col_definition.title)
         label.show()
         treeview_column.set_widget(label)
-
         treeview_column.set_resizable(True)
         treeview_column.set_clickable(True)
         treeview_column.set_reorderable(True)
@@ -626,8 +624,22 @@ eview that needs to
             item = self.model[arg][0]
         elif isinstance(arg, gtk.TreeIter):
             item = self.model.get_value(arg, 0)
+        elif isinstance(arg, slice):
+            # for some reason when we try to slice the whole
+            # list ([:]) we get a slice object with the content
+            # slice(None, None, None)
+            stop = arg.stop
+            start = arg.start
+            if stop is None:
+                stop = len(self.model)
+                start = 0
+                
+            items = []
+            for item in range(start, stop):
+                items.append(self.model[arg][item])
+            return items
         else:
-            raise ValueError("the index is not an intenger neither a iter")
+            raise ValueError("the index is not an intenger, an iter nor a slice object")
         
         return item
 
@@ -957,6 +969,7 @@ if __name__ == '__main__':
     win.connect('destroy', gtk.main_quit)
 
     class Person:
+        """The parameters need to be of the same name of the column headers"""
         def __init__(self, name, age, city, single):
             self.name, self.age, self.city, self.single = name, age, city, single
 

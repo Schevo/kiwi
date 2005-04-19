@@ -54,11 +54,10 @@ class Entry(gtk.Entry, WidgetProxy.MixinSupportValidation):
     def __init__(self):
         gtk.Entry.__init__(self)
         WidgetProxy.MixinSupportValidation.__init__(self)
-        self.connect("expose-event", self._set_icon_draw_info)
         
-    def _set_icon_draw_info(self, widget, event):
-        self._widget = self
-        self._gdk_window = self.window
+        # this attributes stores the info on were to draw icons and paint
+        # the background
+        self._widget_to_draw = self
     
     def do_changed(self):
         """Called when the content of the entry changes.
@@ -103,16 +102,20 @@ class Entry(gtk.Entry, WidgetProxy.MixinSupportValidation):
         needs to be done.
         
         Draws information and mandatory icons when necessary
-        """        
-        result = self.chain(event)
+        """
+        result = gtk.Entry.do_expose_event(self, event)
+        # the line below was replace by the line above because of changes
+        # in pygtk 2.6
+        #result = self.chain(event)
         
-        # set this attributes so the draw icon method knows where to draw
-        self._widget = self
-        self._gdk_window = self.window
+        # this attributes stores the info on were to draw icons and paint
+        # the background
+        # it's been defined here because it's when we have gdk window available
+        self._gdkwindow_to_draw = self.window
+
+        self._draw_icon()
         
-        self._define_icons_to_draw()
-        
-        return result
-              
+        return result    
+    
 gobject.type_register(Entry)
     

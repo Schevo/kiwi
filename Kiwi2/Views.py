@@ -235,6 +235,10 @@ class SlaveView(gobject.GObject):
         self.toplevel_name = toplevel_name or self.toplevel_name
         self.toplevel = toplevel or self.toplevel
         self.widgets = widgets or self.widgets or []
+	
+	# stores the function that will be called when widgets 
+	# validity is checked
+	self._validate_function = None
         
         for reserved in ["widgets", "toplevel", "gladefile",
                          "gladename", "tree", "model", "controller"]:
@@ -264,6 +268,25 @@ class SlaveView(gobject.GObject):
         self._accel_groups = gtk.accel_groups_from_object(self.toplevel)
 
         self.slaves = {}
+
+
+    def check_widgets_validity(self):
+	"""Checks if there are widgets with invalid data.
+	Calls the registered validate function
+	"""
+	if self._validate_function is None:
+	    return
+        valid = True
+	for widget_name in self.widgets:
+	    widget = self.get_widget(widget_name)
+	    if hasattr(widget, "_valid_data"):
+		if not widget._valid_data:
+		    valid = False
+	
+	self._validate_function(valid)
+
+    def register_validate_function(self, function):
+	self._validate_function = function
 
     def _init_glade_adaptor(self):
         """Special init code that subclasses may want to override."""

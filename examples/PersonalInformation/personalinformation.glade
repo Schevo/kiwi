@@ -31,102 +31,75 @@
                         <property name="n_columns">2</property>
                         <property name="visible">True</property>
                         <child>
-                            <widget class="GtkLabel" id="label8">
-                                <property name="label" context="True" translatable="True">Nationality:</property>
+                            <widget class="GtkLabel" id="label9">
+                                <property name="label" context="True" translatable="True">Sex:</property>
                                 <property name="events"></property>
                                 <property name="xalign">1.0</property>
                                 <property name="visible">True</property>
                             </widget>
                             <packing>
-                                <property name="bottom_attach">6</property>
-                                <property name="top_attach">5</property>
+                                <property name="bottom_attach">7</property>
+                                <property name="top_attach">6</property>
                             </packing>
                         </child>
                         <child>
-                            <widget class="Kiwi2+Widgets+ComboBox+ComboBoxEntry" id="nationality">
-                                <property name="mandatory">True</property>
-                                <property name="model_attribute">nationality</property>
+                            <widget class="Kiwi2+Widgets+ComboBox+ComboBox" id="sex">
+                                <property name="model_attribute">sex</property>
                                 <property name="events"></property>
                                 <property name="data_type">str</property>
                                 <property name="visible">True</property>
                             </widget>
                             <packing>
                                 <property name="left_attach">1</property>
-                                <property name="bottom_attach">6</property>
-                                <property name="top_attach">5</property>
+                                <property name="bottom_attach">7</property>
+                                <property name="top_attach">6</property>
                                 <property name="right_attach">2</property>
                             </packing>
                         </child>
                         <child>
-                            <widget class="Kiwi2+Widgets+SpinButton+SpinButton" id="weight">
-                                <property name="mandatory">True</property>
-                                <property name="adjustment">0.000000 0.000000 100.000000 1.000000 10.000000 0.000000</property>
-                                <property name="model_attribute">weight</property>
+                            <widget class="GtkLabel" id="label1">
+                                <property name="label" context="True" translatable="True">Name:</property>
                                 <property name="events"></property>
-                                <property name="can_focus">True</property>
-                                <property name="data_type">float</property>
+                                <property name="xalign">1.0</property>
                                 <property name="visible">True</property>
                             </widget>
-                            <packing>
-                                <property name="left_attach">1</property>
-                                <property name="bottom_attach">5</property>
-                                <property name="top_attach">4</property>
-                                <property name="right_attach">2</property>
-                            </packing>
+                            <packing/>
                         </child>
                         <child>
-                            <widget class="GtkLabel" id="label5">
-                                <property name="label" context="True" translatable="True">Weight:</property>
+                            <widget class="GtkLabel" id="label2">
+                                <property name="label" context="True" translatable="True">Age:</property>
                                 <property name="events"></property>
                                 <property name="xalign">1.0</property>
                                 <property name="visible">True</property>
                             </widget>
                             <packing>
-                                <property name="bottom_attach">5</property>
-                                <property name="top_attach">4</property>
+                                <property name="bottom_attach">2</property>
+                                <property name="top_attach">1</property>
                             </packing>
                         </child>
                         <child>
-                            <widget class="GtkLabel" id="label4">
-                                <property name="label" context="True" translatable="True">Height:</property>
+                            <widget class="GtkLabel" id="label3">
+                                <property name="label" context="True" translatable="True">Birthdate:</property>
                                 <property name="events"></property>
                                 <property name="xalign">1.0</property>
                                 <property name="visible">True</property>
                             </widget>
                             <packing>
-                                <property name="bottom_attach">4</property>
-                                <property name="top_attach">3</property>
-                            </packing>
-                        </child>
-                        <child>
-                            <widget class="Kiwi2+Widgets+Entry+Entry" id="height">
-                                <property name="mandatory">True</property>
-                                <property name="model_attribute">height</property>
-                                <property name="events"></property>
-                                <property name="can_focus">True</property>
-                                <property name="data_type">float</property>
-                                <property name="visible">True</property>
-                            </widget>
-                            <packing>
-                                <property name="left_attach">1</property>
-                                <property name="bottom_attach">4</property>
-                                <property name="top_attach">3</property>
-                                <property name="right_attach">2</property>
-                            </packing>
-                        </child>
-                        <child>
-                            <widget class="Kiwi2+Widgets+Entry+Entry" id="birthdate">
-                                <property name="mandatory">True</property>
-                                <property name="model_attribute">birthdate</property>
-                                <property name="events"></property>
-                                <property name="can_focus">True</property>
-                                <property name="data_type">date</property>
-                                <property name="visible">True</property>
-                            </widget>
-                            <packing>
-                                <property name="left_attach">1</property>
                                 <property name="bottom_attach">3</property>
                                 <property name="top_attach">2</property>
+                            </packing>
+                        </child>
+                        <child>
+                            <widget class="Kiwi2+Widgets+Entry+Entry" id="name">
+                                <property name="mandatory">True</property>
+                                <property name="model_attribute">name</property>
+                                <property name="events"></property>
+                                <property name="can_focus">True</property>
+                                <property name="data_type">str</property>
+                                <property name="visible">True</property>
+                            </widget>
+                            <packing>
+                                <property name="left_attach">1</property>
                                 <property name="right_attach">2</property>
                             </packing>
                         </child>
@@ -147,76 +120,103 @@
                             </packing>
                         </child>
                         <child>
-                            <widget class="Kiwi2+Widgets+Entry+Entry" id="name">
+                            <widget class="Kiwi2+Widgets+Entry+Entry" id="birthdate">
                                 <property name="mandatory">True</property>
-                                <property name="model_attribute">name</property>
+                                <property name="model_attribute">birthdate</property>
                                 <property name="events"></property>
                                 <property name="can_focus">True</property>
-                                <property name="data_type">str</property>
+                                <property name="data_type">date</property>
                                 <property name="visible">True</property>
                             </widget>
                             <packing>
                                 <property name="left_attach">1</property>
-                                <property name="right_attach">2</property>
-                            </packing>
-                        </child>
-                        <child>
-                            <widget class="GtkLabel" id="label3">
-                                <property name="label" context="True" translatable="True">Birthdate:</property>
-                                <property name="events"></property>
-                                <property name="xalign">1.0</property>
-                                <property name="visible">True</property>
-                            </widget>
-                            <packing>
                                 <property name="bottom_attach">3</property>
                                 <property name="top_attach">2</property>
+                                <property name="right_attach">2</property>
                             </packing>
                         </child>
                         <child>
-                            <widget class="GtkLabel" id="label2">
-                                <property name="label" context="True" translatable="True">Age:</property>
+                            <widget class="Kiwi2+Widgets+Entry+Entry" id="height">
+                                <property name="mandatory">True</property>
+                                <property name="model_attribute">height</property>
+                                <property name="events"></property>
+                                <property name="can_focus">True</property>
+                                <property name="data_type">float</property>
+                                <property name="visible">True</property>
+                            </widget>
+                            <packing>
+                                <property name="left_attach">1</property>
+                                <property name="bottom_attach">4</property>
+                                <property name="top_attach">3</property>
+                                <property name="right_attach">2</property>
+                            </packing>
+                        </child>
+                        <child>
+                            <widget class="GtkLabel" id="label4">
+                                <property name="label" context="True" translatable="True">Height:</property>
                                 <property name="events"></property>
                                 <property name="xalign">1.0</property>
                                 <property name="visible">True</property>
                             </widget>
                             <packing>
-                                <property name="bottom_attach">2</property>
-                                <property name="top_attach">1</property>
+                                <property name="bottom_attach">4</property>
+                                <property name="top_attach">3</property>
                             </packing>
                         </child>
                         <child>
-                            <widget class="GtkLabel" id="label1">
-                                <property name="label" context="True" translatable="True">Name:</property>
+                            <widget class="GtkLabel" id="label5">
+                                <property name="label" context="True" translatable="True">Weight:</property>
                                 <property name="events"></property>
                                 <property name="xalign">1.0</property>
                                 <property name="visible">True</property>
                             </widget>
-                            <packing/>
+                            <packing>
+                                <property name="bottom_attach">5</property>
+                                <property name="top_attach">4</property>
+                            </packing>
                         </child>
                         <child>
-                            <widget class="Kiwi2+Widgets+ComboBox+ComboBox" id="sex">
-                                <property name="model_attribute">sex</property>
+                            <widget class="Kiwi2+Widgets+SpinButton+SpinButton" id="weight">
+                                <property name="mandatory">True</property>
+                                <property name="adjustment">0.000000 0.000000 100.000000 1.000000 10.000000 0.000000</property>
+                                <property name="model_attribute">weight</property>
+                                <property name="events"></property>
+                                <property name="can_focus">True</property>
+                                <property name="data_type">float</property>
+                                <property name="visible">True</property>
+                            </widget>
+                            <packing>
+                                <property name="left_attach">1</property>
+                                <property name="bottom_attach">5</property>
+                                <property name="top_attach">4</property>
+                                <property name="right_attach">2</property>
+                            </packing>
+                        </child>
+                        <child>
+                            <widget class="Kiwi2+Widgets+ComboBox+ComboBoxEntry" id="nationality">
+                                <property name="mandatory">True</property>
+                                <property name="model_attribute">nationality</property>
                                 <property name="events"></property>
                                 <property name="data_type">str</property>
                                 <property name="visible">True</property>
                             </widget>
                             <packing>
                                 <property name="left_attach">1</property>
-                                <property name="bottom_attach">7</property>
-                                <property name="top_attach">6</property>
+                                <property name="bottom_attach">6</property>
+                                <property name="top_attach">5</property>
                                 <property name="right_attach">2</property>
                             </packing>
                         </child>
                         <child>
-                            <widget class="GtkLabel" id="label9">
-                                <property name="label" context="True" translatable="True">Sex:</property>
+                            <widget class="GtkLabel" id="label8">
+                                <property name="label" context="True" translatable="True">Nationality:</property>
                                 <property name="events"></property>
                                 <property name="xalign">1.0</property>
                                 <property name="visible">True</property>
                             </widget>
                             <packing>
-                                <property name="bottom_attach">7</property>
-                                <property name="top_attach">6</property>
+                                <property name="bottom_attach">6</property>
+                                <property name="top_attach">5</property>
                             </packing>
                         </child>
                     </widget>
@@ -261,6 +261,7 @@
                                 <property name="receives_default">True</property>
                                 <property name="events"></property>
                                 <property name="can_focus">True</property>
+                                <property name="sensitive">False</property>
                                 <property name="visible">True</property>
                                 <property name="label">gtk-ok</property>
                                 <property name="use_stock">True</property>

@@ -1,3 +1,20 @@
+2005-04-19  Gustavo Rahal <gustavo@async.com.br>
+
+	* Kiwi2/Proxies.py: all widgets will have an attribute that specify the
+	views/delegate/etc... that owns it.
+	* Kiwi2/Views.py: added a global validation that check for correctness
+	on all widgets,
+	* Kiwi2/Widgets/ComboBox.py: refactoring, added ability to add items to
+	the comboboxentry list (dafault it not to add).
+	* Kiwi2/Widgets/List.py: added ability to slice kiwilist model
+	* Kiwi2/Widgets/TextView.py: 
+	* Kiwi2/Widgets/Entry.py:
+	* Kiwi2/Widgets/SpinButton.py: code refactoring due to changes on
+	combobox. Some minor changes due to pygtk 2.6
+	* Kiwi2/Widgets/WidgetProxy.py: code refactoring
+	* Kiwi2/examples/PersonalInformation/personalinformation.py: shows how
+	to use global validation
+
 2005-04-13  Daniel Saran R. da Cunha  <daniel@async.com.br>
 
 	* Kiwi2/Widgets/ComboBox.py: make the Widget work properly with 

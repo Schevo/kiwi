@@ -20,31 +20,38 @@ class Form(Delegates.Delegate):
     
         self.nationality.prefill(['Brazilian', 'Other'])
         self.sex.prefill(('Male', 'Female'))
-    
+        self.register_validate_function(self.validity)
+        
     # here we define our custom validation. When a user types anything,
     # the validate signal calls methods with the signature 
     # on_widgetname__validate
     def on_name__validate(self, widget, data):
         if data is None:
-            return None
+            return
         if len(data) > 20:
             # we need to return an exception that will be displayed on
-            # the information tooltip
+            # the information tooltip and the delegate option
             return datatypes.ValidationError("The name is too long")
-        
-        return None
-
+    
+    def on_height__validate(self, widget, data):
+        if data is None:
+            return
+        if data > 50:
+            return datatypes.ValidationError("The name is too long")
+    
     def on_weight__validate(self, widget, data):
         if float(data) > 90:
             # this is really not the type of validation that you would use :)
             # anyway, it's just for reference
             return datatypes.ValidationError("Dude! You need to lose some weight!")
-        return None
+    
+    def validity(self, valid):
+        if valid:
+            self.ok_btn.set_sensitive(True)
 
 person = Person()
 form = Form()
 proxy = form.add_proxy(person, ['name', 'age', 'birthdate', 'height', 'weight', 'about', 'nationality'])
-
 form.show_all()
 
 def on_ok_btn_clicked(widget):

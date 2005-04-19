@@ -603,6 +603,9 @@ class Proxy:
 
             # save this widget in our map
             self._attr_map[attribute] = widget
+            
+            # here we define the view that owns the widget
+            widget.owner = self.view
 
     def _on_widget__content_changed(self, widget):
         data = widget.read()

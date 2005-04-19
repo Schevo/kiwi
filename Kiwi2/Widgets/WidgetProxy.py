@@ -45,6 +45,8 @@ class Mixin(object):
         self._default_value = None
         self._data_type = None
         self._model_attribute = None
+        # this attibute will be set to the view that owns the widget
+        self.owner = None
         
         # now we setup the variables with our parameters
         self.set_data_type(data_type)
@@ -156,16 +158,14 @@ class Mixin(object):
         assert isinstance(data, self._data_type)
         return datatypes.converters[datatypes.TO_STR][self._data_type](data)
 
-
 ERROR_COLOR = "#ffa5a5"
 GOOD_COLOR = "white"
 
-MANDATORY_ICON = gtk.STOCK_FILE
+MANDATORY_ICON = gtk.STOCK_EDIT
 INFO_ICON = gtk.STOCK_DIALOG_INFO
 
 # amount of time until we complain if the data is wrong (seconds)
 COMPLAIN_DELAY = 1
-
 
 class MixinSupportValidation(Mixin):
     """Class used by some Kiwi Widgets that need to support mandatory 
@@ -181,17 +181,19 @@ class MixinSupportValidation(Mixin):
                  default_value=None):
         Mixin.__init__(self, data_type, model_attribute,
                                   default_value)
-        self._mandatory = False
-        self._draw_mandatory_icon = False
-        
-        self._draw_widget = None
-        self._draw_gdk_window = None
         
         self._error_tooltip = ErrorTooltip(self)
         
         # this flag means the data in the entry does not validate
         self._invalid_data = False
-
+        self._valid_data = False
+        # Ok, I know it seems wierd! The thing is that when a mandatory
+        # widget appear it already has invalid data (it's blank!) so
+        # this would mess up with other type of verification.        
+        # So self._invalid_data set to False does not mean that data is true. 
+        # It's just not false! pure magic!
+        
+        
         # this is the last time the user changed the entry
         self._last_change_time = None
 
@@ -204,45 +206,28 @@ class MixinSupportValidation(Mixin):
         # id for the idle that check if we should complain
         self._complaint_checker_id = -1
 
-
         # stores the position of the information icon
         self._info_icon_position = False
-        
+
         # state variables
+        self._mandatory = False
+        self._draw_mandatory_icon = False
+        
         self._draw_info_icon = False
         self._show_error_tooltip = False
         self._error_tooltip_visible = False
-    
-        self._widget = None
-        self._gdk_window = None
     
     def get_mandatory(self):
         """Checks if the Kiwi Widget is set to mandatory"""
         return self._mandatory
     
     def set_mandatory(self, mandatory):
-        """Sets the Kiwi Widget as mandatory, in other words, the widget needs 
-        to provide data to the widget 
+        """Sets the Kiwi Widget as mandatory, in other words, 
+        the user needs to provide data to the widget 
         """
         self._mandatory = mandatory
         self._draw_mandatory_icon = mandatory
         self.queue_draw()
-
-    def _define_icons_to_draw(self):
-        
-        if self._draw_info_icon:
-            icon_x_pos, icon_y_pos, pixbuf_width, pixbuf_height = \
-                      self._draw_icon(INFO_ICON)
-            
-            kiwi_entry_name = self.get_name()
-            
-            icon_x_range = range(icon_x_pos, icon_x_pos + pixbuf_width)
-            icon_y_range = range(icon_y_pos, icon_y_pos + pixbuf_height)
-            self._info_icon_position = \
-                [icon_x_pos, icon_x_range, icon_y_pos, icon_y_range]
-            
-        elif self._draw_mandatory_icon:
-            self._draw_icon(MANDATORY_ICON)
 
     def _validate_data(self, text):
         """Checks if the data is valid.
@@ -258,20 +243,38 @@ class MixinSupportValidation(Mixin):
             error = self.emit("validate", data)
             if error:
                 raise error
+            
             # if the data is good we don't wait for the idle to inform
             # the user
             self._stop_complaining()
+                    
+            if data is None and self._mandatory:
+                self._valid_data = False
+            else:
+                self._valid_data = True
+            
+            # check if the remaining widgets are ok
+            self.owner.check_widgets_validity()
+            
         except ValidationError, e:
-            if not self._invalid_data:
-                self._invalid_data = True
-                self._validation_error_message = str(e)
-                self._error_tooltip.set_error_text(self._validation_error_message)
-                if self._complaint_checker_id == -1:
-                    self._complaint_checker_id = \
-                        gobject.idle_add(self._check_for_complaints)
-                    self._get_cursor_position_id = \
-                        gobject.timeout_add(200, self._get_cursor_position)
-            data = None
+            data = self._validation_error(e)
+            
+        return data
+
+    def _validation_error(self, e):
+        if not self._invalid_data:
+            self._invalid_data = True
+            self._validation_error_message = str(e)
+            self._error_tooltip.set_error_text(self._validation_error_message)
+            if self._complaint_checker_id == -1:
+                self._complaint_checker_id = \
+                    gobject.idle_add(self._check_for_complaints)
+                self._get_cursor_position_id = \
+                    gobject.timeout_add(200, self._get_cursor_position)
+        self._valid_data = False
+        # check if the remaining widgets are ok
+        self.owner.check_widgets_validity()
+        data = None
         return data
 
     def _check_for_complaints(self):
@@ -297,8 +300,10 @@ class MixinSupportValidation(Mixin):
         
         self._show_error_tooltip = True
         self._draw_info_icon = True
-        #self.queue_draw()
-        t_id = gobject.timeout_add(100, merge_colors(self, GOOD_COLOR, ERROR_COLOR).next)
+        self.queue_draw()
+        func = merge_colors(self._widget_to_draw, 
+                            GOOD_COLOR, ERROR_COLOR).next
+        t_id = gobject.timeout_add(100, func)
         self._background_timeout_id = t_id
         
         return True # call back us again please
@@ -317,7 +322,7 @@ class MixinSupportValidation(Mixin):
             gobject.source_remove(self._get_cursor_position_id)
             self._background_timeout_id = -1
             self._complaint_checker_id = -1
-        set_background(self, GOOD_COLOR)
+        set_background(self._widget_to_draw, GOOD_COLOR)
         self._draw_info_icon = False
 
     def _get_cursor_position(self):
@@ -351,39 +356,43 @@ class MixinSupportValidation(Mixin):
                 
         return True
 
-    def _draw_icon(self, icon):
-        """Draw an icon"""
+    def _draw_icon(self):
+        widget = self._widget_to_draw
+        gdk_window = self._gdkwindow_to_draw
         
-        if self._widget is None:
+        if self._draw_mandatory_icon:
+            icon = MANDATORY_ICON
+        elif self._draw_info_icon:
+            icon = INFO_ICON
+        else:
             return
-        
-        widget = self._widget
-        gdk_window = self._gdk_window
-        
-        icon_x_pos, icon_y_pos, pixbuf, pixbuf_width, pixbuf_height = \
-        self._render_icon(icon, widget)
-        
+            
+        iconx, icony, pixbuf, pixw, pixh = self._render_icon(icon, widget)
+           
         area_window = gdk_window.get_children()[0]
-        gdk_window_width, gdk_window_height = area_window.get_size()
-        
-        draw_icon_x = gdk_window_width - pixbuf_width
-        draw_icon_y = (gdk_window_height - pixbuf_height)/2
-        area_window.draw_pixbuf(None, pixbuf, 0, 0, draw_icon_x,
-                                     draw_icon_y, pixbuf_width,
-                                     pixbuf_height)
-        
-        return (icon_x_pos, icon_y_pos, pixbuf_width, pixbuf_height)
+        winw, winh = area_window.get_size()
+            
+        area_window.draw_pixbuf(None, pixbuf, 0, 0, 
+                                winw - pixw, (winh - pixh)/2, 
+                                pixw, pixh)
+                                        
+        if self._draw_info_icon:
+            iconx_range = range(iconx, iconx + pixw)
+            icony_range = range(icony, icony + pixh)
+            self._info_icon_position = \
+                [iconx, iconx_range, icony, icony_range]
+            
 
     def _render_icon(self, icon, widget):
         pixbuf = self.render_icon(icon, gtk.ICON_SIZE_MENU)
-        pixbuf_width = pixbuf.get_width()
-        pixbuf_height = pixbuf.get_height()
-        widget_x, widget_y, widget_width, widget_height = widget.get_allocation()
+        pixw = pixbuf.get_width()
+        pixh = pixbuf.get_height()
+        widget_x, widget_y, widget_w, widget_h = widget.get_allocation()
         
-        icon_x_pos = widget_x + widget_width - pixbuf_width
-        icon_y_pos = widget_y + widget_height - pixbuf_height
+        iconx = widget_x + widget_w - pixw
+        icony = widget_y + widget_h - pixh
         
-        return (icon_x_pos, icon_y_pos, pixbuf, pixbuf_width, pixbuf_height)
+        return (iconx, icony, pixbuf, pixw, pixh)
 
 
 class ErrorTooltip(gtk.Window):
