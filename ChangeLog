@@ -1,3 +1,8 @@
+2005-04-19  Daniel Saran R. da Cunha  <daniel@async.com.br>
+
+	* Kiwi2/Widgets/ComboBox.py (ComboBoxEntry): Now ComboBoxEntry works
+	properly with objects
+	
 2005-04-19  Gustavo Rahal <gustavo@async.com.br>
 
 	* Kiwi2/Proxies.py: all widgets will have an attribute that specify the

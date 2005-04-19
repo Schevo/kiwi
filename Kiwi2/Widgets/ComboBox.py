@@ -321,7 +321,7 @@ class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin,
         except ValidationError, e:
             data = self._validation_error(e)
         
-        return data
+        return self.get_selected_data()
 
     def update(self, data):
         # first, trigger some basic validation
@@ -329,7 +329,7 @@ class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin,
         if data is ValueUnset or data is None:
             self.child.set_text("")
         else:
-            self.child.set_text(self.type2str(data))
+            self.select_item_by_data(data)
         self._check_entry()
 
     def prefill(self, itemdata, sort=False, clear_entry=False):
