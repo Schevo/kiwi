@@ -283,6 +283,7 @@ class SlaveView(gobject.GObject):
             if isinstance(widget, WidgetProxy.MixinSupportValidation):
                 if not widget.valid_data:
                     valid = False
+                    break
         
         self._validate_function(valid)
 

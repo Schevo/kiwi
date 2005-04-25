@@ -44,6 +44,8 @@ class TextView(gtk.TextView, WidgetProxy.MixinSupportValidation):
         gtk.TextView.__init__(self)
         
         self.textbuffer = gtk.TextBuffer()
+        self.textbuffer.connect('changed',
+                                self._on_textbuffer__changed)
         self.set_buffer(self.textbuffer)
         
         self.connect("key-release-event", self._key_release_event)
@@ -62,6 +64,10 @@ class TextView(gtk.TextView, WidgetProxy.MixinSupportValidation):
         self._last_change_time = time.time()
         self.emit('content-changed')
 
+    def _on_textbuffer__changed(self, textbuffer):
+        self.emit('content-changed')
+        self.read()
+
     def read(self):
         start = self.textbuffer.get_start_iter()
         end = self.textbuffer.get_end_iter()
@@ -74,13 +80,14 @@ class TextView(gtk.TextView, WidgetProxy.MixinSupportValidation):
         
         data = self._validate_data(text)
         return data
-
+                    
     def update(self, data):
         # first, trigger some basic validation
         WidgetProxy.MixinSupportValidation.update(self, data)
 
         if data is ValueUnset:
             self.textbuffer.set_text("")
+            self.emit('content-changed')
         else:
             self.textbuffer.set_text(self.type2str(data))
 

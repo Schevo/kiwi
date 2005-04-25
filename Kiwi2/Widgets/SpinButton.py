@@ -39,9 +39,11 @@ class SpinButton(gtk.SpinButton, WidgetProxy.MixinSupportValidation):
     
     
     def __init__(self):
-        # since the default data_type is str we need to set it to int or float for spinbuttons
+        # since the default data_type is str we need to set it to int 
+        # or float for spinbuttons
         WidgetProxy.MixinSupportValidation.__init__(self, data_type=int)
         gtk.SpinButton.__init__(self)
+        self.connect('output', self._on_spinbutton__output)
         
         # this attribute stores the info on where to draw icons and paint
         # the background
@@ -50,6 +52,9 @@ class SpinButton(gtk.SpinButton, WidgetProxy.MixinSupportValidation):
         # due to changes on pygtk 2.6 we have to make some ajustments here
         if gtk.pygtk_version < (2,6):
             self.do_expose_event = self.chain
+        
+    def _on_spinbutton__output(self, *args):
+        self.emit('content-changed')
         
     def set_data_type(self, data_type):
         """Overriden from super class. Since spinbuttons should
@@ -81,15 +86,13 @@ class SpinButton(gtk.SpinButton, WidgetProxy.MixinSupportValidation):
         return data
 
     def update(self, data):
-        # first, trigger some basic validation
         WidgetProxy.MixinSupportValidation.update(self, data)
         
         if data is not ValueUnset and data is not None:
             self.set_value(data)
         else:
             self.set_text("")
-            
-            
+
     def do_expose_event(self, event):
         """Expose-event signal are triggered when a redraw of the widget
         needs to be done.

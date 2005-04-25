@@ -230,9 +230,10 @@ class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin,
         self.set_text_column(0)
         # here we connect the expose-event signal directly to the entry
         self.child.connect('expose-event', self._on_child_entry__expose_event)
-        
-        self.child.connect('changed', self._on_child_entry__changed)
-        
+
+        model = self.get_model()
+        model.connect('row-changed', self._on_model__row_changed)
+
         # HACK! we force a queue_draw because when the window is first
         # displayed the icon is not drawn.
         gobject.idle_add(self.queue_draw)
@@ -300,46 +301,34 @@ class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin,
         else:
             self._draw_mandatory_icon = False
     
-    def _on_child_entry__changed(self, entry):
+    def _on_model__row_changed(self, treemodel, path, iter):
         self._check_entry()
         self.read()
         
     def read(self):
-        try:
-            data = self.child.get_text()
-            items = self.get_model_items()
-            
-            # if data is empty we don't want to return None because
-            # the model won't be updated
-            if not data.strip():
-                data = ''
-            elif data not in items.keys():
-                self._draw_info_icon = True
-                if self._list_writable:
-                    raise ValidationError("Entered value not in list. "
-                                          "To add an item, type "
-                                          "the value and press enter")
-                else:
-                    raise ValidationError("Entered value not in list")
-            else:
-                self._update_selection()
-                data = self.get_selected_data()
-            
-            # check for custom validators
-            error = self.emit("validate", data)
-            if error:
-                raise error
-            
-            # if the data is good we don't wait for the idle to inform
-            # the user
-            self._stop_complaining()
-            self.valid_data = True
-            self._check_widgets_validity()  
-            
-        except ValidationError, e:
-            data = self._validation_error(e)
-            return
+        data = self.child.get_text()
+        items = self.get_model_items()
         
+        # if data is empty we don't want to return None because
+        # the model won't be updated
+        if not data.strip():
+            data = ''
+        elif data not in items.keys():
+            self._draw_info_icon = True
+            if self._list_writable:
+                raise ValidationError("Entered value not in list. "
+                                      "To add an item, type "
+                                      "the value and press enter")
+            else:
+                raise ValidationError("Entered value not in list")
+        else:
+            self._update_selection()
+            data = self.get_selected_data()
+        
+        # if the data is good we don't wait for the idle to inform
+        # the user
+        self._validate_data(data)
+        self._check_widgets_validity()  
         return data
 
     def update(self, data):
