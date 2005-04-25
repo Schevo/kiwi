@@ -152,7 +152,7 @@ class SignalBroker(object):
             if not w_name:
                 continue
             widget = getattr(view, w_name, None)
-            if not widget:
+            if widget is None:
                 raise AttributeError("couldn't find widget %s in %s"
                                      % (w_name, view))
             if not isinstance(widget, (gtk.Widget, gtk.Action)):

@@ -1,3 +1,8 @@
+2005-04-25  Johan Dahlin  <jdahlin@async.com.br>
+
+	* Kiwi2/Views.py: Compare references, since some widgets overrides 
+	equality checks (eg, __nonzero__ for ComboBoxEntry)
+
 2005-04-19  Gustavo Rahal <gustavo@async.com.br>
 
 	* Kiwi2/View.py:
