@@ -53,6 +53,10 @@ class TextView(gtk.TextView, WidgetProxy.MixinSupportValidation):
         # although we have our own draw method we still need to 
         # set this attribute because it is used to paint the background
         self._widget_to_draw = self
+        
+        # due to changes on pygtk 2.6 we have to make some ajustments here
+        if gtk.pygtk_version < (2,6):
+            self.do_expose_event = self.chain
     
     def _key_release_event(self, *args):
         self._last_change_time = time.time()
@@ -85,11 +89,7 @@ class TextView(gtk.TextView, WidgetProxy.MixinSupportValidation):
         needs to be done.
         
         Draws information and mandatory icons when necessary
-        """
-        # due to changes on pygtk 2.6 we have to make some ajustments here
-        if gtk.pygtk_version < (2,6):
-            self.do_expose_event = self.chain
-        
+        """        
         result = gtk.TextView.do_expose_event(self, event)
         
         # this attribute stores the info on where to draw icons and paint

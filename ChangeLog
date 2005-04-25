@@ -1,3 +1,13 @@
+2005-04-25  Gustavo Rahal <gustavo@async.com.br>
+
+	* Kiwi2/Widgets/ComboBox.py: bugs fixes. 1955, 1953, 1952, 1923
+	* Kiwi2/Widgets/TextView.py
+	* Kiwi2/Widgets/Entry.py
+	* Kiwi2/Widgets/SpinButton.py: checking of pygtk version done inside
+	init
+	* Kiwi2/Widgets/WidgetProxy.py: now check widgets validity is only
+	called when the widget is attached to a view/delegate
+
 2005-04-25  Johan Dahlin  <jdahlin@async.com.br>
 
 	* Kiwi2/Views.py: Compare references, since some widgets overrides 

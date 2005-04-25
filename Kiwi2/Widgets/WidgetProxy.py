@@ -189,7 +189,7 @@ class MixinSupportValidation(Mixin):
         
         # this flag means the data in the entry does not validate
         self._invalid_data = False
-        self._valid_data = False
+        self.valid_data = False
         # Ok, I know it seems wierd! The thing is that when a mandatory
         # widget appear it already has invalid data (it's blank!) so
         # this would mess up with other type of verification.        
@@ -218,7 +218,8 @@ class MixinSupportValidation(Mixin):
         
         self._draw_info_icon = False
         self._show_error_tooltip = False
-        self._error_tooltip_visible = False
+        self._error_tooltip_visible = False    
+    
     
     def get_mandatory(self):
         """Checks if the Kiwi Widget is set to mandatory"""
@@ -252,12 +253,12 @@ class MixinSupportValidation(Mixin):
             self._stop_complaining()
                     
             if data is None and self._mandatory:
-                self._valid_data = False
+                self.valid_data = False
             else:
-                self._valid_data = True
+                self.valid_data = True
             
             # check if the remaining widgets are ok
-            self.owner.check_widgets_validity()
+            self._check_widgets_validity()
             
         except ValidationError, e:
             data = self._validation_error(e)
@@ -266,9 +267,9 @@ class MixinSupportValidation(Mixin):
 
     def _validation_error(self, e):
         if self._invalid_data:
-            self._valid_data = False
+            self.valid_data = False
             # check if the remaining widgets are ok
-            self.owner.check_widgets_validity()
+            self._check_widgets_validity()
         
         self._invalid_data = True
         self._validation_error_message = str(e)
@@ -333,6 +334,7 @@ class MixinSupportValidation(Mixin):
         the information icon
         """
         if not self._info_icon_position:
+            self._error_tooltip.disappear()
             return True
         
         icon_x, icon_x_range, icon_y, icon_y_range = self._info_icon_position
@@ -396,6 +398,13 @@ class MixinSupportValidation(Mixin):
                                 winw - pixw, (winh - pixh)/2, 
                                 pixw, pixh)
 
+    def _check_widgets_validity(self):
+        try:
+            self.owner.check_widgets_validity()
+        except AttributeError, e:
+            # in this case the view is not defined yet
+            pass
+            
 
 class ErrorTooltip(gtk.Window):
     """Small tooltip window that popup when the user click on top of the error (information) icon"""

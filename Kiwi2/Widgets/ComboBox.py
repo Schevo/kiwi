@@ -143,7 +143,7 @@ class ComboProxyMixin:
                 self.select_item_by_label(data)
             else:
                 raise KeyError("No item correspond to data %r" % data)
-    
+            
     def get_model_items(self):
         model = self.get_model()
         items = {}
@@ -217,6 +217,8 @@ class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin,
     # not the combo box itself.
     #gsignal('expose-event', 'override')
     
+    gsignal('changed', 'override')
+    
     gproperty("list-writable", bool, False, 
               "List Writable", gobject.PARAM_READWRITE)
     
@@ -227,9 +229,9 @@ class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin,
 
         self.set_text_column(0)
         # here we connect the expose-event signal directly to the entry
-        self.child.connect('expose-event', self._on_entry__expose_event)
+        self.child.connect('expose-event', self._on_child_entry__expose_event)
         
-        self.child.connect('changed', self._on_entry__changed)
+        self.child.connect('changed', self._on_child_entry__changed)
         
         # HACK! we force a queue_draw because when the window is first
         # displayed the icon is not drawn.
@@ -237,7 +239,6 @@ class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin,
         
         self.set_events(gtk.gdk.KEY_RELEASE_MASK)
         self.connect("key-release-event", self._on_key_release)
-        self.child.connect("focus-out-event", self._on_child_entry_focus_out)
     
         self._list_writable = False
         # this attributes stores the info on were to draw icons and paint
@@ -250,6 +251,12 @@ class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin,
     def set_list_writable(self, writable):
         self._list_writable = writable
     
+    def _update_selection(self, text=None):
+        if text is None:
+            text = self.child.get_text()
+        
+        self.select_item_by_label(text)
+    
     def _add_text_to_combo_list(self):
         text = self.child.get_text()
         if not text.strip():
@@ -257,11 +264,11 @@ class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin,
         items = self.get_model_items()
         if text not in items.keys():
             self.append_item(text)
-                
-    def _on_child_entry_focus_out(self, widget, event):
-        if self._list_writable:
-            self._add_text_to_combo_list()
+            self._update_selection(text)
+     
+    def do_changed(self):
         self.emit('content-changed')
+        self.chain()
     
     def _on_key_release(self, widget, event):
         """Checks for "Enter" key presses and add the entry text to 
@@ -271,9 +278,12 @@ class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin,
             return
         if event.keyval in (gtk.keysyms.KP_Enter, gtk.keysyms.Return):
             self._add_text_to_combo_list()
-        self.emit('content-changed')
         
-    def _on_entry__expose_event(self, widget, event):
+        # we call read here because "Enter" key press does 
+        # not trigger entry_changed
+        self.read()
+        
+    def _on_child_entry__expose_event(self, widget, event):
         # this attributes stores the info on were to draw icons and paint
         # the background
         # it's been defined here because it's when we have gdk window available
@@ -287,28 +297,35 @@ class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin,
         
         if len(self.child.get_text()) == 0 and self._mandatory:
             self._draw_mandatory_icon = True
-            self.queue_draw()
         else:
             self._draw_mandatory_icon = False
-            self.queue_draw()
     
-    def _on_entry__changed(self, entry):
+    def _on_child_entry__changed(self, entry):
         self._check_entry()
-        self.emit('content-changed')
+        self.read()
         
     def read(self):
         try:
             data = self.child.get_text()
             items = self.get_model_items()
-            if data not in items.keys() and data.strip():
+            
+            # if data is empty we don't want to return None because
+            # the model won't be updated
+            if not data.strip():
+                data = ''
+            elif data not in items.keys():
                 self._draw_info_icon = True
                 if self._list_writable:
                     raise ValidationError("Entered value not in list. "
-                                          "To add an item type "
+                                          "To add an item, type "
                                           "the value and press enter")
                 else:
                     raise ValidationError("Entered value not in list")
+            else:
+                self._update_selection()
+                data = self.get_selected_data()
             
+            # check for custom validators
             error = self.emit("validate", data)
             if error:
                 raise error
@@ -316,18 +333,19 @@ class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin,
             # if the data is good we don't wait for the idle to inform
             # the user
             self._stop_complaining()
-            self._valid_data = True
-            self.owner.check_widgets_validity()
+            self.valid_data = True
+            self._check_widgets_validity()  
             
         except ValidationError, e:
             data = self._validation_error(e)
+            return
         
-        return self.get_selected_data()
+        return data
 
     def update(self, data):
         # first, trigger some basic validation
         WidgetProxy.Mixin.update(self, data)
-        if data is ValueUnset or data is None:
+        if data is ValueUnset or data is None or not data.strip():
             self.child.set_text("")
         else:
             self.select_item_by_data(data)
