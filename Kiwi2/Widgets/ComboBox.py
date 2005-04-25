@@ -312,7 +312,7 @@ class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin,
         # if data is empty we don't want to return None because
         # the model won't be updated
         if not data.strip():
-            data = ''
+            data = None
         elif data not in items.keys():
             self._draw_info_icon = True
             if self._list_writable:
@@ -334,7 +334,7 @@ class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin,
     def update(self, data):
         # first, trigger some basic validation
         WidgetProxy.Mixin.update(self, data)
-        if data is ValueUnset or data is None or not data.strip():
+        if data is ValueUnset or data is None:
             self.child.set_text("")
         else:
             self.select_item_by_data(data)

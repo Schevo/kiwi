@@ -610,7 +610,7 @@ class Proxy:
     def _on_widget__content_changed(self, widget):
         data = widget.read()
         # only update the model if the data is correct
-        if data is not None:
+        if data is not ValueUnset:
             self._update_model(widget, data)
 
     def _update_model(self, widget, value):

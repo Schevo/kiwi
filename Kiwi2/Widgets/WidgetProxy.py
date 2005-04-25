@@ -147,6 +147,8 @@ class Mixin(object):
         if self._data_type is None:
             msg = "You must set the data type before converting a string"
             raise TypeError(msg)
+        if data is None:
+            return
         assert isinstance(data, basestring)
         # if the user clear the widget we should not raise a conversion error
         if data == '':
@@ -261,8 +263,9 @@ class MixinSupportValidation(Mixin):
             self._check_widgets_validity()
             
         except ValidationError, e:
-            data = self._validation_error(e)
-            
+            self._validation_error(e)
+            return ValueUnset
+        
         return data
 
     def _validation_error(self, e):
