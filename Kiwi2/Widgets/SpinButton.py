@@ -88,10 +88,10 @@ class SpinButton(gtk.SpinButton, WidgetProxy.MixinSupportValidation):
     def update(self, data):
         WidgetProxy.MixinSupportValidation.update(self, data)
         
-        if data is not ValueUnset and data is not None:
-            self.set_value(data)
-        else:
+        if data is ValueUnset or data is None:
             self.set_text("")
+        else:
+            self.set_value(data)
 
     def do_expose_event(self, event):
         """Expose-event signal are triggered when a redraw of the widget
