@@ -1,3 +1,13 @@
+2005-04-26  Gustavo Rahal <gustavo@async.com.br>
+
+	* Kiwi2/Widgets/List.py: fixed bug 1962
+
+2005-04-26  Gustavo Rahal <gustavo@async.com.br>
+
+	* Kiwi2/Widgets/SpinButton.py: minor cosmetic change in code to be
+	similar to other widgets.
+	* Kiwi2/Widgets/TextView.py: is data is None set text as empty
+
 2005-04-25  Johan Dahlin  <jdahlin@async.com.br>
 
 	reviewed by: Gustavo
