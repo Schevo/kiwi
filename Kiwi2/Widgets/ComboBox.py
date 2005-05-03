@@ -166,7 +166,7 @@ class ComboProxyMixin:
             if data is None:
                 #the user only prefilled the combo with strings
                 return model.get_value(iter, COL_COMBO_LABEL)
-            return data   
+            return data
     
 class ComboBox(gtk.ComboBox, ComboProxyMixin, WidgetProxy.Mixin):
     WidgetProxy.implementsIProxy()
@@ -323,12 +323,11 @@ class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin,
                 raise ValidationError("Entered value not in list")
         else:
             self._update_selection()
+            label = self.get_selected_label()
+            self._validate_data(label)
             data = self.get_selected_data()
+            self._check_widgets_validity()
         
-        # if the data is good we don't wait for the idle to inform
-        # the user
-        self._validate_data(data)
-        self._check_widgets_validity()  
         return data
 
     def update(self, data):

@@ -1,4 +1,11 @@
-2005-04-26  Gustavo Rahal <gustavo@async.com.br>
+2005-05-03  Gustavo Rahal <gustavo@async.com.br>
+
+	* tests/test_Entry.py: test now checks for ValueUnset instead of None
+	* Kiwi2/Widgets/ComboBox.py: proper error checking
+	* Kiwi2/Widgets/List.py: column with number are right justified by
+	default. Fixed justification error
+	
+2005-04-26 Gustavo Rahal <gustavo@async.com.br>
 
 	* Kiwi2/Widgets/List.py: fixed bug 1962
 

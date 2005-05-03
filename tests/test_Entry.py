@@ -2,7 +2,7 @@
 from utils import refresh_gui
 
 from Kiwi2.Widgets import Entry, datatypes
-
+from Kiwi2 import ValueUnset
 import unittest
 import time
 
@@ -31,7 +31,7 @@ class EntryTest(unittest.TestCase):
         entry.set_property("data-type", "date")
         # let's make the entry complain!
         entry.set_text("string")
-        self.assertEqual(entry.read(), None)
+        self.assertEqual(entry.read(), ValueUnset)
         self.assertNotEqual(entry._complaint_checker_id, -1)
         
         # now let's put proper data
@@ -52,7 +52,7 @@ class EntryTest(unittest.TestCase):
             
             # wrong value
             entry.set_text("23.400.000,2")
-            self.assertEqual(entry.read(), None)
+            self.assertEqual(entry.read(), ValueUnset)
         
         
 if __name__ == '__main__':

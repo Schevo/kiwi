@@ -412,12 +412,17 @@ class List(gtk.ScrolledWindow):
         renderer = self._create_best_renderer_for_type\
                  (col_definition.data_type, col_index)
         
-        if col_definition.justify.value_nick == 'right':
+        if col_definition.justify:
+            if col_definition.justify.value_nick == 'right':
+                renderer.set_property("xalign", 1)
+            elif col_definition.justify.value_nick == 'center':
+                renderer.set_property("xalign", 0.5)
+            else: # align to left
+                renderer.set_property("xalign", 0)
+        
+        elif col_definition.data_type in (int, float):
             renderer.set_property("xalign", 1)
-        elif col_definition.justify.value_nick == 'center':
-            renderer.set_property("xalign", 0.5)
-        elif col_definition.justify.value_nick == 'left':
-            renderer.set_property("xalign", 0)
+
         
         treeview_column.pack_start(renderer)
         treeview_column.set_cell_data_func(renderer, self._set_cell_data,

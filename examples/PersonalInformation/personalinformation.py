@@ -46,8 +46,7 @@ class Form(Delegates.Delegate):
             return datatypes.ValidationError("Dude! You need to lose some weight!")
     
     def validity(self, valid):
-        if valid:
-            self.ok_btn.set_sensitive(True)
+        self.ok_btn.set_sensitive(valid)
 
 person = Person()
 form = Form()
