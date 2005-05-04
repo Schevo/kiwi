@@ -1,3 +1,12 @@
+2005-05-04  Gustavo Rahal <gustavo@async.com.br>
+	
+	* Kiwi2/Widgets/Kiwi2/RadioButton.py: fixed error data-value
+	* Kiwi2/Widgets/Kiwi2/List.py: minor code improvements from comments 
+	of last checkin
+	* Kiwi2/Widgets/Kiwi2/Label.py: now kiwilabels have the ability to
+	update the model
+	* Kiwi2/Widgets/Kiwi2/WidgetProxy.py: minor fix in do_get_property
+
 2005-05-03  Gustavo Rahal <gustavo@async.com.br>
 
 	* tests/test_Entry.py: test now checks for ValueUnset instead of None

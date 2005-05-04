@@ -116,6 +116,8 @@ class Column:
         if visible is not None:
             self.visible = visible
         if justify is not None:
+            if not isinstance(justify, gtk.Justification):
+                raise TypeError('justify parameter should be %r instead of %r' % (gtk.Justification, type(justify)))
             self.justify = justify
         if format is not None:
             self.format = format
@@ -412,15 +414,17 @@ class List(gtk.ScrolledWindow):
         renderer = self._create_best_renderer_for_type\
                  (col_definition.data_type, col_index)
         
+        justify = col_definition.justify
+        
         if col_definition.justify:
-            if col_definition.justify.value_nick == 'right':
+            if justify == gtk.JUSTIFY_RIGHT:
                 renderer.set_property("xalign", 1)
-            elif col_definition.justify.value_nick == 'center':
+            elif justify == gtk.JUSTIFY_CENTER:
                 renderer.set_property("xalign", 0.5)
             else: # align to left
                 renderer.set_property("xalign", 0)
         
-        elif col_definition.data_type in (int, float):
+        elif issubclass(col_definition.data_type, (int, float)):
             renderer.set_property("xalign", 1)
 
         

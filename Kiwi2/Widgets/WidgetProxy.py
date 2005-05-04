@@ -81,10 +81,10 @@ class Mixin(object):
         
     def do_get_property(self, pspec):
         prop_name = pspec.name.replace("-", "_")
-        try:
-            return getattr(self, "get_%s" % prop_name)()
-        except AttributeError:
+        func = getattr(self, "get_%s" % prop_name, None)
+        if not func:
             raise AttributeError("Invalid property name: %s" % pspec.name)
+        return func()
 
     def do_set_property(self, pspec, value):
         prop_name = pspec.name.replace("-", "_")
