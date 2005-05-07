@@ -21,10 +21,11 @@
 # 
 # Author(s): Lorenzo Gil Sanchez <lgs@sicem.biz>
 
+import datetime
 
 from Kiwi2.accessors import kgetattr
 from Kiwi2 import ValueUnset
-from Kiwi2.Widgets.datatypes import str2bool
+from Kiwi2.Widgets import datatypes
 from Kiwi2.initgtk import gtk, gobject
 from Kiwi2.utils import gsignal, gproperty
 
@@ -37,8 +38,11 @@ def str2enum(value_name, enum_class):
             return enum
 
 def str2type(value, default_type=str):
-    type_map = {'str': str, 'int': int, 'float': float}
-    return type_map.get(value, default_type)
+    if value not in datatypes.supported_types_names:
+        return default_type
+    else:
+        ind = datatypes.supported_types_names.index(value)
+        return datatypes.supported_types[ind]
 
 class Column:
     """Specifies a column in a List"""
@@ -216,12 +220,12 @@ class Column:
         self.attribute = fields[0] or None
         self.title = fields[1] or None
         self.data_type = str2type(fields[2], default_type=None)
-        self.visible = str2bool(fields[3], default_value=True)
+        self.visible = datatypes.str2bool(fields[3], default_value=True)
         self.justify = str2enum(fields[4], gtk.JUSTIFY_LEFT)
         self.format = fields[5]
         self.tooltip = fields[6]
         self.width = (fields[7] and int(fields[7])) or None
-        self.sorted = str2bool(fields[8], default_value=False)
+        self.sorted = datatypes.str2bool(fields[8], default_value=False)
         self.order = str2enum(fields[9], gtk.SORT_ASCENDING) \
                      or gtk.SORT_ASCENDING
 
@@ -476,6 +480,10 @@ class List(gtk.ScrolledWindow):
  #           renderer.set_property('activatable', True)
  #           renderer.connect('toggled', self._on_renderer__toggled,
  #                            column_index)
+        elif issubclass(data_type, datetime.date):
+            renderer = gtk.CellRendererText()
+            renderer.set_data('renderer-property', 'text')
+            
         elif issubclass(data_type, basestring):
             renderer = gtk.CellRendererText()
             renderer.set_data('renderer-property', 'text')
@@ -598,16 +606,7 @@ eview that needs to
         self._sort_column_definition_index = column_index
         cd = self._column_definitions[column_index]
 
-        # maybe it's the first time this column is ordere        
-        module = xml_node.getAttribute(tags.XML_TAG_LIB)
-        if not module in self._modules.keys():
-            module_name = xml_node.getAttribute(tags.XML_TAG_LIB)
-            module = __import__(module_name, globals(), locals())
-            
-            if hasattr(module, 'gazpacho_prefix'):
-                prefix = getattr(module, 'gazpacho_prefix')
-                self._modules[prefix.lower()] = module
-
+        # maybe it's the first time this column is ordered
         if cd.order is None:
             cd.order = gtk.SORT_DESCENDING
 

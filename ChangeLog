@@ -1,3 +1,9 @@
+2005-05-07  Lorenzo Gil Sanchez  <lgs@sicem.biz>
+
+	* Kiwi2/Widgets/List.py: added support for dates in KiwiList.
+	(List._on_column__clicked): removed some code that should
+	never been there 
+
 2005-05-04  Gustavo Rahal <gustavo@async.com.br>
 	
 	* Kiwi2/Widgets/Kiwi2/RadioButton.py: fixed error data-value
