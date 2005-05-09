@@ -1,3 +1,9 @@
+2005-05-09  Sidnei da Silva  <sidnei@awkly.org>
+
+	reviewed by Johan Dahlin <jdahlin@async.com.br>
+	
+	* setup.py (packages): add Kiwi2.Widgets.
+
 2005-05-07  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
 	* Kiwi2/Widgets/List.py: added support for dates in KiwiList.

@@ -23,7 +23,9 @@ setup(
     url = "http://www.async.com.br/projects/",
     license = "GNU LGPL 2.1 (see COPYING)",
 
-    packages = ['Kiwi2', 'Kiwi2.WidgetProxies'],
+    packages = ['Kiwi2',
+                'Kiwi2.Widgets',
+                'Kiwi2.WidgetProxies'],
     package_dir = {'Kiwi2':'Kiwi2'},
     )
 
