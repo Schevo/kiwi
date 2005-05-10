@@ -37,12 +37,12 @@ def str2enum(value_name, enum_class):
         if value_name in (enum.value_name, enum.value_nick):
             return enum
 
-def str2type(value, default_type=str):
-    if value not in datatypes.supported_types_names:
-        return default_type
-    else:
+def str2type(value):
+    if value in datatypes.supported_types_names:
         ind = datatypes.supported_types_names.index(value)
         return datatypes.supported_types[ind]
+    else:
+        raise ValueError("The datatype '%s' is not supported" % value)
 
 class Column:
     """Specifies a column in a List"""
@@ -219,7 +219,7 @@ class Column:
 
         self.attribute = fields[0] or None
         self.title = fields[1] or None
-        self.data_type = str2type(fields[2], default_type=None)
+        self.data_type = str2type(fields[2])
         self.visible = datatypes.str2bool(fields[3], default_value=True)
         self.justify = str2enum(fields[4], gtk.JUSTIFY_LEFT)
         self.format = fields[5]
