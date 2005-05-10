@@ -420,7 +420,7 @@ class List(gtk.ScrolledWindow):
         
         justify = col_definition.justify
         
-        if col_definition.justify:
+        if justify is not None:
             if justify == gtk.JUSTIFY_RIGHT:
                 renderer.set_property("xalign", 1)
             elif justify == gtk.JUSTIFY_CENTER:
