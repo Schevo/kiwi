@@ -396,8 +396,8 @@ class List(gtk.ScrolledWindow):
 
         # setup the button to show the popup menu
         button = self.__get_column_button(treeview_column)
-        button.connect('button-press-event',
-                       self._on_header__button_press_event)
+        button.connect('button-release-event',
+                       self._on_header__button_release_event)
 
     def _setup_columns(self):
         autosize = True
@@ -506,10 +506,10 @@ class List(gtk.ScrolledWindow):
             data = datatypes.format(definition.format, data)
         cellrenderer.set_property(renderer_prop, data)
 
-    def _on_header__button_press_event(self, button, event):
+    def _on_header__button_release_event(self, button, event):
         if event.button == 3:
             self._popup.popup(None, None, None, event.button, event.time)
-            return True
+            return False
 
         return False
 
