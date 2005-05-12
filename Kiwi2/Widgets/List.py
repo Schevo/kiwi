@@ -246,7 +246,7 @@ class List(gtk.ScrolledWindow):
     #  - title: the title that shows in the column header. Default to ''
     #  - data_type: one of 'str', 'int', 'float', 'date'. Default to str
     #  - visible: if this column is visible or not. Default to True
-    #  - justify: one of 'left', 'center', 'right'. Default to 'left'
+    #  - justify: a gtk.Justification value. Defaults to gtk.JUSTIFY_LEFT.
     #  - tooltip: the tooltip on the column header. Deafult to ''
     #  - format: string format for numeric types. Deafult to ''
     #  - width: the number of pixels for the widget. Default to 0, which
@@ -431,10 +431,14 @@ class List(gtk.ScrolledWindow):
         elif issubclass(col_definition.data_type, (int, float)):
             renderer.set_property("xalign", 1)
 
-        
+        # You can't subclass bool, so this is okay
+        if (col_definition.data_type is bool and
+            col_definition.format):
+            raise TypeError("format is not supported for boolean columns") 
+
         treeview_column.pack_start(renderer)
-        treeview_column.set_cell_data_func(renderer, self._set_cell_data,
-                                           col_definition.attribute)
+        treeview_column.set_cell_data_func(renderer, self._cell_data_func,
+                                           col_definition)
         treeview_column.set_visible(col_definition.visible)
         menuitem = treeview_column.get_data('menuitem')
         menuitem.set_active(col_definition.visible)
@@ -494,23 +498,12 @@ class List(gtk.ScrolledWindow):
         
         return renderer
 
-    def _set_cell_data(self, column, cellrenderer, model, iter,
-                       model_attribute):
-        """This method is called for every cell in the tre        
-        module = xml_node.getAttribute(tags.XML_TAG_LIB)
-        if not module in self._modules.keys():
-            module_name = xml_node.getAttribute(tags.XML_TAG_LIB)
-            module = __import__(module_name, globals(), locals())
-            
-            if hasattr(module, 'gazpacho_prefix'):
-                prefix = getattr(module, 'gazpacho_prefix')
-                self._modules[prefix.lower()] = module
-eview that needs to
-        be renderer. No need to say it has to be *fast*
-        """
+    def _cell_data_func(self, column, cellrenderer, model, iter, definition):
         renderer_prop = cellrenderer.get_data('renderer-property')
         instance = model.get_value(iter, 0)
-        data = kgetattr(instance, model_attribute, None)
+        data = kgetattr(instance, definition.attribute, None)
+        if definition.format:
+            data = datatypes.format(definition.format, data)
         cellrenderer.set_property(renderer_prop, data)
 
     def _on_header__button_press_event(self, button, event):
@@ -574,15 +567,6 @@ eview that needs to
             if c.sorted:
                 return i
         return -1        
-        module = xml_node.getAttribute(tags.XML_TAG_LIB)
-        if not module in self._modules.keys():
-            module_name = xml_node.getAttribute(tags.XML_TAG_LIB)
-            module = __import__(module_name, globals(), locals())
-            
-            if hasattr(module, 'gazpacho_prefix'):
-                prefix = getattr(module, 'gazpacho_prefix')
-                self._modules[prefix.lower()] = module
-
 
     def _sort_function(self, model, iter1, iter2):
         obj1 = model.get_value(iter1, 0)

@@ -109,7 +109,13 @@ def str2float(value):
         return float(value)
     except ValueError:
         raise ValidationError("This field requires a number")
+
+def format(format, value):
+    return locale.format(format, value, 1)
     
+def float2str(value):
+    return format('%f', value)
+
 supported_types = (str, int, float, bool, date, object)
 
 supported_types_names = map(lambda t: t.__name__, supported_types)
@@ -120,7 +126,7 @@ converters = {
     TO_STR:   {
         str: lambda v: v,
         int: str,
-        float: locale.str,
+        float: float2str,
         bool: str,
         date: date2str,
         object: lambda v: v

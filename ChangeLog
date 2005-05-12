@@ -1,3 +1,14 @@
+2005-05-12  Johan Dahlin  <jdahlin@async.com.br>
+
+	* Kiwi2/Widgets/List.py:
+	* Kiwi2/Widgets/datatypes.py: 
+	Add support for Column.Data, does not allow it for booleans.
+	Remove some unused code and comments from gazpacho.
+	Use locale.format to format strings, also use this for
+	float types.
+
+	r=lgs
+
 2005-05-10  Johan Dahlin  <jdahlin@async.com.br>
 
 	* Kiwi2/Widgets/List.py (List._setup_column): Fix justification.
