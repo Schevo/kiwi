@@ -30,11 +30,16 @@ file is that some parts of the Kiwi Framework should be usable without
 any graphics involved.
 """
 
-try:
-    import pygtk
-    pygtk.require('2.0')
-except ImportError:
-    raise ImportError("Couldn't import required package PyGTK+ 2.x")
+import sys
+
+# Before trying to import pygtk, check if gtk is already imported
+if not ('gtk._gtk' in sys.modules or
+        'gobject' in sys.modules):
+    try:
+        import pygtk
+        pygtk.require('2.0')
+    except ImportError:
+        raise ImportError("Couldn't import required package PyGTK+ 2.x")
 
 import gtk
 import gobject
