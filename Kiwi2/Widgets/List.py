@@ -281,8 +281,8 @@ class List(gtk.ScrolledWindow):
         self._tooltips = gtk.Tooltips()
 
         # convinience connections
-        id = self.treeview.get_selection().connect("changed",
-                                                   self._on_selection__changed)
+        selection = self.treeview.get_selection()
+        id = selection.connect("changed", self._on_selection__changed)
         self._selection_changed_id = id
         id = self.treeview.connect_after("row-activated",
                                          self._on_treeview__row_activated)
@@ -878,25 +878,35 @@ class List(gtk.ScrolledWindow):
         self.treeview.get_column(column_index).set_visible(visibility)
 
     def get_selection_mode(self):
-        return self.treeview.get_selection().get_mode()
+        selection = self.treeview.get_selection()
+        if selection:
+            return selection.get_mode()
     
     def set_selection_mode(self, mode):
-        self.treeview.get_selection().set_mode(mode)
+        selection = self.treeview.get_selection()
+        if selection:
+            return selection.set_mode(mode)
 
     def unselect_all(self):
-        self.treeview.get_selection().unselect_all()
+        selection = self.treeview.get_selection()
+        if selection:
+            selection.unselect_all()
 
     def select_instance(self, instance):
-        iter = self.get_iter(instance)
-        self.treeview.get_selection().select_iter(iter)
+        selection = self.treeview.get_selection()
+        if selection:
+            iter = self.get_iter(instance)
+            selection.select_iter(iter)
 
     def get_selected(self):
         selection = self.treeview.get_selection()
-        model, paths = selection.get_selected_rows()
-        if paths:
-            result = [model.get_value(model.get_iter(p), 0) for p in paths]
-            return tuple(result)
-
+        if selection:
+            model, paths = selection.get_selected_rows()
+            if paths:
+                result = [model.get_value(model.get_iter(p), 0) for p in paths]
+                return tuple(result)
+        return ()
+        
     def add_list(self, list, clear=True, restore_selection=False,
                  progress_handler=None):
         """Allows a list to be loaded, by default clearing it first.
@@ -930,9 +940,10 @@ class List(gtk.ScrolledWindow):
         # Avoid spurious selection or signal emissions when swapping
         # selection mode
         selection = self.treeview.get_selection()
-        selection.handler_block(self._selection_changed_id)
-        self.set_selection_mode(old_mode)
-        selection.handler_unblock(self._selection_changed_id)
+        if selection:
+            selection.handler_block(self._selection_changed_id)
+            self.set_selection_mode(old_mode)
+            selection.handler_unblock(self._selection_changed_id)
 
         if restore_selection:
             for instance in old_sel:

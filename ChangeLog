@@ -1,5 +1,8 @@
 2005-05-14  Johan Dahlin  <jdahlin@async.com.br>
 
+	* Kiwi2/Widgets/List.py: Protect selection, it's None if called
+	after List is destroyed.
+
 	* Kiwi2/initgtk.py: Guard pygtk.require, so we can import gtk before
 
 2005-05-12  Lorenzo Gil Sanchez  <lgs@sicem.biz>
