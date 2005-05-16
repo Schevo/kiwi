@@ -712,8 +712,8 @@ class List(gtk.ScrolledWindow):
         Use this function at your own risk
         """
         button = column.get_widget()
-        assert button is not None, ("You must call column.set_widget() '
-            'before calling __get_column_button")
+        assert button is not None, ("You must call column.set_widget() "
+            "before calling __get_column_button")
         while not isinstance(button, gtk.Button):
             button = button.get_parent()
 
