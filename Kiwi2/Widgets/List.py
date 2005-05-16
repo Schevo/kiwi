@@ -965,7 +965,8 @@ class List(gtk.ScrolledWindow):
             # emitted, or applications might end up with inconsistent
             # state.
             row_iter = self.model.get_iter_first()
-            self._select_and_focus_row(row_iter)
+            if row_iter:
+                self._select_and_focus_row(row_iter)
             
         self.treeview.thaw_notify()
         return ret
