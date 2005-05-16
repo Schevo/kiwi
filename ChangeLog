@@ -1,3 +1,7 @@
+2005-05-16  Johan Dahlin  <jdahlin@async.com.br>
+
+	* Kiwi2/Widgets/List.py: Reformat to fit in 79 columns.
+
 2005-05-14  Johan Dahlin  <jdahlin@async.com.br>
 
 	* Kiwi2/Widgets/List.py: Protect selection, it's None if called

@@ -99,10 +99,10 @@ class Column:
         If no Columns are sorted, the List will be created unsorted.
         - order: one of gtk.SORT_ASCENDING or gtk.SORT_DESCENDING or -1. The
         value -1 is used internally when the column is not sorted.
-        - title_pixmap: if set to a filename (that can be in gladepath), a pixmap
-        will be used *instead* of the title set. The title string will still be
-        used to identify the column in the column selection and in a tooltip, if
-        a tooltip is not set.
+        - title_pixmap: if set to a filename (that can be in gladepath),
+        a pixmap will be used *instead* of the title set. The title string
+        will still be used to identify the column in the column selection
+        and in a tooltip, if a tooltip is not set.
         """
         # XXX: filter function?
         if attribute is not None:
@@ -121,7 +121,8 @@ class Column:
             self.visible = visible
         if justify is not None:
             if not isinstance(justify, gtk.Justification):
-                raise TypeError('justify parameter should be %r instead of %r' % (gtk.Justification, type(justify)))
+                raise TypeError('justify parameter should be %r instead of %r'
+                                % (gtk.Justification, type(justify)))
             self.justify = justify
         if format is not None:
             self.format = format
@@ -175,9 +176,10 @@ class Column:
             cdict["pixmap_spec"] = ""
         # Isn't printing text lovely?
         return """
-\tColumn(attribute=%(attribute)s, title=%(title)s, visible=%(visible)s, justify=%(justify)s, 
-\t\tformat=%(format)s, tooltip=%(tooltip)s, width=%(width)s, sorted=%(sorted)s,
-\t\torder=%(order)s, title_pixmap=%(title_pixmap)s%(pixmap_spec)s,
+\tColumn(attribute=%(attribute)s, title=%(title)s, visible=%(visible)s,
+\t\tjustify=%(justify)s, format=%(format)s, tooltip=%(tooltip)s, 
+\t\twidth=%(width)s, sorted=%(sorted)s, order=%(order)s, 
+\t\ttitle_pixmap=%(title_pixmap)s, %(pixmap_spec)s,
 \t\tdecimal_separator=%(decimal_separator)s)""" % cdict
 
     def __repr__(self):
@@ -477,7 +479,8 @@ class List(gtk.ScrolledWindow):
             renderer = gtk.CellRendererText()
             renderer.set_data('renderer-property', 'text')
 #            renderer.set_property('editable', True)
-#            renderer.connect('edited', self._on_renderer__edited, column_index)
+#            renderer.connect('edited', self._on_renderer__edited,
+#                             column_index)
         elif data_type is bool:
             renderer = gtk.CellRendererToggle()
             renderer.set_data('renderer-property', 'active')
@@ -487,12 +490,12 @@ class List(gtk.ScrolledWindow):
         elif issubclass(data_type, datetime.date):
             renderer = gtk.CellRendererText()
             renderer.set_data('renderer-property', 'text')
-            
         elif issubclass(data_type, basestring):
             renderer = gtk.CellRendererText()
             renderer.set_data('renderer-property', 'text')
 #            renderer.set_property('editable', True)
-#            renderer.connect('edited', self._on_renderer__edited, column_index)
+#            renderer.connect('edited', self._on_renderer__edited,
+#                             column_index)
         else:
             raise ValueError("the type %s is not supported yet" % data_type)
         
@@ -582,7 +585,8 @@ class List(gtk.ScrolledWindow):
             # this mean we are not sorting at all
             return
 
-        old_column = self.treeview.get_column(self._sort_column_definition_index)
+        old_column = self.treeview.get_column(
+            self._sort_column_definition_index)
         old_column.set_sort_indicator(False)
         
         # reverse the old order or start with SORT_DESCENDING if there was no
@@ -708,7 +712,8 @@ class List(gtk.ScrolledWindow):
         Use this function at your own risk
         """
         button = column.get_widget()
-        assert button is not None, "You must call column.set_widget() before calling __get_column_button"
+        assert button is not None, ("You must call column.set_widget() '
+            'before calling __get_column_button")
         while not isinstance(button, gtk.Button):
             button = button.get_parent()
 
@@ -836,7 +841,8 @@ class List(gtk.ScrolledWindow):
         self.set_selection_mode(gtk.SELECTION_SINGLE)
         
 ##         if not self._typelist:
-##             self._typelist = self._get_types(instance, self._column_definitions)
+##             self._typelist = self._get_types(instance,
+##                                              self._column_definitions)
 ##             clist.set_typelist(self._typelist)
 ##             self._justify_columns(self._column_definitions, self._typelist)
 
@@ -980,7 +986,10 @@ if __name__ == '__main__':
     class Person:
         """The parameters need to be of the same name of the column headers"""
         def __init__(self, name, age, city, single):
-            self.name, self.age, self.city, self.single = name, age, city, single
+            (self.name,
+             self.age,
+             self.city,
+             self.single) = name, age, city, single
 
     columns = (
         Column('name', sorted=True, tooltip='What about a stupid tooltip?'),
