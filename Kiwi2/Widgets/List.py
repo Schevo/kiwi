@@ -402,6 +402,9 @@ class List(gtk.ScrolledWindow):
                        self._on_header__button_release_event)
 
     def _setup_columns(self):
+        if self._columns_configured:
+            return
+        
         autosize = True
         for i, column in enumerate(self._column_definitions):
             treeview_column = self.treeview.get_column(i)
@@ -438,6 +441,7 @@ class List(gtk.ScrolledWindow):
             col_definition.format):
             raise TypeError("format is not supported for boolean columns") 
 
+        print treeview_column, 'pack_start', renderer, col_definition.attribute
         treeview_column.pack_start(renderer)
         treeview_column.set_cell_data_func(renderer, self._cell_data_func,
                                            col_definition)
