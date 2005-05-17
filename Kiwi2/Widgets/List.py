@@ -207,7 +207,7 @@ class Column:
         order = self.order.value_nick
         return "%s|%s|%s|%s|%s|%s|%s|%s|%s|%s" % \
                (attr, title, data_type, visible, justify,
-                format, tooltip, width, sorted, order)
+                tooltip, format, width, sorted, order)
     
     def set_from_string(self, data_string):
         fields = data_string.split('|')
@@ -224,8 +224,8 @@ class Column:
         self.data_type = str2type(fields[2])
         self.visible = datatypes.str2bool(fields[3], default_value=True)
         self.justify = str2enum(fields[4], gtk.JUSTIFY_LEFT)
-        self.format = fields[5]
-        self.tooltip = fields[6]
+        self.tooltip = fields[5]
+        self.format = fields[6]
         self.width = (fields[7] and int(fields[7])) or None
         self.sorted = datatypes.str2bool(fields[8], default_value=False)
         self.order = str2enum(fields[9], gtk.SORT_ASCENDING) \
