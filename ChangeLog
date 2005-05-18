@@ -1,5 +1,9 @@
 2005-05-18  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
+	* Kiwi2/Widgets/ComboBox.py (ComboProxyMixin.select_item_by_data) 
+	(ComboProxyMixin.select_item_by_label): improve error messages to
+	easily detect programming errors.
+
 	* Kiwi2/Proxies.py (Proxy._setup_widgets): provides the widget name
 	in the warning message. Now is much easier to fix this programming
 	error.

@@ -129,7 +129,8 @@ class ComboProxyMixin:
                 self.set_active_iter(row.iter)
                 break
         else:
-            raise KeyError("No item correspond to label %s" % label)
+            raise KeyError("No item correspond to label %s in the combo %s" \
+                           % (label, self.name))
     
     def select_item_by_data(self, data):
         model = self.get_model()
@@ -142,7 +143,8 @@ class ComboProxyMixin:
                 #the user only prefilled the combo with strings
                 self.select_item_by_label(data)
             else:
-                raise KeyError("No item correspond to data %r" % data)
+                raise KeyError("No item correspond to data %r in the combo %s" \
+                               % (data, self.name))
             
     def get_model_items(self):
         model = self.get_model()
