@@ -592,9 +592,9 @@ class Proxy:
             if not attribute:
                 # we don't listen for changes in this widget because
                 # we don't know the model attribute
-                _warn("The widget %s is a KiwiWidget but does not have "
+                _warn("The widget %s (%s) is a KiwiWidget but does not have "
                       "a model attribute set so it will not be eassociated "
-                      "with the model" % widget)
+                      "with the model" % (widget, widget.name))
                 continue
              
             connection_id = widget.connect('content-changed',
