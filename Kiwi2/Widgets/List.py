@@ -60,6 +60,7 @@ class Column:
     order = gtk.SORT_ASCENDING
     pixmap_spec = None
     decimal_separator = None
+    expand = False
     def __init__(self, 
                  attribute     = None,
                  title         = None, 
@@ -73,7 +74,8 @@ class Column:
                  sorted        = None,
                  order         = None,
                  pixmap_spec   = None,
-                 decimal_separator = None
+                 decimal_separator = None,
+                 expand        = None,
                  ):
         """Creates a new Column, which describes how a column in a
         List should be rendered.
@@ -103,6 +105,8 @@ class Column:
         a pixmap will be used *instead* of the title set. The title string
         will still be used to identify the column in the column selection
         and in a tooltip, if a tooltip is not set.
+        - expand: if set column will expand. Note: this space is shared
+        equally amongst all columns that have the expand set to True.
         """
         # XXX: filter function?
         if attribute is not None:
@@ -150,6 +154,9 @@ class Column:
 #                                      self.decimal_separator or 
 #                                      Views.global_decimal_separator)
 #            self.ensure_decimal_translator()
+        if self.expand is not None:
+            self.expand = expand
+            
         # XXX: validate bizarre option combinations
         # Tip: when adding items here, remember to update
         # CListDelegate.dump_column_code()
@@ -180,7 +187,7 @@ class Column:
 \t\tjustify=%(justify)s, format=%(format)s, tooltip=%(tooltip)s, 
 \t\twidth=%(width)s, sorted=%(sorted)s, order=%(order)s, 
 \t\ttitle_pixmap=%(title_pixmap)s, %(pixmap_spec)s,
-\t\tdecimal_separator=%(decimal_separator)s)""" % cdict
+\t\tdecimal_separator=%(decimal_separator)s, %(expand)s)""" % cdict
 
     def __repr__(self):
         dict = self.__dict__.copy()
@@ -205,6 +212,7 @@ class Column:
         width = self.width and int(self.width) or ''
         sorted = str(self.sorted)
         order = self.order.value_nick
+        # XXX: expand
         return "%s|%s|%s|%s|%s|%s|%s|%s|%s|%s" % \
                (attr, title, data_type, visible, justify,
                 tooltip, format, width, sorted, order)
@@ -230,7 +238,8 @@ class Column:
         self.sorted = datatypes.str2bool(fields[8], default_value=False)
         self.order = str2enum(fields[9], gtk.SORT_ASCENDING) \
                      or gtk.SORT_ASCENDING
-
+        # XXX: expand, remember to sync with __str__
+        
         return True
     
 class List(gtk.ScrolledWindow):
@@ -456,7 +465,11 @@ class List(gtk.ScrolledWindow):
             widget = self.__get_column_button(treeview_column)
             if widget is not None:
                 self._tooltips.set_tip(widget, col_definition.tooltip)
-                    
+
+        if col_definition.expand:
+            # Default is False
+            treeview_column.set_expand(True)
+            
 #%s where I expected a GtkButton""" % (column.tooltip, i, col))
             #if column.decimal_separator:
             ## XXX: This is a hack. I now see we need to keep the data model

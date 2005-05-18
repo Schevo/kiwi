@@ -1,3 +1,7 @@
+2005-05-18  Johan Dahlin  <jdahlin@async.com.br>
+
+	* Kiwi2/Widgets/List.py: Add expand property to Column.
+
 2005-05-18  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
 	* Kiwi2/Widgets/ComboBox.py (ComboProxyMixin.select_item_by_data) 
