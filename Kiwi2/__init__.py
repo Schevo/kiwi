@@ -1,8 +1,7 @@
-#!/usr/bin/env python
 #
 # Kiwi: a Framework and Enhanced Widgets for Python
 #
-# Copyright (C) 2003-2004 Async Open Source
+# Copyright (C) 2003-2005 Async Open Source
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -20,7 +19,9 @@
 # USA
 # 
 # Author(s): Christian Reis <kiko@async.com.br>
-#
+#            Lorenzo Gil Sanchez <lgs@sicem.biz>
+#            Johan Dahlin <jdahlin@async.com.br>
+#         
 
 """Kiwi is a library designed to make developing graphical applications as easy as possible. It offers both a framework and a set of enhanced widgets, and is based on Python and GTK+. Kiwi borrows concepts from MVC, Java Swing and Microsoft MFC, but implements a set of unique classes that take advantage of the flexibility and simplicity of Python to make real-world application creation much easier.
 

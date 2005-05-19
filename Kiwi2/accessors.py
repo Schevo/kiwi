@@ -1,8 +1,7 @@
-#!/usr/bin/env python
 #
 # Kiwi: a Framework and Enhanced Widgets for Python
 #
-# Copyright (C) 2002, 2003 Async Open Source
+# Copyright (C) 2002-2005 Async Open Source
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -21,6 +20,8 @@
 # 
 # Author(s): Andreas Kostyrka <andreas@mtg.co.at>
 #            Christian Reis <kiko@async.com.br>
+#            Johan Dahlin <jdahlin@async.com.br>
+#
 
 """The accessors module offers two important front-end functions:
 kgetattr and ksetattr. These functions allow retrieving attribute values

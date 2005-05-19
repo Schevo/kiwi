@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 #
 # Kiwi: a Framework and Enhanced Widgets for Python
 #

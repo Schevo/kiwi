@@ -1,8 +1,7 @@
-#!/usr/bin/env python
 #
 # Kiwi: a Framework and Enhanced Widgets for Python
 #
-# Copyright (C) 2003-2004 Async Open Source
+# Copyright (C) 2003-2005 Async Open Source
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -20,6 +19,9 @@
 # USA
 # 
 # Author(s): Christian Reis <kiko@async.com.br>
+#            Daniel Saran R. da Cunha <daniel@async.com.br>
+#            Lorenzo Gil Sanchez <lgs@sicem.biz>
+#            Gustavo Rahal <gustavo@async.com.br>
 #
 
 """Defines an enhanced version of GtkRadioButton"""

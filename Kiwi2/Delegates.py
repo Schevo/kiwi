@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 #
 # Kiwi: a Framework and Enhanced Widgets for Python
 #
@@ -20,6 +19,8 @@
 # USA
 # 
 # Author(s): Christian Reis <kiko@async.com.br>
+#            Lorenzo Gil Sanchez <lgs@sicem.biz>
+#            Johan Dahlin <jdahlin@async.com.br>
 #
 
 """Defines the Delegate classes that are included in the Kiwi Framework."""

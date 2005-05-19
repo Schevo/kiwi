@@ -1,5 +1,34 @@
 2005-05-19  Johan Dahlin  <jdahlin@async.com.br>
 
+	* AUTHORS:
+	* Kiwi2/Controllers.py:
+	* Kiwi2/Delegates.py:
+	* Kiwi2/Models.py:
+	* Kiwi2/Proxies.py:
+	* Kiwi2/Views.py:
+	* Kiwi2/Widgets/CheckButton.py:
+	* Kiwi2/Widgets/ComboBox.py:
+	* Kiwi2/Widgets/Entry.py:
+	* Kiwi2/Widgets/Label.py:
+	* Kiwi2/Widgets/List.py:
+	* Kiwi2/Widgets/RadioButton.py:
+	* Kiwi2/Widgets/SpinButton.py:
+	* Kiwi2/Widgets/TextView.py:
+	* Kiwi2/Widgets/WidgetProxy.py:
+	* Kiwi2/Widgets/Wizard.py:
+	* Kiwi2/Widgets/__init__.py:
+	* Kiwi2/Widgets/datatypes.py:
+	* Kiwi2/__init__.py:
+	* Kiwi2/accessors.py:
+	* Kiwi2/initgtk.py:
+	* Kiwi2/utils.py:
+	* Kiwi2/version.py:
+
+	Update authors, remove #! in all files and 
+	add licenses to a few files.
+
+2005-05-19  Johan Dahlin  <jdahlin@async.com.br>
+
 	* Kiwi2/Widgets/CheckButton.py:
 	* Kiwi2/Widgets/ComboBox.py:
 	* Kiwi2/Widgets/Entry.py:
