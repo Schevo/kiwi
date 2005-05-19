@@ -40,6 +40,8 @@ class Form(Delegates.Delegate):
             return datatypes.ValidationError("The name is too long")
     
     def on_weight__validate(self, widget, data):
+        if data is None:
+            return
         if float(data) > 90:
             # this is really not the type of validation that you would use :)
             # anyway, it's just for reference
