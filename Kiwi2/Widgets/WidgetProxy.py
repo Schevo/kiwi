@@ -247,11 +247,13 @@ class MixinSupportValidation(Mixin):
             self.draw_mandatory_icon_if_needed()            
 
             data = self.str2type(text)
-            # this signal calls the on_widgetname__validate method of the 
-            # view class and gets the exception (if any).
-            error = self.emit("validate", data)
-            if error:
-                raise error
+
+            if data is not None:
+                # this signal calls the on_widgetname__validate method of the 
+                # view class and gets the exception (if any).
+                error = self.emit("validate", data)
+                if error:
+                    raise error
             
             # if the data is good we don't wait for the idle to inform
             # the user

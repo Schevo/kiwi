@@ -1,5 +1,11 @@
 2005-05-19  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
+	* Kiwi2/Widgets/WidgetProxy.py (MixinSupportValidation._validate_data): 
+	if the data is None don't try to validate
+
+	* examples/PersonalInformation/personalinformation.py: validators
+	don't need to handler the None case now.
+
 	* Kiwi2/Widgets/SpinButton.py (SpinButton.update): fix stupid mistake
 
 	* Kiwi2/Widgets/WidgetProxy.py (MixinSupportValidation.set_mandatory): 

@@ -26,22 +26,16 @@ class Form(Delegates.Delegate):
     # the validate signal calls methods with the signature 
     # on_widgetname__validate
     def on_name__validate(self, widget, data):
-        if data is None:
-            return
         if len(data) > 20:
             # we need to return an exception that will be displayed on
             # the information tooltip and the delegate option
             return datatypes.ValidationError("The name is too long")
     
     def on_height__validate(self, widget, data):
-        if data is None:
-            return
         if data > 50:
             return datatypes.ValidationError("The name is too long")
     
     def on_weight__validate(self, widget, data):
-        if data is None:
-            return
         if float(data) > 90:
             # this is really not the type of validation that you would use :)
             # anyway, it's just for reference
