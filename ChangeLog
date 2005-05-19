@@ -1,5 +1,9 @@
 2005-05-19  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
+	* Kiwi2/Widgets/WidgetProxy.py (MixinSupportValidation.set_mandatory): 
+	don't redraw the widget here since that is done in the validate_data
+	method.
+
 	* examples/PersonalInformation/personalinformation.py : 
 	fix this example by allowing data to be None in the weight
 	validation

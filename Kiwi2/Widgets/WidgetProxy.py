@@ -227,8 +227,6 @@ class MixinSupportValidation(Mixin):
         the user needs to provide data to the widget 
         """
         self._mandatory = mandatory
-        self._draw_mandatory_icon = mandatory
-        self.queue_draw()
 
     def _validate_data(self, text):
         """Checks if the data is valid.
