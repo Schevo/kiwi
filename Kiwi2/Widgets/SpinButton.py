@@ -83,7 +83,7 @@ class SpinButton(gtk.SpinButton, WidgetProxy.MixinSupportValidation):
             self.set_text("")
             self.draw_mandatory_icon_if_needed()
         else:
-            self.set_data(data)
+            self.set_value(data)
 
     def do_expose_event(self, event):
         """Expose-event signal are triggered when a redraw of the widget
