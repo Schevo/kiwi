@@ -184,22 +184,17 @@ class MixinSupportValidation(Mixin):
     
     def __init__(self, data_type=str, model_attribute=None,
                  default_value=None):
-        Mixin.__init__(self, data_type, model_attribute,
-                                  default_value)
+        Mixin.__init__(self, data_type, model_attribute, default_value)
         
         self._error_tooltip = ErrorTooltip(self)
         
         # this flag means the data in the entry does not validate
         self._invalid_data = False
-        self.valid_data = False
-        # Ok, I know it seems wierd! The thing is that when a mandatory
-        # widget appear it already has invalid data (it's blank!) so
-        # this would mess up with other type of verification.        
-        # So self._invalid_data set to False does not mean that data is true. 
-        # It's just not false! pure magic!
+        # we also want to check if the widget is empty, which is an error
+        # for mandatory widgets
+        self._blank_data = False
         
-        
-        # this is the last time the user changed the entry
+        # this is the last time the user changed the widget
         self._last_change_time = None
 
         self._validation_error_message = ""
@@ -255,9 +250,9 @@ class MixinSupportValidation(Mixin):
             self._stop_complaining()
                     
             if data is None and self._mandatory:
-                self.valid_data = False
+                self._blank_data = False
             else:
-                self.valid_data = True
+                self._blank_data = True
             
             # check if the remaining widgets are ok
             self._check_widgets_validity()
@@ -270,7 +265,7 @@ class MixinSupportValidation(Mixin):
 
     def _validation_error(self, e):
         if self._invalid_data:
-            self.valid_data = False
+            self._blank_data = False
             # check if the remaining widgets are ok
             self._check_widgets_validity()
         
@@ -402,12 +397,8 @@ class MixinSupportValidation(Mixin):
                                 pixw, pixh)
 
     def _check_widgets_validity(self):
-        try:
+        if getattr(self, 'owner', None):
             self.owner.check_widgets_validity()
-        except AttributeError, e:
-            # in this case the view is not defined yet
-            pass
-            
 
 class ErrorTooltip(gtk.Window):
     """Small tooltip window that popup when the user click on top of the error (information) icon"""

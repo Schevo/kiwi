@@ -1,5 +1,9 @@
 2005-05-19  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
+	* Kiwi2/Widgets/WidgetProxy.py (MixinSupportValidation.__init__): 
+	changed self.valid_data to self._blank_data to avoid confusing
+	names
+
 	* Kiwi2/Widgets/ComboBox.py (ComboBoxEntry.read): fix validation
 	errors that were going to the console instead of showing in the
 	interface.
