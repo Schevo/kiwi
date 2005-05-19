@@ -1,5 +1,14 @@
 2005-05-19  Johan Dahlin  <jdahlin@async.com.br>
 
+	* Kiwi2/Controllers.py:
+	* Kiwi2/Proxies.py:
+	* Kiwi2/Views.py:
+	* Kiwi2/Widgets/List.py:
+	* Kiwi2/utils.py: Update docstrings, to make epydoc happy
+	* doc/Makefile: Clean up and add some more files
+
+2005-05-19  Johan Dahlin  <jdahlin@async.com.br>
+
 	* AUTHORS:
 	* Kiwi2/Controllers.py:
 	* Kiwi2/Delegates.py:

@@ -102,11 +102,12 @@ def rgb_color_to_string(red, green, blue):
     return "#%02X%02X%02X" % (red >> 8, green >> 8, blue >> 8)
     
 def set_foreground(widget, color, state=gtk.STATE_NORMAL):
-    """Set the foreground color of a widget:
+    """
+    Set the foreground color of a widget:
 
-    - widget: the widget we are changing the color
-    - color: a hexadecimal code or a well known color name
-    - state: the state we are afecting, see gtk.STATE_*
+      - widget: the widget we are changing the color
+      - color: a hexadecimal code or a well known color name
+      - state: the state we are afecting, see gtk.STATE_*
     """
     widget.modify_fg(state, gtk.gdk.color_parse(color))
 
@@ -117,11 +118,12 @@ def get_foreground(widget, state=gtk.STATE_NORMAL):
     return gdk_color_to_string(color)
 
 def set_background(widget, color, state=gtk.STATE_NORMAL):
-    """Set the background color of a widget:
+    """
+    Set the background color of a widget:
 
-    - widget: the widget we are changing the color
-    - color: a hexadecimal code or a well known color name
-    - state: the state we are afecting, see gtk.STATE_*
+      - widget: the widget we are changing the color
+      - color: a hexadecimal code or a well known color name
+      - state: the state we are afecting, see gtk.STATE_*
     """
     if isinstance(widget, gtk.Entry):
         widget.modify_base(state, gtk.gdk.color_parse(color))
@@ -133,7 +135,6 @@ def get_background(widget, state=gtk.STATE_NORMAL):
     style = widget.get_style()
     color = style.bg[state]
     return gdk_color_to_string(color)
-    
 
 def merge_colors(widget, src_color, dst_color, steps=10):
     """Change the background of widget from src_color to dst_color

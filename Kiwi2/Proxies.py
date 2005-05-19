@@ -571,9 +571,11 @@ class Proxy:
     # Below are the guts
     
     def _setup_widgets(self, widgets):
-        """Connect to the 'content-changed' signal of all the Kiwi widgets
+        """
+        Connect to the 'content-changed' signal of all the Kiwi widgets
         in the widgets list parameter.
-        @widgets is a list of widget names
+        @param widgets: the widget names
+        @type  widgets: list of strings
         """
         self._attr_map = {}
         for widget_name in widgets:

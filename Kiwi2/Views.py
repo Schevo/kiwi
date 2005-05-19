@@ -638,16 +638,16 @@ class SlaveView(gobject.GObject):
     #
 
     def add_proxy(self, model=None, widgets=None):
-        """Add a proxy to this view that automatically update a model when
+        """
+        Add a proxy to this view that automatically update a model when
         the view changes. Arguments:
-
-        - model. the object we are proxing. It can be None if we don't have
-        a model yet and we want to display the interface and set it up with
-        future models.
-
-        - widgets. the list of widgets that contains model attributes to be
-        proxied. If it is None (or not specified) it will be the whole list
-        of widgets this View has
+          
+          - model. the object we are proxing. It can be None if we don't have
+          a model yet and we want to display the interface and set it up with
+          future models.
+          - widgets. the list of widgets that contains model attributes to be
+          proxied. If it is None (or not specified) it will be the whole list
+          of widgets this View has.
 
         This method return a Proxy object that you may want to use to force
         updates or setting new models. Keep a reference to it since there is

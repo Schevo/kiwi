@@ -82,36 +82,38 @@ class Column:
                  decimal_separator = None,
                  expand        = None,
                  ):
-        """Creates a new Column, which describes how a column in a
+        """
+        Creates a new Column, which describes how a column in a
         List should be rendered.
-        - attribute: a string with the name of the instance attribute the
-        column represents
-        - title: the title of the column, defaulting to the capitalized form
-        of the attribute
-        - type: the type of the attribute that will be inserted into the
-        column 
-        - visible: a boolean specifying if it is initially hidden or shown
-        - justify: one of gtk.JUSTIFY_LEFT, gtk.JUSTIFY_RIGHT or
-        gtk.JUSTIFY_CENTER or None. If None, the justification will be
-        determined by the type of the attribute value of the first
-        instance to be inserted in the List (integers and floats
-        will be right-aligned).
-        - format: a format string to be applied to the attribute value upon
-        insertion in the list
-        - width: the width in pixels of the column, if not set, uses the
-        default to List. If no Column specifies a width,
-        columns_autosize() will be called on the List upon add_instance()
-        or the first add_list().
-        - sorted: whether or not the List is to be sorted by this column.
-        If no Columns are sorted, the List will be created unsorted.
-        - order: one of gtk.SORT_ASCENDING or gtk.SORT_DESCENDING or -1. The
-        value -1 is used internally when the column is not sorted.
-        - title_pixmap: if set to a filename (that can be in gladepath),
-        a pixmap will be used *instead* of the title set. The title string
-        will still be used to identify the column in the column selection
-        and in a tooltip, if a tooltip is not set.
-        - expand: if set column will expand. Note: this space is shared
-        equally amongst all columns that have the expand set to True.
+
+          - attribute: a string with the name of the instance attribute the
+            column represents
+          - title: the title of the column, defaulting to the capitalized form
+            of the attribute
+          - type: the type of the attribute that will be inserted into the
+            column 
+          - visible: a boolean specifying if it is initially hidden or shown
+          - justify: one of gtk.JUSTIFY_LEFT, gtk.JUSTIFY_RIGHT or
+            gtk.JUSTIFY_CENTER or None. If None, the justification will be
+            determined by the type of the attribute value of the first
+            instance to be inserted in the List (integers and floats
+            will be right-aligned).
+          - format: a format string to be applied to the attribute value upon
+            insertion in the list
+          - width: the width in pixels of the column, if not set, uses the
+            default to List. If no Column specifies a width,
+            columns_autosize() will be called on the List upon add_instance()
+            or the first add_list().
+          - sorted: whether or not the List is to be sorted by this column.
+            If no Columns are sorted, the List will be created unsorted.
+          - order: one of gtk.SORT_ASCENDING or gtk.SORT_DESCENDING or -1. The
+            value -1 is used internally when the column is not sorted.
+          - title_pixmap: if set to a filename (that can be in gladepath),
+            a pixmap will be used *instead* of the title set. The title string
+            will still be used to identify the column in the column selection
+            and in a tooltip, if a tooltip is not set.
+          - expand: if set column will expand. Note: this space is shared
+            equally amongst all columns that have the expand set to True.
         """
         # XXX: filter function?
         if attribute is not None:
@@ -936,15 +938,17 @@ class List(gtk.ScrolledWindow):
         
     def add_list(self, list, clear=True, restore_selection=False,
                  progress_handler=None):
-        """Allows a list to be loaded, by default clearing it first.
+        """
+        Allows a list to be loaded, by default clearing it first.
         freeze() and thaw() are called internally to avoid flashing.
-        - list: a list to be added
-        - clear: a boolean that specifies whether or not to clear the list
-        - restore_selection: a boolean that specifies whether or not to
-        try and preserve the original selection in the list (provided that
-        at least some instances are still present in the new list).
-        - progress_handler: a callback function to be called while the list
-        is being filled
+        
+          - list: a list to be added
+          - clear: a boolean that specifies whether or not to clear the list
+          - restore_selection: a boolean that specifies whether or not to
+            try and preserve the original selection in the list (provided that
+            at least some instances are still present in the new list).
+          - progress_handler: a callback function to be called while the list
+            is being filled
 
         There is a problem with select=True and mode SELECTION_BROWSE. The
         focus_row is not updated, and the end result is that you have a

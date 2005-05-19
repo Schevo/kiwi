@@ -41,12 +41,12 @@ class BaseController:
         view is also attached to it. The arguments are identical to the
         view and keyactions class variables.
 
-        - view: the correspondent view for the controller
-        - keyactions: a mapping from GDK key symbol (GDK.A, etc.) to a
-          method. The method will be called when any relevant keypress is
-          generated for that view. The handler definition should look like:
+          - view: the correspondent view for the controller
+          - keyactions: a mapping from GDK key symbol (GDK.A, etc.) to a
+            method. The method will be called when any relevant keypress is
+            generated for that view. The handler definition should look like:
 
-              def my_A_handler(self, widget, event, args):
+            >>> def my_A_handler(self, widget, event, args):
         """
 
         if not view and not self.view:
