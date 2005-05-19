@@ -1,5 +1,13 @@
 2005-05-19  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
+	* Kiwi2/Widgets/ComboBox.py (ComboBoxEntry.read): fix validation
+	errors that were going to the console instead of showing in the
+	interface.
+	Update the model when the user edit the entry
+	Don't listen to model row changes since we don't want to inform our
+	proxy about them and we don't need to do anything special in the
+	comboboxentry itself
+	
 	* Kiwi2/Proxies.py (Proxy._initialize_widgets): block the widgets
 	when we initialize them so we don't get updates back to the model
 

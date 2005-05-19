@@ -233,8 +233,10 @@ class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin,
         # here we connect the expose-event signal directly to the entry
         self.child.connect('expose-event', self._on_child_entry__expose_event)
 
-        model = self.get_model()
-        model.connect('row-changed', self._on_model__row_changed)
+        # there are two 'changed' signals we need to care about:
+        # 1) changed on the Combo (we override that signal)
+        # 2) changed on the Entry (we connect to that signal here)
+        self.child.connect('changed', self._on_entry__changed)
 
         # HACK! we force a queue_draw because when the window is first
         # displayed the icon is not drawn.
@@ -294,6 +296,10 @@ class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin,
         
         self._draw_icon()
 
+    def _on_entry__changed(self, widget):
+        self._check_entry()
+        self.emit('content-changed')
+        
     def _check_entry(self):
         """Called when something on the entry changes"""
         self._last_change_time = time.time()
@@ -303,32 +309,26 @@ class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin,
         else:
             self._draw_mandatory_icon = False
     
-    def _on_model__row_changed(self, treemodel, path, iter):
-        self._check_entry()
-        self.read()
-        
     def read(self):
-        data = self.child.get_text()
         items = self.get_model_items()
-        
-        # if data is empty we don't want to return None because
-        # the model won't be updated
-        if not data.strip():
-            data = None
-        elif data not in items.keys():
-            self._draw_info_icon = True
+        text = self.child.get_text()
+
+        if not text.strip():
+            data = None        
+        elif text not in items.keys():
+            # special validation
             if self._list_writable:
-                raise ValidationError("Entered value not in list. "
-                                      "To add an item, type "
-                                      "the value and press enter")
+                self._draw_info_icon = True
+                error = ValidationError("Entered value not in list. "
+                                        "To add an item, type "
+                                        "the value and press enter")
             else:
-                raise ValidationError("Entered value not in list")
-        else:
-            self._update_selection()
-            label = self.get_selected_label()
-            self._validate_data(label)
-            data = self.get_selected_data()
-            self._check_widgets_validity()
+                error = ValidationError("Entered value not in list")
+            self._validation_error(error)
+            return ValueUnset
+
+        # now the standard validation
+        data = self._validate_data(text)
         
         return data
 
