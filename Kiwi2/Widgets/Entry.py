@@ -46,7 +46,7 @@ class Entry(gtk.Entry, WidgetProxy.MixinSupportValidation):
     """
     WidgetProxy.implementsIProxy()
     WidgetProxy.implementsIMandatoryProxy()
-    
+
     gsignal('changed', 'override')
     # mandatory widgets need to have this signal connected
     gsignal('expose-event', 'override')
@@ -59,10 +59,6 @@ class Entry(gtk.Entry, WidgetProxy.MixinSupportValidation):
         # the background
         self._widget_to_draw = self
         
-        # due to changes on pygtk 2.6 we have to make some ajustments here
-        if gtk.pygtk_version < (2,6):
-            self.do_expose_event = self.chain
-    
     def do_changed(self):
         """Called when the content of the entry changes.
 
@@ -71,12 +67,6 @@ class Entry(gtk.Entry, WidgetProxy.MixinSupportValidation):
         """
         
         self._last_change_time = time.time()
-        
-        if len(self.get_text()) == 0 and self._mandatory:
-            self._draw_mandatory_icon = True
-        else:
-            self._draw_mandatory_icon = False
-        
         self.emit('content-changed')
         self.chain()
         
@@ -94,6 +84,7 @@ class Entry(gtk.Entry, WidgetProxy.MixinSupportValidation):
 
         if data is ValueUnset or data is None:
             self.set_text("")
+            self.draw_mandatory_icon_if_needed()
         else:
             self.set_text(self.type2str(data))
 
@@ -107,7 +98,10 @@ class Entry(gtk.Entry, WidgetProxy.MixinSupportValidation):
         
         Draws information and mandatory icons when necessary
         """
-        result = gtk.Entry.do_expose_event(self, event)
+        if gtk.pygtk_version < (2,6):
+            result = self.chain(event)
+        else:
+            result = gtk.Entry.do_expose_event(self, event)
 
         # this attribute stores the info on where to draw icons and paint
         # the background

@@ -1,5 +1,17 @@
 2005-05-19  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
+	* Kiwi2/Widgets/WidgetProxy.py: 
+	* Kiwi2/Widgets/Entry.py: 
+	* Kiwi2/Widgets/ComboBox.py: 
+	- Make expose events work with GTK 2.4 and 2.6
+	- Put as much validation code as possible in MixinSupportValidation
+	- Add some comments and docstring to parts that are not trivial
+	- Fix drawing mandatory icons. Now when somebody changes a widget
+	(either a proxy or the user) we check if the widget is empty to
+	draw the mandatory icon (if the widget mandatory prop is True)
+	- Reuse the validate signal in the ComboBoxEntry to perform aditional
+	validations
+
 	* Kiwi2/Widgets/WidgetProxy.py (MixinSupportValidation.is_correct) 
 	(MixinSupportValidation._validate_data) 
 	(MixinSupportValidation.__init__): properly initialize and manage

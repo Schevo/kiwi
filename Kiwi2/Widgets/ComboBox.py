@@ -272,6 +272,7 @@ class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin,
             self._update_selection(text)
      
     def do_changed(self):
+        self._last_change_time = time.time()
         self.emit('content-changed')
         self.chain()
     
@@ -297,49 +298,41 @@ class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin,
         self._draw_icon()
 
     def _on_entry__changed(self, widget):
-        self._check_entry()
-        self.emit('content-changed')
-        
-    def _check_entry(self):
         """Called when something on the entry changes"""
         self._last_change_time = time.time()
-        
-        if len(self.child.get_text()) == 0 and self._mandatory:
-            self._draw_mandatory_icon = True
-        else:
-            self._draw_mandatory_icon = False
-    
-    def read(self):
-        items = self.get_model_items()
-        text = self.child.get_text()
+        self.emit('content-changed')
 
-        if not text.strip():
-            data = None        
-        elif text not in items.keys():
-            # special validation
+    def read(self):
+        text = self.child.get_text()
+        data = self._validate_data(text)
+        
+        return data
+
+    def do_validate(self, data):
+        """ComboBoxEntry has a validate default handler that check if the
+        text of the entry is an item of the list"""
+        items = self.get_model_items()
+
+        if data is None or not data.strip():
+            return
+
+        if data not in items.keys():
             if self._list_writable:
-                self._draw_info_icon = True
                 error = ValidationError("Entered value not in list. "
                                         "To add an item, type "
                                         "the value and press enter")
             else:
                 error = ValidationError("Entered value not in list")
-            self._validation_error(error)
-            return ValueUnset
-
-        # now the standard validation
-        data = self._validate_data(text)
-        
-        return data
-
+            return error
+    
     def update(self, data):
         # first, trigger some basic validation
         WidgetProxy.Mixin.update(self, data)
         if data is ValueUnset or data is None:
             self.child.set_text("")
+            self.draw_mandatory_icon_if_needed()
         else:
             self.select_item_by_data(data)
-        self._check_entry()
 
     def prefill(self, itemdata, sort=False, clear_entry=False):
         super(ComboBoxEntry, self).prefill(itemdata, sort)

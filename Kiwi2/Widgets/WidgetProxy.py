@@ -238,6 +238,16 @@ class MixinSupportValidation(Mixin):
         returns the widget data-type
         """
         try:
+            # check if we should draw the mandatory icon
+            # this need to be done before any data conversion because we
+            # we don't want to end drawing two icons
+            if text is None or text == '':
+                self._blank_data = True
+            else:
+                self._blank_data = False
+
+            self.draw_mandatory_icon_if_needed()            
+
             data = self.str2type(text)
             # this signal calls the on_widgetname__validate method of the 
             # view class and gets the exception (if any).
@@ -248,11 +258,6 @@ class MixinSupportValidation(Mixin):
             # if the data is good we don't wait for the idle to inform
             # the user
             self._stop_complaining()
-
-            if data is None:
-                self._blank_data = True
-            else:
-                self._blank_data = False
 
             # check if the remaining widgets are ok
             self._check_widgets_validity()
@@ -359,6 +364,10 @@ class MixinSupportValidation(Mixin):
         return True
 
     def _draw_icon(self):
+        # if there is something wrong in the validation (draw_info_icon = True)
+        # the widget should not be empty (draw_mandatory_icon = True)
+        assert not (self._draw_mandatory_icon and self._draw_info_icon)
+        
         if self._draw_mandatory_icon:
             icon = MANDATORY_ICON
         elif self._draw_info_icon:
@@ -408,6 +417,13 @@ class MixinSupportValidation(Mixin):
             return False
 
         return True
+
+    def draw_mandatory_icon_if_needed(self):
+        if self._blank_data and self._mandatory:
+            self._draw_mandatory_icon = True
+        else:
+            self._draw_mandatory_icon = False
+        self.queue_draw()
         
 class ErrorTooltip(gtk.Window):
     """Small tooltip window that popup when the user click on top of the error
