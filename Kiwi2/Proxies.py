@@ -671,8 +671,11 @@ class Proxy:
                     if defvalue is not None:
                         value = defvalue
 
-            update = getattr(self, "tweak_%s" % attribute, None) or self.update
-            update(attribute, value)
+            tweak_function = getattr(self, "tweak_%s" % attribute, None)
+            if tweak_function:
+                tweak_function(attribute, value)
+            else:
+                self.update(attribute, value, block=True)
 
     def _register_proxy_in_model(self, attribute):
         model = self.model

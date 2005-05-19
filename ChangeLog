@@ -1,3 +1,8 @@
+2005-05-19  Lorenzo Gil Sanchez  <lgs@sicem.biz>
+
+	* Kiwi2/Proxies.py (Proxy._initialize_widgets): block the widgets
+	when we initialize them so we don't get updates back to the model
+
 2005-05-18  Johan Dahlin  <jdahlin@async.com.br>
 
 	* Kiwi2/Widgets/List.py: Add expand property to Column.
