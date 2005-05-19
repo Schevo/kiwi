@@ -192,7 +192,7 @@ class MixinSupportValidation(Mixin):
         self._invalid_data = False
         # we also want to check if the widget is empty, which is an error
         # for mandatory widgets
-        self._blank_data = False
+        self._blank_data = True
         
         # this is the last time the user changed the widget
         self._last_change_time = None
@@ -248,12 +248,12 @@ class MixinSupportValidation(Mixin):
             # if the data is good we don't wait for the idle to inform
             # the user
             self._stop_complaining()
-                    
-            if data is None and self._mandatory:
-                self._blank_data = False
-            else:
+
+            if data is None:
                 self._blank_data = True
-            
+            else:
+                self._blank_data = False
+
             # check if the remaining widgets are ok
             self._check_widgets_validity()
             
@@ -400,8 +400,18 @@ class MixinSupportValidation(Mixin):
         if getattr(self, 'owner', None):
             self.owner.check_widgets_validity()
 
+    def is_correct(self):
+        if self._invalid_data:
+            return False
+
+        if self._blank_data and self._mandatory:
+            return False
+
+        return True
+        
 class ErrorTooltip(gtk.Window):
-    """Small tooltip window that popup when the user click on top of the error (information) icon"""
+    """Small tooltip window that popup when the user click on top of the error
+    (information) icon"""
     def __init__(self, widget):
         gtk.Window.__init__(self, gtk.WINDOW_POPUP)
         

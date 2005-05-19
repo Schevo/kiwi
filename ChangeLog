@@ -1,5 +1,17 @@
 2005-05-19  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
+	* Kiwi2/Widgets/WidgetProxy.py (MixinSupportValidation.is_correct) 
+	(MixinSupportValidation._validate_data) 
+	(MixinSupportValidation.__init__): properly initialize and manage
+	the _blank_data attribute
+
+	* Kiwi2/Views.py (SlaveView.check_widgets_validity) 
+	(SlaveView.register_validate_function): use the is_correct method
+	to check if the data of a widget is ok. Document the
+	register_validate_function to understand the meaning of its only
+	parameter
+	(SlaveView.attach_slave): show the slave after the attacment process
+
 	* Kiwi2/Widgets/WidgetProxy.py (MixinSupportValidation.__init__): 
 	changed self.valid_data to self._blank_data to avoid confusing
 	names

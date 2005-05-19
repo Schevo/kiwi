@@ -270,7 +270,7 @@ class SlaveView(gobject.GObject):
 
         self.slaves = {}
 
-
+    # Global validations
     def check_widgets_validity(self):
         """Checks if there are widgets with invalid data.
         Calls the registered validate function
@@ -281,13 +281,24 @@ class SlaveView(gobject.GObject):
         for widget_name in self.widgets:
             widget = self.get_widget(widget_name)
             if isinstance(widget, WidgetProxy.MixinSupportValidation):
-                if not widget.valid_data:
+                if not widget.is_correct():
                     valid = False
                     break
-        
+
         self._validate_function(valid)
 
     def register_validate_function(self, function):
+        """The signature of the validate function is:
+
+        def function(is_valid):
+
+        or, if it is a method:
+
+        def function(self, is_valid):
+
+        where the 'is_valid' parameter is True if all the widgets have
+        valid data or False otherwise.
+        """
         self._validate_function = function
 
     def _init_glade_adaptor(self):
@@ -548,7 +559,10 @@ class SlaveView(gobject.GObject):
         else:
             raise typeerror(
                 "widget to be replaced must be wrapped in eventbox")
-     
+
+        # when attaching a slave we usually want it visible
+        parent.show_all()
+        
         # call slave's callback
         slave.on_attach(self)
 
