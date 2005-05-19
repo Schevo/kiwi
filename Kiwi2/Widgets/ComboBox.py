@@ -22,6 +22,8 @@
 # Author(s): Christian Reis <kiko@async.com.br>
 #
 
+"""Defines enhanced versions of GtkComboBox and GtkComboBoxEntry"""
+
 import time
 
 import gobject

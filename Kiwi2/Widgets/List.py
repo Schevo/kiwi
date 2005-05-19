@@ -21,6 +21,8 @@
 # 
 # Author(s): Lorenzo Gil Sanchez <lgs@sicem.biz>
 
+"""Defines an enhanced version of GtkTreeView"""
+
 import datetime
 
 from Kiwi2.accessors import kgetattr

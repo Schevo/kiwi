@@ -1,3 +1,6 @@
+
+"""Defines enhanced versions of various GTK+ widgets"""
+
 from List import List
 from Entry import Entry
 from Label import Label

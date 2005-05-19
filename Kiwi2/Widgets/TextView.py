@@ -22,6 +22,8 @@
 # Author(s): Christian Reis <kiko@async.com.br>
 #
 
+"""Defines an enhanced version of GtkTextView"""
+
 import time
 
 from Kiwi2.initgtk import gtk, gobject

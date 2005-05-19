@@ -22,6 +22,8 @@
 # Author(s): Christian Reis <kiko@async.com.br>
 #
 
+"""Defines an enhanced version of GtkCheckButton"""
+
 from Kiwi2.initgtk import gtk, gobject
 from Kiwi2.Widgets import WidgetProxy
 from Kiwi2.utils import gsignal
