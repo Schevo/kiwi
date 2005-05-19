@@ -58,14 +58,18 @@ class Entry(gtk.Entry, WidgetProxy.MixinSupportValidation):
         # this attribute stores the info on where to draw icons and paint
         # the background
         self._widget_to_draw = self
+
+        if gtk.pygtk_version < (2,6):
+            self.chain_expose_event = self.chain
+        else:
+            self.chain_expose_event = gtk.Entry.do_expose_event
         
     def do_changed(self):
         """Called when the content of the entry changes.
 
         Sets an internal variable that stores the last time the user
         changed the entry
-        """
-        
+        """        
         self._last_change_time = time.time()
         self.emit('content-changed')
         self.chain()
@@ -98,11 +102,8 @@ class Entry(gtk.Entry, WidgetProxy.MixinSupportValidation):
         
         Draws information and mandatory icons when necessary
         """
-        if gtk.pygtk_version < (2,6):
-            result = self.chain(event)
-        else:
-            result = gtk.Entry.do_expose_event(self, event)
-
+        result = self.chain_expose_event(event)
+        
         # this attribute stores the info on where to draw icons and paint
         # the background
         # it's been defined here because it's when we have gdk window available

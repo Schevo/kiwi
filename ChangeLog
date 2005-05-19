@@ -1,7 +1,9 @@
 2005-05-19  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
-	* Kiwi2/Widgets/WidgetProxy.py: 
 	* Kiwi2/Widgets/Entry.py: 
+	(Entry.__init__): setup the chain function in the constructor
+	instead of the expose handler
+
 	* Kiwi2/Widgets/ComboBox.py: 
 	- Make expose events work with GTK 2.4 and 2.6
 	- Put as much validation code as possible in MixinSupportValidation
