@@ -7,6 +7,8 @@
 	* Kiwi2/utils.py: Update docstrings, to make epydoc happy
 	* doc/Makefile: Clean up and add some more files
 
+	* Kiwi2/WidgetProxies: Remove
+
 2005-05-19  Johan Dahlin  <jdahlin@async.com.br>
 
 	* AUTHORS:

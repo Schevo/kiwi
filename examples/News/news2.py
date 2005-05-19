@@ -27,10 +27,12 @@ news = [
 # Specify the columns: one for each attribute of NewsItem, the URL
 # column invisible by default
 my_columns = [ Column("title", sorted=True), 
-               Column("author"), 
+               Column("author", justify=gtk.JUSTIFY_RIGHT), 
                Column("url", title="URL", visible=False) ]
 
 kiwilist = List(my_columns, news)
-slave = Delegates.SlaveDelegate(toplevel=kiwilist)
-slave.show_all()
+w = gtk.Window()
+w.set_size_request(600, 250)
+w.add(kiwilist)
+w.show_all()
 gtk.main()
