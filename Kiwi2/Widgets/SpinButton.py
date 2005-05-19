@@ -33,7 +33,7 @@ class SpinButton(gtk.SpinButton, WidgetProxy.MixinSupportValidation):
     WidgetProxy.implementsIProxy()
     WidgetProxy.implementsIMandatoryProxy()
 
-    gsignal('value-changed', 'override')
+    gsignal('changed', 'override')
     # mandatory widgets need to have this signal connected
     gsignal('expose-event', 'override')
     
@@ -43,7 +43,6 @@ class SpinButton(gtk.SpinButton, WidgetProxy.MixinSupportValidation):
         # or float for spinbuttons
         WidgetProxy.MixinSupportValidation.__init__(self, data_type=int)
         gtk.SpinButton.__init__(self)
-        self.connect('output', self._on_spinbutton__output)
         
         # this attribute stores the info on where to draw icons and paint
         # the background
@@ -51,10 +50,9 @@ class SpinButton(gtk.SpinButton, WidgetProxy.MixinSupportValidation):
         
         # due to changes on pygtk 2.6 we have to make some ajustments here
         if gtk.pygtk_version < (2,6):
-            self.do_expose_event = self.chain
-        
-    def _on_spinbutton__output(self, *args):
-        self.emit('content-changed')
+            self.chain_expose = self.chain
+        else:
+            self.chain_expose = lambda e: gtk.SpinButton.do_expose_event(self, e)
         
     def set_data_type(self, data_type):
         """Overriden from super class. Since spinbuttons should
@@ -67,21 +65,14 @@ class SpinButton(gtk.SpinButton, WidgetProxy.MixinSupportValidation):
             self._data_type = old_datatype
             raise TypeError("SpinButtons only accept integer or float values")
         
-    def do_value_changed(self):
-
+    def do_changed(self):
         self._last_change_time = time.time()        
-        
-        if len(self.get_text()) == 0 and self._mandatory:
-            self._draw_mandatory_icon = True
-        else:
-            self._draw_mandatory_icon = False
-            
         self.emit('content-changed')
         self.chain()
 
     def read(self):
-        text = self.get_value()
-        data = self._validate_data(self.type2str(text))
+        text = self.get_text()
+        data = self._validate_data(text)
 
         return data
 
@@ -90,8 +81,9 @@ class SpinButton(gtk.SpinButton, WidgetProxy.MixinSupportValidation):
         
         if data is ValueUnset or data is None:
             self.set_text("")
+            self.draw_mandatory_icon_if_needed()
         else:
-            self.set_value(data)
+            self.set_data(data)
 
     def do_expose_event(self, event):
         """Expose-event signal are triggered when a redraw of the widget
@@ -99,7 +91,7 @@ class SpinButton(gtk.SpinButton, WidgetProxy.MixinSupportValidation):
         
         Draws information and mandatory icons when necessary
         """        
-        result = gtk.SpinButton.do_expose_event(self, event)
+        result = self.chain_expose(event)
         
         # this attribute stores the info on where to draw icons and paint
         # the background

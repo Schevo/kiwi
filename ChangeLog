@@ -1,5 +1,9 @@
 2005-05-19  Lorenzo Gil Sanchez  <lgs@sicem.biz>
 
+	* Kiwi2/Widgets/SpinButton.py: simplify this class but using just
+	the changed signal and forget about value-changed and output signals.
+	Fix it for gtk+ 2.4 using the same technique as in the Entry
+
 	* Kiwi2/Widgets/Entry.py: 
 	(Entry.__init__): setup the chain function in the constructor
 	instead of the expose handler

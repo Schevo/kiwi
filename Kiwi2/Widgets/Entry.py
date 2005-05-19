@@ -60,9 +60,9 @@ class Entry(gtk.Entry, WidgetProxy.MixinSupportValidation):
         self._widget_to_draw = self
 
         if gtk.pygtk_version < (2,6):
-            self.chain_expose_event = self.chain
+            self.chain_expose = self.chain
         else:
-            self.chain_expose_event = gtk.Entry.do_expose_event
+            self.chain_expose = lambda e: gtk.Entry.do_expose_event(self, e)
         
     def do_changed(self):
         """Called when the content of the entry changes.
@@ -102,7 +102,7 @@ class Entry(gtk.Entry, WidgetProxy.MixinSupportValidation):
         
         Draws information and mandatory icons when necessary
         """
-        result = self.chain_expose_event(event)
+        result = self.chain_expose(event)
         
         # this attribute stores the info on where to draw icons and paint
         # the background
