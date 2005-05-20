@@ -322,7 +322,7 @@ class List(gtk.ScrolledWindow):
         self._sort_column_definition_index = -1
 
         if self._has_enough_type_information():
-            self._setup()
+            self._setup_columns()
 
         if instance_list is not None:
             self.treeview.freeze_notify()
@@ -338,14 +338,6 @@ class List(gtk.ScrolledWindow):
 
 #        self.__setup_popup_button()
 
-    def _setup(self):
-        """Post initialize the List. This should be called everytime
-        a critical component is changed (like a column definition).
-        """
-
-        # fine grain setup
-        self._setup_columns()
-        
     # Columns handling
     def _has_enough_type_information(self):
         """True if all the columns has a type set.
@@ -692,7 +684,7 @@ class List(gtk.ScrolledWindow):
             self._get_types(instance_list[0])
             self._create_columns()
             if not self._columns_configured:
-                self._setup()
+                self._setup_columns()
             
         for instance in instance_list:
             self.model.append((instance,))
@@ -825,7 +817,7 @@ class List(gtk.ScrolledWindow):
         self._clear_columns()
         self._create_columns()
         if self._has_enough_type_information():
-            self._setup()
+            self._setup_columns()
         
     def do_get_property(self, pspec):
         if pspec.name == 'column-definitions':
@@ -849,7 +841,7 @@ class List(gtk.ScrolledWindow):
             self._get_types(instance)
             self._create_columns()
             if not self._columns_configured:
-                self._setup()
+                self._setup_columns()
 
         # Freeze and save original selection mode to avoid blinking
         self.treeview.freeze_notify()
