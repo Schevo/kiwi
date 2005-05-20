@@ -310,9 +310,9 @@ class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin,
 
     def read(self):
         text = self.child.get_text()
-        data = self._validate_data(text)
+        self._validate_data(text)
         
-        return data
+        return self.get_selected_data()
 
     def do_validate(self, data):
         """ComboBoxEntry has a validate default handler that check if the

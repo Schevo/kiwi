@@ -1,5 +1,10 @@
 2005-05-20  Johan Dahlin  <jdahlin@async.com.br>
 
+	* Kiwi2/Widgets/ComboBox.py: First validate, then return
+	return get_selected_data(), which will return the data if you have
+	some, otherwise the label will be returned. Fixes bug reported 
+	by Henrique.
+
 	* Kiwi2/Widgets/List.py: Clean up justification handling.
 	Rename col_definition to column, and always refer to treeview columns
 	as treeview_column, to avoid confusion.
