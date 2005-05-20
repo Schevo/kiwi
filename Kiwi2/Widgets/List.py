@@ -286,6 +286,7 @@ class List(gtk.ScrolledWindow):
 
         self._columns_created = False
         self._columns_configured = False
+        self._autosize = True
         
         self.model = gtk.ListStore(object)
         self.model.set_sort_func(0, self._sort_function)
@@ -410,14 +411,9 @@ class List(gtk.ScrolledWindow):
         if self._columns_configured:
             return
         
-        autosize = True
         for i, column in enumerate(self._columns):
             treeview_column = self.treeview.get_column(i)
             self._setup_column(column, i, treeview_column)
-            if column.width is not None:
-                autosize = False
-
-        self._autosize = autosize
 
         #clist.enable_column_select()
 
@@ -477,6 +473,9 @@ class List(gtk.ScrolledWindow):
             self._sort_column_definition_index = col_index
             treeview_column.set_sort_indicator(True)
             
+        if column.width is not None:
+            self._autosize = False
+
 #%s where I expected a GtkButton""" % (column.tooltip, i, col))
             #if column.decimal_separator:
             ## XXX: This is a hack. I now see we need to keep the data model
