@@ -383,6 +383,9 @@ class List(gtk.ScrolledWindow):
                       specify type in Column constructor.""" % c.attribute)
 
     def _create_columns(self):
+        if self._columns_created:
+            return
+        
         """Create the treeview columns"""
         for column in self._columns:
             self._create_column(column)
@@ -699,8 +702,7 @@ class List(gtk.ScrolledWindow):
 
         if not self._has_enough_type_information():
             self._get_types(instance_list[0])
-            if not self._columns_created:
-                self._create_columns()
+            self._create_columns()
             if not self._columns_configured:
                 self._setup()
             
@@ -857,8 +859,7 @@ class List(gtk.ScrolledWindow):
 
         if not self._has_enough_type_information():
             self._get_types(instance)
-            if not self._columns_created:
-                self._create_columns()
+            self._create_columns()
             if not self._columns_configured:
                 self._setup()
 
