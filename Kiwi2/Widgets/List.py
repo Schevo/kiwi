@@ -273,7 +273,7 @@ class List(gtk.ScrolledWindow):
     #  - order: one of 'ascending', 'descending' or ''. Default to ''
     gproperty('column-definitions', str, nick="ColumnDefinitions")
     
-    def __init__(self, column_definitions=[],
+    def __init__(self, columns=[],
                  instance_list=None,
                  mode=gtk.SELECTION_BROWSE):
         """Create a new Kiwi TreeView.
@@ -310,11 +310,11 @@ class List(gtk.ScrolledWindow):
         self._popup = gtk.Menu()
 
         # allow to specify only one column
-        if isinstance(column_definitions, Column):
-            column_definitions = [column_definitions]
+        if isinstance(columns, Column):
+            columns = [columns]
 
         # when setting the column definition the columns are created
-        self.set_column_definitions(column_definitions)
+        self.set_columns(columns)
 
         # by default we are unordered. This index points to the column
         # definition of the column that dictates the order, in case there is
@@ -330,7 +330,7 @@ class List(gtk.ScrolledWindow):
             self.treeview.thaw_notify()
 
         if self._sort_column_definition_index != -1:
-            cd = self._column_definitions[self._sort_column_definition_index]
+            cd = self._columns[self._sort_column_definition_index]
             self.model.set_sort_column_id(0, cd.order)
 
         # Set selection mode last to avoid spurious events
@@ -357,7 +357,7 @@ class List(gtk.ScrolledWindow):
         """True if all the columns has a type set.
         This is used to know if we can create the treeview columns.
         """
-        for c in self._column_definitions:
+        for c in self._columns:
             if c.data_type is None:
                 return False
         return True
@@ -366,7 +366,7 @@ class List(gtk.ScrolledWindow):
         """Iterates through columns, using the type attribute when found or
         the type of the associated attribute from the sample instance provided.
         """
-        for c in self._column_definitions:
+        for c in self._columns:
             if c.data_type is not None:
                 continue
             # steal attribute from sample instance and use its type
@@ -384,18 +384,18 @@ class List(gtk.ScrolledWindow):
 
     def _create_columns(self):
         """Create the treeview columns"""
-        for i, col in enumerate(self._column_definitions):
+        for i, col in enumerate(self._columns):
             self._create_column(col, i)
 
         self._columns_created = True
         self._columns_configured = False
         
-    def _create_column(self, col_definition, col_index):
+    def _create_column(self, column, col_index):
         treeview_column = gtk.TreeViewColumn()
         # we need to set our own widget because otherwise
         # __get_column_button won't work
 
-        label = gtk.Label(col_definition.title)
+        label = gtk.Label(column.title)
         label.show()
         treeview_column.set_widget(label)
         treeview_column.set_resizable(True)
@@ -404,7 +404,7 @@ class List(gtk.ScrolledWindow):
         self.treeview.append_column(treeview_column)
 
         # add a menuitem in the popup
-        menuitem = gtk.CheckMenuItem(col_definition.title)
+        menuitem = gtk.CheckMenuItem(column.title)
         # we store the menuitem in the column so we can change its value later
         treeview_column.set_data('menuitem', menuitem)
         menuitem.connect("activate", self._on_menuitem__activate,
@@ -422,7 +422,7 @@ class List(gtk.ScrolledWindow):
             return
         
         autosize = True
-        for i, column in enumerate(self._column_definitions):
+        for i, column in enumerate(self._columns):
             treeview_column = self.treeview.get_column(i)
             self._setup_column(column, i, treeview_column)
             if column.width is not None:
@@ -434,16 +434,16 @@ class List(gtk.ScrolledWindow):
 
         self._columns_configured = True
 
-    def _setup_column(self, col_definition, col_index, treeview_column):
+    def _setup_column(self, column, col_index, treeview_column):
 
         renderer = self._create_best_renderer_for_type\
-                 (col_definition.data_type, col_index)
+                 (column.data_type, col_index)
         
-        justify = col_definition.justify
+        justify = column.justify
         # If we don't specify a justification, right align it for int/float
         # and left align it for everything else. 
         if (justify is None and 
-            issubclass(col_definition.data_type, (int, float))):
+            issubclass(column.data_type, (int, float))):
             justify = gtk.JUSTIFY_RIGHT
         else:
             justify = gtk.JUSTIFY_LEFT
@@ -460,27 +460,27 @@ class List(gtk.ScrolledWindow):
             renderer.set_property("xalign", xalign)
             
         # You can't subclass bool, so this is okay
-        if (col_definition.data_type is bool and
-            col_definition.format):
+        if (column.data_type is bool and
+            column.format):
             raise TypeError("format is not supported for boolean columns") 
 
         treeview_column.pack_start(renderer)
         treeview_column.set_cell_data_func(renderer, self._cell_data_func,
-                                           col_definition)
-        treeview_column.set_visible(col_definition.visible)
+                                           column)
+        treeview_column.set_visible(column.visible)
         menuitem = treeview_column.get_data('menuitem')
-        menuitem.set_active(col_definition.visible)
+        menuitem.set_active(column.visible)
 
         treeview_column.connect("clicked", self._on_column__clicked, col_index)
-        if col_definition.width is not None:
+        if column.width is not None:
             treeview_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
-            treeview_column.set_fixed_width(col_definition.width)
-        if col_definition.tooltip is not None:
+            treeview_column.set_fixed_width(column.width)
+        if column.tooltip is not None:
             widget = self.__get_column_button(treeview_column)
             if widget is not None:
-                self._tooltips.set_tip(widget, col_definition.tooltip)
+                self._tooltips.set_tip(widget, column.tooltip)
 
-        if col_definition.expand:
+        if column.expand:
             # Default is False
             treeview_column.set_expand(True)
             
@@ -552,8 +552,8 @@ class List(gtk.ScrolledWindow):
     def _on_renderer__edited(self, renderer, path, new_text, column_index):
         row_iter = self.model.get_iter(path)
         instance = self.model.get_value(row_iter, 0)
-        model_attribute = self._column_definitions[column_index].attribute
-        data_type = self._column_definitions[column_index].data_type
+        model_attribute = self._columns[column_index].attribute
+        data_type = self._columns[column_index].data_type
         value = new_text
         if data_type in (int, float):
             value = data_type(new_text)
@@ -565,7 +565,7 @@ class List(gtk.ScrolledWindow):
         row_iter = self.model.get_iter(path)
         instance = self.model.get_value(row_iter, 0)
         value = not renderer.get_active()
-        model_attribute = self._column_definitions[column_index].attribute
+        model_attribute = self._columns[column_index].attribute
         setattr(instance, model_attribute, value)
 
     def _clear_columns(self):
@@ -596,7 +596,7 @@ class List(gtk.ScrolledWindow):
         """Return the index of the first column with the sorted attribute
         set to True.
         """
-        for i, c in enumerate(self._column_definitions):
+        for i, c in enumerate(self._columns):
             if c.sorted:
                 return i
         return -1        
@@ -604,7 +604,7 @@ class List(gtk.ScrolledWindow):
     def _sort_function(self, model, iter1, iter2):
         obj1 = model.get_value(iter1, 0)
         obj2 = model.get_value(iter2, 0)
-        cd = self._column_definitions[self._sort_column_definition_index]
+        cd = self._columns[self._sort_column_definition_index]
         attr = cd.attribute
         value1 = kgetattr(obj1, attr)
         value2 = kgetattr(obj2, attr)
@@ -622,7 +622,7 @@ class List(gtk.ScrolledWindow):
         # reverse the old order or start with SORT_DESCENDING if there was no
         # previous order
         self._sort_column_definition_index = column_index
-        cd = self._column_definitions[column_index]
+        cd = self._columns[column_index]
 
         # maybe it's the first time this column is ordered
         if cd.order is None:
@@ -805,10 +805,10 @@ class List(gtk.ScrolledWindow):
     #
     # Public API
     #
-    def get_column_definitions(self):
-        return self._column_definitions_string
+    def get_columns(self):
+        return self._columns_string
 
-    def set_column_definitions(self, value):
+    def set_columns(self, value):
         """This function can be called in two different ways:
          - value is a string with the column definitions in a special format
            (see column-definitions property at the beginning of this class)
@@ -816,22 +816,22 @@ class List(gtk.ScrolledWindow):
          - value is a list/tuple of Column objects
         """
         if isinstance(value, basestring):
-            self._column_definitions_string = value
-            self._column_definitions = []            
+            self._columns_string = value
+            self._columns = []            
             for col in value.split('^'):
                 if not col:
                     continue
                 c = Column()
                 success = c.set_from_string(col)
                 if success:
-                    self._column_definitions.append(c)
+                    self._columns.append(c)
                 
         elif isinstance(value, (list, tuple)):
-            self._column_definitions = value
+            self._columns = value
             cols = []
             for col in value:
                 cols.append(str(col))
-            self._column_definitions_string = '^'.join(cols)
+            self._columns_string = '^'.join(cols)
         else:
             raise ValueError("value should be a string of a list of columns")
 
@@ -842,13 +842,13 @@ class List(gtk.ScrolledWindow):
         
     def do_get_property(self, pspec):
         if pspec.name == 'column-definitions':
-            return self.get_column_definitions()
+            return self.get_columns()
         else:
             raise AttributeError('Unknown property %s' % pspec.name)
 
     def do_set_property(self, pspec, value):
         if pspec.name == 'column-definitions':
-            self.set_column_definitions(value)
+            self.set_columns(value)
         else:
             raise AttributeError('Unknown property %s' % pspec.name)
     
@@ -872,9 +872,9 @@ class List(gtk.ScrolledWindow):
         
 ##         if not self._typelist:
 ##             self._typelist = self._get_types(instance,
-##                                              self._column_definitions)
+##                                              self._columns)
 ##             clist.set_typelist(self._typelist)
-##             self._justify_columns(self._column_definitions, self._typelist)
+##             self._justify_columns(self._columns, self._typelist)
 
         row_iter = self.model.append((instance,))
         if self._autosize:
