@@ -298,7 +298,7 @@ class List(gtk.ScrolledWindow):
         # these tooltips are used for the columns
         self._tooltips = gtk.Tooltips()
 
-        # convinience connections
+        # convenience connections
         selection = self.treeview.get_selection()
         id = selection.connect("changed", self._on_selection__changed)
         self._selection_changed_id = id
