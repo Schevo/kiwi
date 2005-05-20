@@ -718,12 +718,9 @@ class List(gtk.ScrolledWindow):
         """Returns the treeiter where this instance is using a linear search.
         If the instance is not in the list it returns None
         """
-        row_iter = self.model.get_iter_first()
-        while row_iter:
-            model_instance = self.model.get_value(row_iter, 0)
-            if model_instance is instance:
-                return row_iter
-            row_iter = self.model.iter_next(row_iter)
+        for row in self.model:
+            if row[0] is instance:
+                return row.iter
 
     def get_iter(self, instance):
         iter = self._get_iter_from_instance(instance)
@@ -902,9 +899,12 @@ class List(gtk.ScrolledWindow):
             raise RuntimeError(msg)
 
         # linear search for the instance to remove
-        iter = self.get_iter(instance)
-        # now is safe to remove it
-        self.model.remove(iter)
+        iter = self._get_iter_from_instance(instance)
+        if iter:
+            self.model.remove(iter)
+            return True
+            
+        return False
 
     def update_instance(self, new_instance):
         iter = self.get_iter(new_instance)
