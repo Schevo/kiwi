@@ -1,3 +1,7 @@
+2005-05-20  Johan Dahlin  <jdahlin@async.com.br>
+
+	* Kiwi2/Widgets/List.py: Clean up justification handling.
+
 2005-05-19  Johan Dahlin  <jdahlin@async.com.br>
 
 	* Kiwi2/Controllers.py:

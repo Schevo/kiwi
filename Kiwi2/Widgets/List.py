@@ -440,18 +440,25 @@ class List(gtk.ScrolledWindow):
                  (col_definition.data_type, col_index)
         
         justify = col_definition.justify
-        
+        # If we don't specify a justification, right align it for int/float
+        # and left align it for everything else. 
+        if (justify is None and 
+            issubclass(col_definition.data_type, (int, float))):
+            justify = gtk.JUSTIFY_RIGHT
+        else:
+            justify = gtk.JUSTIFY_LEFT
+            
         if justify is not None:
             if justify == gtk.JUSTIFY_RIGHT:
-                renderer.set_property("xalign", 1)
+                xalign = 1.0
             elif justify == gtk.JUSTIFY_CENTER:
-                renderer.set_property("xalign", 0.5)
-            else: # align to left
-                renderer.set_property("xalign", 0)
-        
-        elif issubclass(col_definition.data_type, (int, float)):
-            renderer.set_property("xalign", 1)
-
+                xalign = 0.5
+            elif justify == gtk.JUSTIFY_LEFT:
+                xalign = 0.0
+            else:
+                raise AssertionError
+            renderer.set_property("xalign", xalign)
+            
         # You can't subclass bool, so this is okay
         if (col_definition.data_type is bool and
             col_definition.format):
