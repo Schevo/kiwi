@@ -384,13 +384,13 @@ class List(gtk.ScrolledWindow):
 
     def _create_columns(self):
         """Create the treeview columns"""
-        for i, col in enumerate(self._columns):
-            self._create_column(col, i)
+        for column in self._columns:
+            self._create_column(column)
 
         self._columns_created = True
         self._columns_configured = False
         
-    def _create_column(self, column, col_index):
+    def _create_column(self, column):
         treeview_column = gtk.TreeViewColumn()
         # we need to set our own widget because otherwise
         # __get_column_button won't work
