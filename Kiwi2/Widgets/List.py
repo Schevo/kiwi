@@ -342,12 +342,6 @@ class List(gtk.ScrolledWindow):
         """Post initialize the List. This should be called everytime
         a critical component is changed (like a column definition).
         """
-        # are we sorted?
-        self._sort_column_definition_index = self._which_sort()
-        i = self._sort_column_definition_index
-        if i != -1:
-            treeview_column = self.treeview.get_column(i)
-            treeview_column.set_sort_indicator(True)
 
         # fine grain setup
         self._setup_columns()
@@ -486,6 +480,10 @@ class List(gtk.ScrolledWindow):
         if column.expand:
             # Default is False
             treeview_column.set_expand(True)
+
+        if column.sorted:
+            self._sort_column_definition_index = col_index
+            treeview_column.set_sort_indicator(True)
             
 #%s where I expected a GtkButton""" % (column.tooltip, i, col))
             #if column.decimal_separator:
@@ -594,16 +592,6 @@ class List(gtk.ScrolledWindow):
     def _select_and_focus_row(self, row_iter):
         self.treeview.set_cursor(self.model.get_path(row_iter))
                     
-    # sorting methods
-    def _which_sort(self):
-        """Return the index of the first column with the sorted attribute
-        set to True.
-        """
-        for i, c in enumerate(self._columns):
-            if c.sorted:
-                return i
-        return -1        
-
     def _sort_function(self, model, iter1, iter2):
         obj1 = model.get_value(iter1, 0)
         obj2 = model.get_value(iter2, 0)

@@ -3,6 +3,7 @@
 	* Kiwi2/Widgets/List.py: Clean up justification handling.
 	Rename col_definition to column, and always refer to treeview columns
 	as treeview_column, to avoid confusion.
+	(List): Setup sorting in a slightly saner way
 
 2005-05-19  Johan Dahlin  <jdahlin@async.com.br>
 
