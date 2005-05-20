@@ -683,8 +683,7 @@ class List(gtk.ScrolledWindow):
         if not self._has_enough_type_information():
             self._get_types(instance_list[0])
             self._create_columns()
-            if not self._columns_configured:
-                self._setup_columns()
+            self._setup_columns()
             
         for instance in instance_list:
             self.model.append((instance,))
@@ -840,8 +839,7 @@ class List(gtk.ScrolledWindow):
         if not self._has_enough_type_information():
             self._get_types(instance)
             self._create_columns()
-            if not self._columns_configured:
-                self._setup_columns()
+            self._setup_columns()
 
         # Freeze and save original selection mode to avoid blinking
         self.treeview.freeze_notify()
