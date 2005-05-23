@@ -533,7 +533,8 @@ class List(gtk.ScrolledWindow):
 
     def _on_menuitem__activate(self, menuitem, treeview_column):
         treeview_column.set_visible(menuitem.get_active())
-
+        import code; code.interact(local=locals())
+        
     def _on_renderer__edited(self, renderer, path, new_text, column_index):
         row_iter = self.model.get_iter(path)
         instance = self.model.get_value(row_iter, 0)
