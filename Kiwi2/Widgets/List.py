@@ -284,7 +284,7 @@ class List(gtk.ScrolledWindow):
         # menu
         self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
 
-        self._columns_created = False
+        self._rcolumns_created = False
         self._columns_configured = False
         self._autosize = True
         
@@ -333,8 +333,6 @@ class List(gtk.ScrolledWindow):
 
         # Set selection mode last to avoid spurious events
         self.set_selection_mode(mode)
-
-#        self.__setup_popup_button()
 
     # Columns handling
     def _has_enough_type_information(self):
@@ -400,7 +398,7 @@ class List(gtk.ScrolledWindow):
         self._popup.append(menuitem)
 
         # setup the button to show the popup menu
-        button = self.__get_column_button(treeview_column)
+        button = self._get_column_button(treeview_column)
         button.connect('button-release-event',
                        self._on_header__button_release_event)
 
@@ -411,8 +409,6 @@ class List(gtk.ScrolledWindow):
         for i, column in enumerate(self._columns):
             treeview_column = self.treeview.get_column(i)
             self._setup_column(column, i, treeview_column)
-
-        #clist.enable_column_select()
 
         self._columns_configured = True
 
@@ -458,7 +454,7 @@ class List(gtk.ScrolledWindow):
             treeview_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
             treeview_column.set_fixed_width(column.width)
         if column.tooltip is not None:
-            widget = self.__get_column_button(treeview_column)
+            widget = self._get_column_button(treeview_column)
             if widget is not None:
                 self._tooltips.set_tip(widget, column.tooltip)
 
@@ -473,7 +469,7 @@ class List(gtk.ScrolledWindow):
         if column.width is not None:
             self._autosize = False
 
-#%s where I expected a GtkButton""" % (column.tooltip, i, col))
+        #%s where I expected a GtkButton""" % (column.tooltip, i, col))
             #if column.decimal_separator:
             ## XXX: This is a hack. I now see we need to keep the data model
             ## in the CList too, but it's too late to add this. Anyway,
@@ -702,12 +698,11 @@ class List(gtk.ScrolledWindow):
     def get_iter(self, instance):
         iter = self._get_iter_from_instance(instance)
         if iter is None: 
-            msg = "The instance %s is not in the list."
-            raise ValueError(msg % instance)
+            raise ValueError("The instance %s is not in the list." % instance)
         return iter
         
     # hacks
-    def __get_column_button(self, column):
+    def _get_column_button(self, column):
         """Return the button widget of a particular TreeViewColumn.
 
         This hack is needed since that widget is private of the TreeView but
@@ -715,64 +710,65 @@ class List(gtk.ScrolledWindow):
 
         Use this function at your own risk
         """
+        
         button = column.get_widget()
         assert button is not None, ("You must call column.set_widget() "
-            "before calling __get_column_button")
+            "before calling _get_column_button")
+        
         while not isinstance(button, gtk.Button):
             button = button.get_parent()
 
         return button
 
     # start of the hack to put a button on top of the vertical scrollbar
-    def __setup_popup_button(self):
+    def _setup_popup_button(self):
         """Put a button on top of the vertical scrollbar to show the popup
         menu.
         Internally it uses a POPUP window so you can tell how *Evil* is this.
         """
-        self.__popup_window = gtk.Window(gtk.WINDOW_POPUP)
-        self.__popup_button = gtk.Button('*')
-        self.__popup_window.add(self.__popup_button)
-        self.__popup_window.show_all()
+        self._popup_window = gtk.Window(gtk.WINDOW_POPUP)
+        self._popup_button = gtk.Button('*')
+        self._popup_window.add(self._popup_button)
+        self._popup_window.show_all()
         
-        self.forall(self.__find_vertical_scrollbar)
+        self.forall(self._find_vertical_scrollbar)
         self.connect('size-allocate', self._on_scrolled_window__size_allocate)
         self.connect('realize', self._on_scrolled_window__realize)
 
-    def __find_vertical_scrollbar(self, widget):
+    def _find_vertical_scrollbar(self, widget):
         """This method is called from a .forall() method in the ScrolledWindow.
         It just save a reference to the vertical scrollbar for doing evil
         things later.
         """
         if isinstance(widget, gtk.VScrollbar):
-            self.__vscrollbar = widget
+            self._vscrollbar = widget
 
-
-    def __get_header_height(self):
+    def _get_header_height(self):
         treeview_column = self.treeview.get_column(0)
-        button = self.__get_column_button(treeview_column)
+        button = self._get_column_button(treeview_column)
         alloc = button.get_allocation()
         return alloc.height
 
     def _on_scrolled_window__realize(self, widget):
         toplevel = widget.get_toplevel()
-        self.__popup_window.set_transient_for(toplevel)
-        self.__popup_window.set_destroy_with_parent(True)
+        self._popup_window.set_transient_for(toplevel)
+        self._popup_window.set_destroy_with_parent(True)
         
     def _on_scrolled_window__size_allocate(self, widget, allocation):
         """Resize the Vertical Scrollbar to make it smaller and let space
         for the popup button. Also put that button there.
         """
-        old_alloc = self.__vscrollbar.get_allocation()
-        height = self.__get_header_height()
+        old_alloc = self._vscrollbar.get_allocation()
+        height = self._get_header_height()
         new_alloc = gtk.gdk.Rectangle(old_alloc.x, old_alloc.y + height,
                                       old_alloc.width,
                                       old_alloc.height - height)
-        self.__vscrollbar.size_allocate(new_alloc)
+        self._vscrollbar.size_allocate(new_alloc)
         # put the popup_window in its position
         gdk_window = self.window
         if gdk_window is not None:
             x, y = gdk_window.get_origin()
-            self.__popup_window.move(x + old_alloc.x, y + old_alloc.y)
+            self._popup_window.move(x + old_alloc.x, y + old_alloc.y)
         
     # end of the popup button hack
 
@@ -789,6 +785,7 @@ class List(gtk.ScrolledWindow):
 
          - value is a list/tuple of Column objects
         """
+        
         if isinstance(value, basestring):
             self._columns_string = value
             self._columns = []            
@@ -802,10 +799,7 @@ class List(gtk.ScrolledWindow):
                 
         elif isinstance(value, (list, tuple)):
             self._columns = value
-            cols = []
-            for col in value:
-                cols.append(str(col))
-            self._columns_string = '^'.join(cols)
+            self._columns_string = '^'.join([str(col) for col in value])
         else:
             raise ValueError("value should be a string of a list of columns")
 
@@ -842,12 +836,6 @@ class List(gtk.ScrolledWindow):
         old_mode = self.get_selection_mode()
         self.set_selection_mode(gtk.SELECTION_SINGLE)
         
-##         if not self._typelist:
-##             self._typelist = self._get_types(instance,
-##                                              self._columns)
-##             clist.set_typelist(self._typelist)
-##             self._justify_columns(self._columns, self._typelist)
-
         row_iter = self.model.append((instance,))
         if self._autosize:
             self.treeview.columns_autosize()
@@ -869,9 +857,8 @@ class List(gtk.ScrolledWindow):
         returns True.
         """
         if not self._has_enough_type_information():
-            msg = ("There is no columns neither data on the list yet so you "
-                   "can not remove any instance")
-            raise RuntimeError(msg)
+            raise RuntimeError(("There is no columns neither data on the "
+                                "list yet so you can not remove any instance"))
 
         # linear search for the instance to remove
         iter = self._get_iter_from_instance(instance)
@@ -886,7 +873,8 @@ class List(gtk.ScrolledWindow):
         self.model.row_changed(self.model.get_path(iter), iter)
         
     def set_column_visibility(self, column_index, visibility):
-        self.treeview.get_column(column_index).set_visible(visibility)
+        column = self.treeview.get_column(column_index)
+        colum.set_visible(visibility)
 
     def get_selection_mode(self):
         selection = self.treeview.get_selection()
@@ -914,9 +902,11 @@ class List(gtk.ScrolledWindow):
         if selection:
             model, paths = selection.get_selected_rows()
             if paths:
-                result = [model.get_value(model.get_iter(p), 0) for p in paths]
-                return tuple(result)
-        return ()
+                result = tuple([model[path][0] for (path,) in paths])
+        else:
+            result = ()
+            
+        return result
         
     def add_list(self, list, clear=True, restore_selection=False,
                  progress_handler=None):
