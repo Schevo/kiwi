@@ -284,7 +284,7 @@ class List(gtk.ScrolledWindow):
         # menu
         self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
 
-        self._rcolumns_created = False
+        self._columns_created = False
         self._columns_configured = False
         self._autosize = True
         
