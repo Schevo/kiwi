@@ -248,7 +248,80 @@ class Column:
         # XXX: expand, remember to sync with __str__
         
         return True
+
+class ContextMenu(gtk.Menu):
+    """
+    ContextMenu is a wrapper for the menu that's displayed when right
+    clicking on a column header. It monitors the treeview and rebuilds
+    when columns are added, removed or moved.
+    """
     
+    def __init__(self, treeview):
+        gtk.Menu.__init__(self)
+        
+        self._dirty = True
+        self.signal_ids = []
+        self.treeview = treeview
+        self.treeview.connect('columns-changed',
+                              self._on_treeview__columns_changed)
+        self._create()
+        
+    def clean(self):
+        for child in self.get_children():
+            self.remove(child)
+            
+        for menuitem, signal_id in self.signal_ids:
+            menuitem.disconnect(signal_id)
+        self.signal_ids = []
+
+    def popup(self, event):
+        self._create()
+        gtk.Menu.popup(self, None, None, None,
+                       event.button, event.time)
+        
+    def _create(self):
+        if not self._dirty:
+            return
+        
+        self.clean()
+        
+        for column in self.treeview.get_columns():
+            header_widget = column.get_widget()
+            title = header_widget.get_text()
+                
+            menuitem = gtk.CheckMenuItem(title)
+            menuitem.set_active(column.get_visible())
+            signal_id = menuitem.connect("activate",
+                                         self._on_menuitem__activate,
+                                         column)
+            self.signal_ids.append((menuitem, signal_id))
+            menuitem.show()
+            self.append(menuitem)
+            
+        self._dirty = False
+
+    def _on_treeview__columns_changed(self, treeview):
+        self._dirty = True
+        
+    def _on_menuitem__activate(self, menuitem, column):
+        active = menuitem.get_active()
+        column.set_visible(active)
+
+        children = self.get_children()
+
+        if active:
+            # Make sure all items are selectable
+            for child in children:
+                child.set_sensitive(True)
+        else:
+            # Protect so we can't hide all the menu items
+            # If there's only one menuitem less to select, set
+            # it to insensitive
+            active_children = [child for child in children
+                                         if child.get_active()]
+            if len(active_children) == 1:
+                active_children[0].set_sensitive(False)
+        
 class List(gtk.ScrolledWindow):
     """An enhanced version of GtkTreeView, which provides pythonic wrappers
     for accessing rows, and optional facilities for column sorting (with
@@ -308,7 +381,7 @@ class List(gtk.ScrolledWindow):
         self._row_activated_id = id
 
         # create a popup menu for showing or hiding columns
-        self._popup = gtk.Menu()
+        self._popup = ContextMenu(self.treeview)
 
         # allow to specify only one column
         if isinstance(columns, Column):
@@ -388,15 +461,6 @@ class List(gtk.ScrolledWindow):
         treeview_column.set_reorderable(True)
         self.treeview.append_column(treeview_column)
 
-        # add a menuitem in the popup
-        menuitem = gtk.CheckMenuItem(column.title)
-        # we store the menuitem in the column so we can change its value later
-        treeview_column.set_data('menuitem', menuitem)
-        menuitem.connect("activate", self._on_menuitem__activate,
-                         treeview_column)
-        menuitem.show()
-        self._popup.append(menuitem)
-
         # setup the button to show the popup menu
         button = self._get_column_button(treeview_column)
         button.connect('button-release-event',
@@ -446,8 +510,6 @@ class List(gtk.ScrolledWindow):
         treeview_column.set_cell_data_func(renderer, self._cell_data_func,
                                            column)
         treeview_column.set_visible(column.visible)
-        menuitem = treeview_column.get_data('menuitem')
-        menuitem.set_active(column.visible)
 
         treeview_column.connect("clicked", self._on_column__clicked, col_index)
         if column.width is not None:
@@ -526,31 +588,11 @@ class List(gtk.ScrolledWindow):
 
     def _on_header__button_release_event(self, button, event):
         if event.button == 3:
-            self._popup.popup(None, None, None, event.button, event.time)
+            self._popup.popup(event)
             return False
 
         return False
 
-    def _on_menuitem__activate(self, menuitem, treeview_column):
-        active = menuitem.get_active()
-        treeview_column.set_visible(active)
-
-        menu = menuitem.get_parent()
-        children = menu.get_children()
-
-        if active:
-            # Make sure all items are selectable
-            for child in children:
-                child.set_sensitive(True)
-        else:
-            # Protect so we can't hide all the menu items
-            # If there's only one menuitem less to select, set
-            # it to insensitive
-            active_children = [child for child in children
-                                         if child.get_active()]
-            if len(active_children) == 1:
-                active_children[0].set_sensitive(False)
-                        
     def _on_renderer__edited(self, renderer, path, new_text, column_index):
         row_iter = self.model.get_iter(path)
         instance = self.model.get_value(row_iter, 0)
@@ -574,9 +616,7 @@ class List(gtk.ScrolledWindow):
         while self.treeview.get_columns():
             self.treeview.remove_column(self.treeview.get_column(0))
 
-        # we also need to clear the popup
-        for child in self._popup.get_children():
-            self._popup.remove(child)
+        self._popup.clean()
 
         self._columns_created = False
         self._columns_configured = False
