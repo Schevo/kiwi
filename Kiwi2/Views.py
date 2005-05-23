@@ -22,6 +22,7 @@
 #            Jon Nelson <jnelson@securepipe.com>
 #            Lorenzo Gil Sanchez <lgs@sicem.biz>
 #            Johan Dahlin <jdahlin@async.com.br>
+#            Henrique Romano <henrique@async.com.br>
 #
 
 """
@@ -164,16 +165,26 @@ class SignalBroker(object):
             # being called unbound and lacking, thus, "self".
             try:
                 if after:
-                   widget.connect_after(signal, methods[fname])
+                   signal_id = widget.connect_after(signal, methods[fname])
                 else:
-                   widget.connect(signal, methods[fname])
+                   signal_id = widget.connect(signal, methods[fname])
             except TypeError, e:
                 raise AttributeError("Widget %s doesn't provide a signal %s"
                                      % (widget.__class__, signal))
             if not self._autoconnected.has_key(widget):
                 self._autoconnected[widget] = []
-            self._autoconnected[widget].append(id)
+            self._autoconnected[widget].append((signal, signal_id))
 
+    def handler_block(self, widget, signal_name):
+        for signal, signal_id in self._autoconnected[widget]:
+            if signal == signal_name:
+                widget.handler_block(signal_id)
+
+    def handler_unblock(self, widget, signal_name):
+        for signal, signal_id in self._autoconnected[widget]:
+            if signal == signal_name:
+                widget.handler_unblock(signal_id)
+        
 class GladeSignalBroker(SignalBroker):
     def __init__(self, view, controller):
         SignalBroker.__init__(self, view, controller)
@@ -630,9 +641,15 @@ class SlaveView(gobject.GObject):
         Disconnect handlers previously connected with 
         autoconnect_signals()"""
         for widget, signals in self._autoconnected.items():
-            for signal in signals:
-                widget.disconnect(signal)
+            for unused, signal_id in signals:
+                widget.disconnect(signal_id)
+    
+    def handler_block(self, widget, signal_name):
+        self.__broker.handler_block(widget, signal_name)
 
+    def handler_unblock(self, widget, signal_name):
+        self.__broker.handler_unblock(widget, signal_name)
+        
     #
     # Proxies
     #

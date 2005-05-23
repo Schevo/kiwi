@@ -1,9 +1,13 @@
 2005-05-23  Johan Dahlin  <jdahlin@async.com.br>
 
+	* Kiwi2/Views.py (SignalBroker.handler_block,
+	SignalBroker.handler_unblock): New methods, to block a signal tied
+	to a widget. Patch by Henrique
+
 	* Kiwi2/Widgets/List.py: Ensure we can't hide all columns.
 	(ContextMenu): New object, factor out context menu from List. Make
 	rebuild it when columns change lazily. It now displays the columns
-	in correct order when columns are moved (or added/removed)	
+	in correct order when columns are moved (or added/removed).	
 
 2005-05-20  Johan Dahlin  <jdahlin@async.com.br>
 
