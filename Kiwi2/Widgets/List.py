@@ -916,12 +916,11 @@ class List(gtk.ScrolledWindow):
 
     def get_selected(self):
         selection = self.treeview.get_selection()
+        result = ()
         if selection:
             model, paths = selection.get_selected_rows()
             if paths:
                 result = tuple([model[path][0] for (path,) in paths])
-        else:
-            result = ()
             
         return result
         
