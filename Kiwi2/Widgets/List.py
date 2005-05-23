@@ -532,9 +532,25 @@ class List(gtk.ScrolledWindow):
         return False
 
     def _on_menuitem__activate(self, menuitem, treeview_column):
-        treeview_column.set_visible(menuitem.get_active())
-        import code; code.interact(local=locals())
-        
+        active = menuitem.get_active()
+        treeview_column.set_visible(active)
+
+        menu = menuitem.get_parent()
+        children = menu.get_children()
+
+        if active:
+            # Make sure all items are selectable
+            for child in children:
+                child.set_sensitive(True)
+        else:
+            # Protect so we can't hide all the menu items
+            # If there's only one menuitem less to select, set
+            # it to insensitive
+            active_children = [child for child in children
+                                         if child.get_active()]
+            if len(active_children) == 1:
+                active_children[0].set_sensitive(False)
+                        
     def _on_renderer__edited(self, renderer, path, new_text, column_index):
         row_iter = self.model.get_iter(path)
         instance = self.model.get_value(row_iter, 0)
