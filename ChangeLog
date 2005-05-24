@@ -1,3 +1,7 @@
+2005-05-24  Johan Dahlin  <jdahlin@async.com.br>
+
+	* Kiwi2/Widgets/List.py: Clean up column handling a bit futher.
+
 2005-05-23  Johan Dahlin  <jdahlin@async.com.br>
 
 	* Kiwi2/Views.py (SignalBroker.handler_block,

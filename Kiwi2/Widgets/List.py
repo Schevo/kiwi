@@ -417,26 +417,29 @@ class List(gtk.ScrolledWindow):
                 return False
         return True
         
-    def _get_types(self, instance):
+    def _guess_types(self, instance):
         """Iterates through columns, using the type attribute when found or
         the type of the associated attribute from the sample instance provided.
         """
-        for c in self._columns:
-            if c.data_type is not None:
-                continue
-            # steal attribute from sample instance and use its type
-            value = kgetattr(instance, c.attribute, ValueUnset)
-            if value is ValueUnset:
-                msg = "Failed to get attribute '%s' for %s"
-                raise TypeError(msg % (c.attribute, instance))
-            
-            tp = type(value)
-            c.data_type = tp
-            if tp is type(None):
-                raise TypeError(
-                      """Detected invalid type None for column `%s'; please
-                      specify type in Column constructor.""" % c.attribute)
+        for column in self._columns:
+            if column.data_type is None:
+                column.data_type = self._guess_type(instance,
+                                                    column.attribute)
 
+    def _guess_type(self, instance, name):
+        # steal attribute from sample instance and use its type
+        value = kgetattr(instance, name, ValueUnset)
+        if value is ValueUnset:
+            raise TypeError("Failed to get attribute '%s' for %s" %
+                            (name, instance))
+            
+        tp = type(value)
+        if tp is type(None):
+            raise TypeError("Detected invalid type None for column `%s'; "
+                            "please specify type in Column constructor.""" %
+                            name)
+        return tp
+    
     def _create_columns(self):
         """Create the treeview columns"""
         if self._columns_created:
@@ -470,16 +473,14 @@ class List(gtk.ScrolledWindow):
         if self._columns_configured:
             return
         
-        for i, column in enumerate(self._columns):
-            treeview_column = self.treeview.get_column(i)
-            self._setup_column(column, i, treeview_column)
+        for column in self._columns:
+            self._setup_column(column)
 
         self._columns_configured = True
 
-    def _setup_column(self, column, col_index, treeview_column):
+    def _setup_column(self, column):
 
-        renderer = self._create_best_renderer_for_type\
-                 (column.data_type, col_index)
+        renderer = self._create_best_renderer_for_type(column)
         
         justify = column.justify
         # If we don't specify a justification, right align it for int/float
@@ -502,16 +503,17 @@ class List(gtk.ScrolledWindow):
             renderer.set_property("xalign", xalign)
             
         # You can't subclass bool, so this is okay
-        if (column.data_type is bool and
-            column.format):
+        if (column.data_type is bool and column.format):
             raise TypeError("format is not supported for boolean columns") 
 
+        index = self._columns.index(column)
+        treeview_column = self.treeview.get_column(index)
         treeview_column.pack_start(renderer)
         treeview_column.set_cell_data_func(renderer, self._cell_data_func,
                                            column)
         treeview_column.set_visible(column.visible)
 
-        treeview_column.connect("clicked", self._on_column__clicked, col_index)
+        treeview_column.connect("clicked", self._on_column__clicked, column)
         if column.width is not None:
             treeview_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
             treeview_column.set_fixed_width(column.width)
@@ -525,7 +527,7 @@ class List(gtk.ScrolledWindow):
             treeview_column.set_expand(True)
 
         if column.sorted:
-            self._sort_column_definition_index = col_index
+            self._sort_column_definition_index = index
             treeview_column.set_sort_indicator(True)
             
         if column.width is not None:
@@ -547,23 +549,25 @@ class List(gtk.ScrolledWindow):
 #        self._justify_columns(columns, typelist)
 
             
-    def _create_best_renderer_for_type(self, data_type, column_index):
+    def _create_best_renderer_for_type(self, column):
         """Create the best CellRenderer for a given type.
         It also set the property of the renderer that depends on the model,
         in the renderer.
         """
+        
+        data_type = column.data_type
         if data_type in (int, float):
             renderer = gtk.CellRendererText()
             renderer.set_data('renderer-property', 'text')
 #            renderer.set_property('editable', True)
 #            renderer.connect('edited', self._on_renderer__edited,
-#                             column_index)
+#                             column)
         elif data_type is bool:
             renderer = gtk.CellRendererToggle()
             renderer.set_data('renderer-property', 'active')
  #           renderer.set_property('activatable', True)
  #           renderer.connect('toggled', self._on_renderer__toggled,
- #                            column_index)
+ #                            column)
         elif issubclass(data_type, datetime.date):
             renderer = gtk.CellRendererText()
             renderer.set_data('renderer-property', 'text')
@@ -572,7 +576,7 @@ class List(gtk.ScrolledWindow):
             renderer.set_data('renderer-property', 'text')
 #            renderer.set_property('editable', True)
 #            renderer.connect('edited', self._on_renderer__edited,
-#                             column_index)
+#                             column)
         else:
             raise ValueError("the type %s is not supported yet" % data_type)
         
@@ -593,11 +597,11 @@ class List(gtk.ScrolledWindow):
 
         return False
 
-    def _on_renderer__edited(self, renderer, path, new_text, column_index):
+    def _on_renderer__edited(self, renderer, path, new_text, column):
         row_iter = self.model.get_iter(path)
         instance = self.model.get_value(row_iter, 0)
-        model_attribute = self._columns[column_index].attribute
-        data_type = self._columns[column_index].data_type
+        model_attribute = column.attribute
+        data_type = column.data_type
         value = new_text
         if data_type in (int, float):
             value = data_type(new_text)
@@ -605,11 +609,11 @@ class List(gtk.ScrolledWindow):
 
         setattr(instance, model_attribute, value)
         
-    def _on_renderer__toggled(self, renderer, path, column_index):
+    def _on_renderer__toggled(self, renderer, path, column):
         row_iter = self.model.get_iter(path)
         instance = self.model.get_value(row_iter, 0)
         value = not renderer.get_active()
-        model_attribute = self._columns[column_index].attribute
+        model_attribute = column.attribute
         setattr(instance, model_attribute, value)
 
     def _clear_columns(self):
@@ -642,7 +646,7 @@ class List(gtk.ScrolledWindow):
         value2 = kgetattr(obj2, attr)
         return cmp(value1, value2)
 
-    def _on_column__clicked(self, treeview_column, column_index):
+    def _on_column__clicked(self, treeview_column, column):
         if self._sort_column_definition_index == -1:
             # this mean we are not sorting at all
             return
@@ -653,20 +657,20 @@ class List(gtk.ScrolledWindow):
         
         # reverse the old order or start with SORT_DESCENDING if there was no
         # previous order
+        column_index = self._columns.index(column)
         self._sort_column_definition_index = column_index
-        cd = self._columns[column_index]
 
         # maybe it's the first time this column is ordered
-        if cd.order is None:
-            cd.order = gtk.SORT_DESCENDING
+        if column.order is None:
+            column.order = gtk.SORT_DESCENDING
 
         # reverse the order
-        old_order = cd.order
+        old_order = column.order
         if old_order == gtk.SORT_ASCENDING:
             new_order = gtk.SORT_DESCENDING
         else:
             new_order = gtk.SORT_ASCENDING
-        cd.order = new_order
+        column.order = new_order
 
         # cosmetic changes
         treeview_column.set_sort_indicator(True)
@@ -730,7 +734,7 @@ class List(gtk.ScrolledWindow):
             return
 
         if not self._has_enough_type_information():
-            self._get_types(instance_list[0])
+            self._guess_types(instance_list[0])
             self._create_columns()
             self._setup_columns()
             
@@ -884,7 +888,7 @@ class List(gtk.ScrolledWindow):
         """
 
         if not self._has_enough_type_information():
-            self._get_types(instance)
+            self._guess_types(instance)
             self._create_columns()
             self._setup_columns()
 
@@ -931,7 +935,7 @@ class List(gtk.ScrolledWindow):
         
     def set_column_visibility(self, column_index, visibility):
         column = self.treeview.get_column(column_index)
-        colum.set_visible(visibility)
+        column.set_visible(visibility)
 
     def get_selection_mode(self):
         selection = self.treeview.get_selection()
