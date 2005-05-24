@@ -64,7 +64,6 @@ class Column:
     sorted = False
     order = gtk.SORT_ASCENDING
     pixmap_spec = None
-    decimal_separator = None
     expand = False
     def __init__(self, 
                  attribute     = None,
@@ -79,7 +78,6 @@ class Column:
                  sorted        = None,
                  order         = None,
                  pixmap_spec   = None,
-                 decimal_separator = None,
                  expand        = None,
                  ):
         """
@@ -155,23 +153,12 @@ class Column:
             self.tooltip = tooltip
         if pixmap_spec is not None:
             self.pixmap_spec = pixmap_spec
-        # Handle separators for specialized types
-#        if self.type in (IntType, FloatType):
-#            self.decimal_separator = (decimal_separator or 
-#                                      self.decimal_separator or 
-#                                      Views.global_decimal_separator)
-#            self.ensure_decimal_translator()
         if self.expand is not None:
             self.expand = expand
             
         # XXX: validate bizarre option combinations
         # Tip: when adding items here, remember to update
         # CListDelegate.dump_column_code()
-    def ensure_decimal_translator(self):
-        sep = self.decimal_separator
-        if sep:
-            self.decimal_translator = string.maketrans(".%s" % sep, 
-                                                        "%s." % sep)
 
     def dump_code(self):
         cdict = {}
@@ -181,7 +168,6 @@ class Column:
         cdict["title"]  = repr(self.title)
         cdict["title_pixmap"]  = repr(self.title_pixmap)
         cdict["format"]  = repr(self.format)
-        cdict["decimal_separator"]  = repr(self.decimal_separator)
         cdict["tooltip"] = repr(self.tooltip)
         if self.pixmap_spec:
             name = "pixmap_spec_%s" % self.attribute
@@ -194,13 +180,13 @@ class Column:
 \t\tjustify=%(justify)s, format=%(format)s, tooltip=%(tooltip)s, 
 \t\twidth=%(width)s, sorted=%(sorted)s, order=%(order)s, 
 \t\ttitle_pixmap=%(title_pixmap)s, %(pixmap_spec)s,
-\t\tdecimal_separator=%(decimal_separator)s, %(expand)s)""" % cdict
+\t\t%(expand)s)""" % cdict
 
     def __repr__(self):
-        dict = self.__dict__.copy()
-        attr = dict['attribute']
-        del dict['attribute']
-        return "<%s %s: %s>" % (self.__class__.__name__, attr, dict)
+        ns = self.__dict__.copy()
+        attr = ns['attribute']
+        del ns['attribute']
+        return "<%s %s: %s>" % (self.__class__.__name__, attr, ns)
 
     def __str__(self):
         attr = self.attribute or ''
@@ -217,17 +203,17 @@ class Column:
         format = self.format or ''
         tooltip = self.tooltip or ''
         width = self.width and int(self.width) or ''
-        sorted = str(self.sorted)
+        sorted_value = str(self.sorted)
         order = self.order.value_nick
         # XXX: expand
         return "%s|%s|%s|%s|%s|%s|%s|%s|%s|%s" % \
                (attr, title, data_type, visible, justify,
-                tooltip, format, width, sorted, order)
+                tooltip, format, width, sorted_value, order)
     
     def set_from_string(self, data_string):
         fields = data_string.split('|')
         if len(fields) != 10:
-            msg = 'every column should have 10 fields: %s' % col
+            msg = 'every column should have 10 fields, not %d' % len(fields)
             raise ValueError(msg)
 
         # the attribute is mandatory
@@ -374,11 +360,11 @@ class List(gtk.ScrolledWindow):
 
         # convenience connections
         selection = self.treeview.get_selection()
-        id = selection.connect("changed", self._on_selection__changed)
-        self._selection_changed_id = id
-        id = self.treeview.connect_after("row-activated",
-                                         self._on_treeview__row_activated)
-        self._row_activated_id = id
+        signal_id = selection.connect("changed", self._on_selection__changed)
+        self._selection_changed_id = signal_id
+        signal_id = self.treeview.connect_after("row-activated",
+                                                self._on_treeview__row_activated)
+        self._row_activated_id = signal_id
 
         # create a popup menu for showing or hiding columns
         self._popup = ContextMenu(self.treeview)
@@ -533,14 +519,6 @@ class List(gtk.ScrolledWindow):
         if column.width is not None:
             self._autosize = False
 
-        #%s where I expected a GtkButton""" % (column.tooltip, i, col))
-            #if column.decimal_separator:
-            ## XXX: This is a hack. I now see we need to keep the data model
-            ## in the CList too, but it's too late to add this. Anyway,
-            ## call ensure to make sure the translator exists.
-                #column.ensure_decimal_translator()
-                #clist._fix_decimal_separator(i, column.decimal_translator)
-
         # typelist here may be none. It's okay; justify_columns will try
         # and use the specified justifications and if not present will
         # not touch the column. When typelist is not set,
@@ -627,12 +605,9 @@ class List(gtk.ScrolledWindow):
         
     # selection methods
     def _find_iter_from_data(self, instance):
-        data_iter = self.model.get_iter_first()
-        while data_iter:
-            if instance == self.model.get_value(data_iter, 0):
-                break
-            data_iter = self.mode.iter_next()
-        return data_iter
+        for row in self.model:
+            if instance == row[0]:
+                return row.iter
 
     def _select_and_focus_row(self, row_iter):
         self.treeview.set_cursor(self.model.get_path(row_iter))
@@ -700,7 +675,7 @@ class List(gtk.ScrolledWindow):
             # slice(None, None, None)
             stop = arg.stop
             start = arg.start
-            if stop is None:
+            if not stop:
                 stop = len(self.model)
                 start = 0
                 
@@ -726,7 +701,7 @@ class List(gtk.ScrolledWindow):
         return True
 
     def __contains__(self, instance):
-        return self._get_iter_from_instance(instance) is not None
+        return self._get_iter_from_instance(instance) != None
 
     # utility methods used by public api methods   
     def _load(self, instance_list, progress_handler=None):
@@ -757,10 +732,10 @@ class List(gtk.ScrolledWindow):
                 return row.iter
 
     def get_iter(self, instance):
-        iter = self._get_iter_from_instance(instance)
-        if iter is None: 
+        treeiter = self._get_iter_from_instance(instance)
+        if not treeiter:
             raise ValueError("The instance %s is not in the list." % instance)
-        return iter
+        return treeiter
         
     # hacks
     def _get_column_button(self, column):
@@ -774,7 +749,7 @@ class List(gtk.ScrolledWindow):
         
         button = column.get_widget()
         assert button is not None, ("You must call column.set_widget() "
-            "before calling _get_column_button")
+                                    "before calling _get_column_button")
         
         while not isinstance(button, gtk.Button):
             button = button.get_parent()
@@ -827,7 +802,7 @@ class List(gtk.ScrolledWindow):
         self._vscrollbar.size_allocate(new_alloc)
         # put the popup_window in its position
         gdk_window = self.window
-        if gdk_window is not None:
+        if gdk_window:
             x, y = gdk_window.get_origin()
             self._popup_window.move(x + old_alloc.x, y + old_alloc.y)
         
@@ -922,16 +897,16 @@ class List(gtk.ScrolledWindow):
                                 "list yet so you can not remove any instance"))
 
         # linear search for the instance to remove
-        iter = self._get_iter_from_instance(instance)
-        if iter:
-            self.model.remove(iter)
+        treeiter = self._get_iter_from_instance(instance)
+        if treeiter:
+            self.model.remove(treeiter)
             return True
             
         return False
 
     def update_instance(self, new_instance):
-        iter = self.get_iter(new_instance)
-        self.model.row_changed(self.model.get_path(iter), iter)
+        treeiter = self.get_iter(new_instance)
+        self.model.row_changed(self.model.get_path(treeiter), treeiter)
         
     def set_column_visibility(self, column_index, visibility):
         column = self.treeview.get_column(column_index)
@@ -955,8 +930,9 @@ class List(gtk.ScrolledWindow):
     def select_instance(self, instance):
         selection = self.treeview.get_selection()
         if selection:
-            iter = self.get_iter(instance)
-            selection.select_iter(iter)
+            treeiter = self.get_iter(instance)
+            if treeiter:
+                selection.select_iter(treeiter)
 
     def get_selected(self):
         selection = self.treeview.get_selection()

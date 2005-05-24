@@ -1,6 +1,8 @@
 2005-05-24  Johan Dahlin  <jdahlin@async.com.br>
 
 	* Kiwi2/Widgets/List.py: Clean up column handling a bit futher.
+	Make pychecker happy. Remove decimal separator, we depend on 2.3
+	where we can set LC_NUMERIC properly
 
 2005-05-23  Johan Dahlin  <jdahlin@async.com.br>
 
