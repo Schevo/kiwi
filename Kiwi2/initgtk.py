@@ -45,11 +45,12 @@ if not ('gtk._gtk' in sys.modules or
 import gtk
 import gobject
 
+glib_version = gobject.glib_version
 from gtk import gtk_version
 from gtk import pygtk_version
 from gtk import mainquit, main
 
-_non_interactive = [ 
+_non_interactive = [
     gtk.Label, 
     gtk.Alignment,
     gtk.AccelLabel,
@@ -90,7 +91,7 @@ def quit_if_last(*args):
     # we don't care about popup windows
     real_toplevels = [tl for tl in toplevels \
                       if tl.get_property('type') == gtk.WINDOW_TOPLEVEL and \
-                      tl.get_property('visible') == True]
+                      tl.get_property('visible')]
     # check if this window is the last one
     assert len(real_toplevels) > 0 
     if len(real_toplevels) == 1:
