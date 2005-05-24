@@ -205,7 +205,7 @@ class ComboBox(gtk.ComboBox, ComboProxyMixin, WidgetProxy.Mixin):
             self.select_item_by_data(data)
 
     def prefill(self, itemdata, sort=False):
-        super(ComboBox, self).prefill(itemdata, sort)
+        self.prefill(itemdata, sort)
     
         # we always have something selected, by default the first item
         self.set_active(0)
@@ -280,8 +280,8 @@ class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin,
      
     def do_changed(self):
         self._last_change_time = time.time()
-        self.chain()
         self.emit('content-changed')
+        self.chain()
     
     def _on_key_release(self, widget, event):
         """Checks for "Enter" key presses and add the entry text to 
@@ -307,10 +307,11 @@ class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin,
     def _on_entry__changed(self, widget):
         """Called when something on the entry changes"""
         self._last_change_time = time.time()
-        #self.emit('content-changed')
+        self.emit('content-changed')
 
     def read(self):
         text = self.child.get_text()
+        self._validate_data(text)
         return self._validate_data(text)
 
     def do_validate(self, data):
