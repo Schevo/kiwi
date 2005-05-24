@@ -62,12 +62,6 @@ def get_default_setter(model, attr_name, cache):
     else:
         return (model, attr_name)
 
-try:
-    object
-except NameError:
-    class object:
-        pass
-
 # The _*_cache dictionaries cache the objects, attributes and callables
 # (called `accessor tuples' here) we retrieve values from. If possible,
 # we use weakrefs to avoid holding hard references to objects, allowing
