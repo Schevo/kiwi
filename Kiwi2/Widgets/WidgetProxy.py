@@ -38,6 +38,8 @@ from Kiwi2.Widgets.datatypes import ValidationError
 MERGE_COLORS_DELAY = 100
 CURSOR_POS_CHECKING_DELAY = 200
 
+__pychecker__ = 'no-classattr'
+
 class Mixin(object):
     """This class is a mixin that provide a common interface for KiwiWidgets.
 

@@ -29,7 +29,7 @@
 Defines the View classes that are included in the Kiwi Framework, which
 are the base of Delegates and Proxies.
 """
-import os, string, re, sys
+import os, string, sys
 
 from Kiwi2 import _warn, get_gladepath, get_imagepath
 from Kiwi2.utils import gsignal
@@ -168,7 +168,7 @@ class SignalBroker(object):
                    signal_id = widget.connect_after(signal, methods[fname])
                 else:
                    signal_id = widget.connect(signal, methods[fname])
-            except TypeError, e:
+            except TypeError:
                 raise AttributeError("Widget %s doesn't provide a signal %s"
                                      % (widget.__class__, signal))
             if not self._autoconnected.has_key(widget):
@@ -184,6 +184,11 @@ class SignalBroker(object):
         for signal, signal_id in self._autoconnected[widget]:
             if signal == signal_name:
                 widget.handler_unblock(signal_id)
+
+    def disconnect_autoconnected(self):
+        for widget, signals in self._autoconnected.items():
+            for unused, signal_id in signals:
+                widget.disconnect(signal_id)
         
 class GladeSignalBroker(SignalBroker):
     def __init__(self, view, controller):
@@ -201,7 +206,7 @@ class GladeSignalBroker(SignalBroker):
         # called by framework.basecontroller. takes a controller, and
         # creates the dictionary to attach to the signals in the tree.
         if not methods:
-            raise assertionerror("controller must be provided")
+            raise AssertionError("controller must be provided")
 
         dict = {}
         for name, method in methods.items():
@@ -242,7 +247,7 @@ class SlaveView(gobject.GObject):
 
         # setup the initial state with the value of the arguments or the
         # class variables
-        
+
         self.gladefile = gladefile or self.gladefile
         self.gladename = gladename or self.gladename
         self.toplevel_name = toplevel_name or self.toplevel_name
@@ -463,11 +468,11 @@ class SlaveView(gobject.GObject):
                     isinstance(widget, (gtk.Label, gtk.HSeparator,
                                         gtk.VSeparator, gtk.Window)):
                     continue
-            allocation = widget.get_allocation()
             if top_widget:
-                top_allocation = top_widget.get_allocation()
-                if top_allocation[0] + top_allocation[1] > \
-                   allocation[0] + allocation[1]:
+                allocation = widget.allocation
+                top_allocation = top_widget.allocation
+                if (top_allocation[0] + top_allocation[1] >
+                    allocation[0] + allocation[1]):
                     top_widget = widget
             else:
                 top_widget = widget
@@ -536,7 +541,7 @@ class SlaveView(gobject.GObject):
             placeholder = getattr(self, name, None)
             
         if not placeholder:
-            raise attributeerror(
+            raise AttributeError(
                   "slave container widget `%s' not found" % name)
         parent = placeholder.get_parent()
 
@@ -569,7 +574,7 @@ class SlaveView(gobject.GObject):
             parent.remove(placeholder)
             parent.add(new_widget)
         else:
-            raise typeerror(
+            raise TypeError(
                 "widget to be replaced must be wrapped in eventbox")
 
         # when attaching a slave we usually want it visible
@@ -640,10 +645,8 @@ class SlaveView(gobject.GObject):
         """
         Disconnect handlers previously connected with 
         autoconnect_signals()"""
-        for widget, signals in self._autoconnected.items():
-            for unused, signal_id in signals:
-                widget.disconnect(signal_id)
-    
+        self.__broker.disconnect_autoconnected()
+        
     def handler_block(self, widget, signal_name):
         self.__broker.handler_block(widget, signal_name)
 

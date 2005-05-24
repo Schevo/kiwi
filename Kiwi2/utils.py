@@ -147,7 +147,7 @@ def merge_colors(widget, src_color, dst_color, steps=10):
     rinc = (rd - rs) / float(steps)
     ginc = (gd - gs) / float(steps)
     binc = (bd - bs) / float(steps)
-    for i in xrange(steps):
+    for dummy in xrange(steps):
         rs += rinc
         gs += ginc
         bs += binc

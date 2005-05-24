@@ -42,8 +42,9 @@ from Kiwi2.Widgets.datatypes import ValidationError
 (COL_COMBO_LABEL,
  COL_COMBO_DATA) = range(2)
 
+__pychecker__ = 'no-classattr'
 
-class ComboProxyMixin:
+class ComboProxyMixin(object):
     """Our combos always have one model with two columns, one for the string
     that is displayed and one for the object it cames from.
     """
@@ -135,7 +136,7 @@ class ComboProxyMixin:
                 self.set_active_iter(row.iter)
                 break
         else:
-            raise KeyError("No item correspond to label %s in the combo %s" \
+            raise KeyError("No item correspond to label %s in the combo %s"
                            % (label, self.name))
     
     def select_item_by_data(self, data):
@@ -149,7 +150,7 @@ class ComboProxyMixin:
                 #the user only prefilled the combo with strings
                 self.select_item_by_label(data)
             else:
-                raise KeyError("No item correspond to data %r in the combo %s" \
+                raise KeyError("No item correspond to data %r in the combo %s" 
                                % (data, self.name))
             
     def get_model_items(self):
@@ -279,8 +280,8 @@ class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin,
      
     def do_changed(self):
         self._last_change_time = time.time()
-        self.emit('content-changed')
         self.chain()
+        self.emit('content-changed')
     
     def _on_key_release(self, widget, event):
         """Checks for "Enter" key presses and add the entry text to 
@@ -306,13 +307,11 @@ class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin,
     def _on_entry__changed(self, widget):
         """Called when something on the entry changes"""
         self._last_change_time = time.time()
-        self.emit('content-changed')
+        #self.emit('content-changed')
 
     def read(self):
         text = self.child.get_text()
-        self._validate_data(text)
-        
-        return self.get_selected_data()
+        return self._validate_data(text)
 
     def do_validate(self, data):
         """ComboBoxEntry has a validate default handler that check if the

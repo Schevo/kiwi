@@ -187,9 +187,8 @@ class PluggableWizard(Delegate):
         # Redefine this method if you want something done when cancelling the
         # wizard.
         self.retval = None
-        return self.close()
 
     def finish(self):
         # Redefine this method if you want something done when finishing the
         # wizard.
-        return self.close()
+        pass

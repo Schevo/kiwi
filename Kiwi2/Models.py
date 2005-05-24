@@ -23,6 +23,7 @@
 
 import pickle, os
 
+from Kiwi2 import _warn
 #
 # A model that implements half of an observer pattern; when its
 # attributes are changed, it notifies any proxies of the change.

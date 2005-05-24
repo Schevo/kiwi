@@ -290,7 +290,9 @@ class OldVirtualProxy:
         # XXX: this will need to be changed for composition
 
         attrs = []
-        widgets = (widgets or self.widgets or [])[:]
+        if not widgets:
+            widgets = getattr(self, 'widgets', [])[:]
+        #widgets = (widgets or self.widgets or [])[:]
         
         for i in range(0, len(widgets)):
             name = widgets[i]
@@ -371,9 +373,9 @@ class OldVirtualProxy:
 
         # Radiogroups need their own loop because they are composed of
         # multiple individual widgets
-        for group_name, group in self._radiogroups.items():
-            groupproxy = RadioGroup.RadioGroupProxy(self, group, group_name)
-            self._set_proxy_vars(groupproxy, group_name)
+        #for group_name, group in self._radiogroups.items():
+        #    groupproxy = RadioGroup.RadioGroupProxy(self, group, group_name)
+        #    self._set_proxy_vars(groupproxy, group_name)
 
     def _set_proxy_vars(self, proxy, name):
         proxy.default = proxy.read()
@@ -533,7 +535,7 @@ class Proxy:
             if value is ValueUnset:
                 value = kgetattr(self.model, attribute, ValueUnset)
                 if value is ValueUnset:
-                    raise ValueError("model value for %s was unset" % name)
+                    raise ValueError("model value for %s was unset" % attribute)
             func(attribute, value)
         else:
             self.update(attribute, value, block=True)
