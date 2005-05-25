@@ -205,7 +205,7 @@ class ComboBox(gtk.ComboBox, ComboProxyMixin, WidgetProxy.Mixin):
             self.select_item_by_data(data)
 
     def prefill(self, itemdata, sort=False):
-        self.prefill(itemdata, sort)
+        ComboProxyMixin.prefill(self, itemdata, sort)
     
         # we always have something selected, by default the first item
         self.set_active(0)
@@ -341,7 +341,7 @@ class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin,
             self.select_item_by_data(data)
 
     def prefill(self, itemdata, sort=False, clear_entry=False):
-        self.prefill(itemdata, sort)
+        ComboProxyMixin.prefill(self, itemdata, sort)
         if clear_entry:
             self.child.set_text("")
 
