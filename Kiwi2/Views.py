@@ -468,6 +468,7 @@ class SlaveView(gobject.GObject):
                     isinstance(widget, (gtk.Label, gtk.HSeparator,
                                         gtk.VSeparator, gtk.Window)):
                     continue
+                
             if top_widget:
                 allocation = widget.allocation
                 top_allocation = top_widget.allocation
@@ -578,7 +579,7 @@ class SlaveView(gobject.GObject):
                 "widget to be replaced must be wrapped in eventbox")
 
         # when attaching a slave we usually want it visible
-        parent.show_all()
+        parent.show()
         
         # call slave's callback
         slave.on_attach(self)
