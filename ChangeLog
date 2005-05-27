@@ -1,3 +1,8 @@
+2005-05-25  Johan Dahlin  <jdahlin@async.com.br>
+
+	* Kiwi2/Views.py (SlaveView.attach_slave): Change show_all 
+	into show.
+
 2005-05-24  Johan Dahlin  <jdahlin@async.com.br>
 
 	* Kiwi2/Delegates.py:
