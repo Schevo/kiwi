@@ -105,19 +105,16 @@ class TextView(gtk.TextView, WidgetProxy.MixinSupportValidation):
         # the background
         # although we have our own draw method we still need to 
         # set this attribute because it is used to paint the background
-        self._gdkwindow_to_draw = self.get_window(gtk.TEXT_WINDOW_TEXT)
-        
-        self._draw_icon()
+        self._draw_icon(self.get_window(gtk.TEXT_WINDOW_TEXT))
         
         return result
     
-    def _draw_pixbuf(self, iconx, icony, pixbuf, pixw, pixh):
-        area_window = self._gdkwindow_to_draw
-        winw, winh = area_window.get_size()
+    def _draw_pixbuf(self, window, iconx, icony, pixbuf, pixw, pixh):
+        winw, winh = window.get_size()
         
-        area_window.draw_pixbuf(None, pixbuf, 0, 0, 
-                                (winw - pixw) / 2, (winh - pixh) / 2,
-                                pixw, pixh)
+        window.draw_pixbuf(None, pixbuf, 0, 0, 
+                           (winw - pixw) / 2, (winh - pixh) / 2,
+                           pixw, pixh)
         
 
 gobject.type_register(TextView)

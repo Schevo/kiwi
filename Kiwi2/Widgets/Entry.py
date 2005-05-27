@@ -112,9 +112,7 @@ class Entry(gtk.Entry, WidgetProxy.MixinSupportValidation):
         # this attribute stores the info on where to draw icons and paint
         # the background
         # it's been defined here because it's when we have gdk window available
-        self._gdkwindow_to_draw = self.window
-
-        self._draw_icon()
+        self._draw_icon(self.window)
         
         return result    
     

@@ -368,7 +368,7 @@ class MixinSupportValidation(Mixin):
                 
         return True
 
-    def _draw_icon(self):
+    def _draw_icon(self, window):
         # if there is something wrong in the validation (draw_info_icon = True)
         # the widget should not be empty (draw_mandatory_icon = True)
         assert not (self._draw_mandatory_icon and self._draw_info_icon)
@@ -380,16 +380,17 @@ class MixinSupportValidation(Mixin):
         else:
             return
             
-        iconx, icony, pixbuf, pixw, pixh = \
-             self._render_icon(icon, self._widget_to_draw)
+        (iconx, icony,
+         pixbuf,
+         pixw, pixh) = self._render_icon(icon, self._widget_to_draw)
         
-        self._draw_pixbuf(iconx, icony, pixbuf, pixw, pixh)
+        self._draw_pixbuf(window, iconx, icony, pixbuf, pixw, pixh)
         
         if self._draw_info_icon:
             iconx_range = range(iconx, iconx + pixw)
             icony_range = range(icony, icony + pixh)
-            self._info_icon_position = \
-                (iconx, iconx_range, icony, icony_range)
+            self._info_icon_position = (iconx, iconx_range,
+                                        icony, icony_range)
 
     def _render_icon(self, icon, widget):
         pixbuf = self.render_icon(icon, gtk.ICON_SIZE_MENU)
@@ -402,8 +403,8 @@ class MixinSupportValidation(Mixin):
         
         return iconx, icony, pixbuf, pixw, pixh
 
-    def _draw_pixbuf(self, iconx, icony, pixbuf, pixw, pixh):
-        area_window = self._gdkwindow_to_draw.get_children()[0]
+    def _draw_pixbuf(self, window, iconx, icony, pixbuf, pixw, pixh):
+        area_window = window.get_children()[0]
         winw, winh = area_window.get_size()
             
         area_window.draw_pixbuf(None, pixbuf, 0, 0, 

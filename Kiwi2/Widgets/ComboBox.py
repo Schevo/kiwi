@@ -300,9 +300,7 @@ class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin,
         # this attributes stores the info on were to draw icons and paint
         # the background
         # it's been defined here because it's when we have gdk window available
-        self._gdkwindow_to_draw = self.child.window
-        
-        self._draw_icon()
+        self._draw_icon(self.child.window)
 
     def _on_child_entry__changed(self, widget):
         """Called when something on the entry changes"""
