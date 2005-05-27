@@ -243,14 +243,14 @@ class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin,
         # there are two 'changed' signals we need to care about:
         # 1) changed on the Combo (we override that signal)
         # 2) changed on the Entry (we connect to that signal here)
-        self.child.connect('changed', self._on_entry__changed)
+        self.child.connect('changed', self._on_child_entry__changed)
 
         # HACK! we force a queue_draw because when the window is first
         # displayed the icon is not drawn.
         gobject.idle_add(self.queue_draw)
         
         self.set_events(gtk.gdk.KEY_RELEASE_MASK)
-        self.connect("key-release-event", self._on_key_release)
+        self.connect("key-release-event", self._on__key_release_event)
     
         self._list_writable = False
         # this attributes stores the info on were to draw icons and paint
@@ -283,7 +283,7 @@ class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin,
         self.emit('content-changed')
         self.chain()
     
-    def _on_key_release(self, widget, event):
+    def _on__key_release_event(self, widget, event):
         """Checks for "Enter" key presses and add the entry text to 
         the combo list if the combo list is set as editable.
         """
@@ -304,7 +304,7 @@ class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin,
         
         self._draw_icon()
 
-    def _on_entry__changed(self, widget):
+    def _on_child_entry__changed(self, widget):
         """Called when something on the entry changes"""
         self._last_change_time = time.time()
         self.emit('content-changed')
