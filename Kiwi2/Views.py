@@ -248,10 +248,18 @@ class SlaveView(gobject.GObject):
         # setup the initial state with the value of the arguments or the
         # class variables
 
-        self.gladefile = gladefile or self.gladefile
-        self.gladename = gladename or self.gladename
-        self.toplevel_name = toplevel_name or self.toplevel_name
-        self.toplevel = toplevel or self.toplevel
+        if not gladefile:
+            gladefile = self.gladefile
+        if not gladename:
+            gladename = self.gladename
+        if not toplevel_name:
+            toplevel_name = self.toplevel_name
+        if not toplevel:
+            toplevel = self.toplevel
+        self.gladefile = gladefile
+        self.gladename = gladename
+        self.toplevel_name = toplevel_name
+        self.toplevel = toplevel
         self.widgets = widgets or self.widgets or []
         
         # stores the function that will be called when widgets 
