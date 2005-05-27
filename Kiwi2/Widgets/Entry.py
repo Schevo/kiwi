@@ -60,10 +60,6 @@ class Entry(gtk.Entry, WidgetProxy.MixinSupportValidation):
         gtk.Entry.__init__(self)
         WidgetProxy.MixinSupportValidation.__init__(self)
         
-        # this attribute stores the info on where to draw icons and paint
-        # the background
-        self._widget_to_draw = self
-
         if gtk.pygtk_version < (2,6):
             self.chain_expose = self.chain
         else:
@@ -76,8 +72,8 @@ class Entry(gtk.Entry, WidgetProxy.MixinSupportValidation):
         changed the entry
         """        
         self._last_change_time = time.time()
-        self.emit('content-changed')
         self.chain()
+        self.emit('content-changed')
         
     def read(self):
         """Called after each character is typed. If the input is wrong start 

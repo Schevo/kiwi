@@ -48,10 +48,6 @@ class SpinButton(gtk.SpinButton, WidgetProxy.MixinSupportValidation):
         WidgetProxy.MixinSupportValidation.__init__(self, data_type=int)
         gtk.SpinButton.__init__(self)
         
-        # this attribute stores the info on where to draw icons and paint
-        # the background
-        self._widget_to_draw = self
-        
         # due to changes on pygtk 2.6 we have to make some ajustments here
         if gtk.pygtk_version < (2,6):
             self.chain_expose = self.chain

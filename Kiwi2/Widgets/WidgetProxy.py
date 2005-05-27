@@ -188,7 +188,7 @@ class MixinSupportValidation(Mixin):
     """
     
     def __init__(self, data_type=str, model_attribute=None,
-                 default_value=None):
+                 default_value=None, widget=None):
         Mixin.__init__(self, data_type, model_attribute, default_value)
         
         self._error_tooltip = ErrorTooltip(self)
@@ -221,7 +221,12 @@ class MixinSupportValidation(Mixin):
         self._draw_info_icon = False
         self._show_error_tooltip = False
         self._error_tooltip_visible = False    
-    
+
+        # this attribute stores the info on where to draw icons and paint
+        # the background
+        if widget is None:
+            widget = self
+        self._widget_to_draw = widget
     
     def get_mandatory(self):
         """Checks if the Kiwi Widget is set to mandatory"""

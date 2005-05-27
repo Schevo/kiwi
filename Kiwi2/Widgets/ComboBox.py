@@ -232,8 +232,9 @@ class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin,
               "List Writable", gobject.PARAM_READWRITE)
     
     def __init__(self):
-        WidgetProxy.MixinSupportValidation.__init__(self)
         gtk.ComboBoxEntry.__init__(self)
+        WidgetProxy.MixinSupportValidation.__init__(self,
+                                                    widget=self.child)
         ComboProxyMixin.__init__(self)
 
         self.set_text_column(0)
@@ -253,9 +254,6 @@ class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin,
         self.connect("key-release-event", self._on__key_release_event)
     
         self._list_writable = False
-        # this attributes stores the info on were to draw icons and paint
-        # the background
-        self._widget_to_draw = self.child
     
     def get_list_writable(self):
         return self._list_writable

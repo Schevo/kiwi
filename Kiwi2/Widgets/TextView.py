@@ -52,12 +52,6 @@ class TextView(gtk.TextView, WidgetProxy.MixinSupportValidation):
         
         self.connect("key-release-event", self._key_release_event)
         
-        # this attribute stores the info on where to draw icons and paint
-        # the background
-        # although we have our own draw method we still need to 
-        # set this attribute because it is used to paint the background
-        self._widget_to_draw = self
-        
         # due to changes on pygtk 2.6 we have to make some ajustments here
         if gtk.pygtk_version < (2,6):
             self.do_expose_event = self.chain
