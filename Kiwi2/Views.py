@@ -479,7 +479,8 @@ class SlaveView(gobject.GObject):
                 
             if top_widget:
                 allocation = widget.allocation
-                top_allocation = getattr(top_widget, 'allocation', (0, 0))
+                top_allocation = getattr(top_widget, 'allocation',  None)
+                assert top_allocation != None
                 if (top_allocation[0] + top_allocation[1] >
                     allocation[0] + allocation[1]):
                     top_widget = widget
