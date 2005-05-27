@@ -35,17 +35,19 @@ from Kiwi2.utils import gsignal, gproperty
 
 
 class Entry(gtk.Entry, WidgetProxy.MixinSupportValidation):
-    """The Kiwi Entry widget has many special features that extend the basic gtk entry.
+    """The Kiwi Entry widget has many special features that extend the basic
+    gtk entry.
     
-    First of all, as every Kiwi Widget, it implements the Proxy protocol. As the users 
-    types the entry can interact with the application model automaticly. 
-    Kiwi Entry also implements intresting UI additions. If the input data does not match
-    the data type of the entry the background nicely fades to a light red color. 
-    As the background changes an information icon appears. When the user
-    passes the mouse over the infomation icon a tooltip is displayed informing the
-    user how to correctly fill the entry. When dealing with date and float data-type
-    the information on how to fill these entries is displayed according to the 
-    current locale.
+    First of all, as every Kiwi Widget, it implements the Proxy protocol.
+    As the users types the entry can interact with the application model
+    automatically. 
+    Kiwi Entry also implements interesting UI additions. If the input data
+    does not match the data type of the entry the background nicely fades
+    to a light red color. As the background changes an information icon
+    appears. When the user passes the mouse over the information icon a
+    tooltip is displayed informing the user how to correctly fill the
+    entry. When dealing with date and float data-type the information on
+    how to fill these entries is displayed according to the current locale.
     """
     WidgetProxy.implementsIProxy()
     WidgetProxy.implementsIMandatoryProxy()
@@ -78,7 +80,7 @@ class Entry(gtk.Entry, WidgetProxy.MixinSupportValidation):
         self.chain()
         
     def read(self):
-        """Called after each caracter is typed. If the input is wrong start 
+        """Called after each character is typed. If the input is wrong start 
         complaining
         """
         text = self.get_text()
