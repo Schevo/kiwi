@@ -28,9 +28,9 @@
 import time
 
 from Kiwi2 import ValueUnset
+from Kiwi2.datatypes import ValidationError
 from Kiwi2.initgtk import gtk, gobject
 from Kiwi2.Widgets import WidgetProxy
-from Kiwi2.Widgets.datatypes import ValidationError
 from Kiwi2.utils import gsignal, gproperty
 
 

@@ -31,7 +31,7 @@ import time
 from Kiwi2 import _warn, ValueUnset
 from Kiwi2.initgtk import gtk, gobject
 from Kiwi2.utils import gsignal, gproperty, set_background, merge_colors
-from Kiwi2.Widgets.datatypes import ValidationError, converter
+from Kiwi2.datatypes import ValidationError, converter
 
 
 MERGE_COLORS_DELAY = 100

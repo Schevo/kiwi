@@ -35,9 +35,9 @@ import gtk
 import gtk.keysyms 
 
 from Kiwi2 import ValueUnset
+from Kiwi2.datatypes import ValidationError
 from Kiwi2.Widgets import WidgetProxy
 from Kiwi2.utils import gsignal, gproperty
-from Kiwi2.Widgets.datatypes import ValidationError
 
 (COL_COMBO_LABEL,
  COL_COMBO_DATA) = range(2)

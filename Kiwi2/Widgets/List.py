@@ -29,8 +29,7 @@
 import datetime
 
 from Kiwi2.accessors import kgetattr
-from Kiwi2 import ValueUnset
-from Kiwi2.Widgets import datatypes
+from Kiwi2 import datatypes, ValueUnset
 from Kiwi2.initgtk import gtk, gobject
 from Kiwi2.utils import gsignal, gproperty
 

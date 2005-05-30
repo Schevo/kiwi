@@ -31,10 +31,24 @@ my_columns = [Column("title", sorted=True),
               Column("author", justify=gtk.JUSTIFY_RIGHT), 
               Column("url", title="URL", visible=False)]
 
-kiwilist = List(my_columns, news)
+kiwilist = List(my_columns)
 w = gtk.Window()
 w.connect('delete-event', gtk.main_quit)
 w.set_size_request(600, 250)
-w.add(kiwilist)
+
+vbox = gtk.VBox()
+w.add(vbox)
+
+def on_button__clicked(button):
+    if len(kiwilist):
+        return
+    
+    kiwilist.add_list(news)
+    
+b = gtk.Button('Add some items')
+b.connect('clicked', on_button__clicked)
+vbox.pack_start(b, False, False)
+
+vbox.pack_start(kiwilist)
 w.show_all()
 gtk.main()
