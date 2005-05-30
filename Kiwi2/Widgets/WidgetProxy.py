@@ -105,7 +105,7 @@ class Mixin(object):
         data_type can be None, a type object or a string with the name of the
         type object, so None, "<type 'str'>" or 'str'
         """
-        print self, 'set_data_type', obj
+
         if obj is None:
             self._data_type = None
             return
