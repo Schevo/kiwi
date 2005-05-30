@@ -42,8 +42,8 @@ class TextView(gtk.TextView, WidgetProxy.MixinSupportValidation):
     gsignal('expose-event', 'override')
     
     def __init__(self):
-        WidgetProxy.MixinSupportValidation.__init__(self)
         gtk.TextView.__init__(self)
+        WidgetProxy.MixinSupportValidation.__init__(self)
         
         self.textbuffer = gtk.TextBuffer()
         self.textbuffer.connect('changed',
