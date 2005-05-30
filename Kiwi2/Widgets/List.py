@@ -42,12 +42,14 @@ def str2enum(value_name, enum_class):
         if value_name in (enum.value_name, enum.value_nick):
             return enum
 
-def str2type(value):
-    if value in datatypes.supported_types_names:
-        ind = datatypes.supported_types_names.index(value)
-        return datatypes.supported_types[ind]
-    else:
-        raise ValueError("The datatype '%s' is not supported" % value)
+
+def str2type(value,
+             from_string=datatypes.converter.from_string):
+    return from_string(str, value)
+
+def str2bool(value, default_value=False,
+             from_string=datatypes.converter.from_string):
+    return from_string(bool, value, default_value)
 
 class Column:
     """Specifies a column in a List"""
@@ -223,12 +225,12 @@ class Column:
         self.attribute = fields[0] or None
         self.title = fields[1] or None
         self.data_type = str2type(fields[2])
-        self.visible = datatypes.str2bool(fields[3], default_value=True)
+        self.visible = str2bool(fields[3], default_value=True)
         self.justify = str2enum(fields[4], gtk.JUSTIFY_LEFT)
         self.tooltip = fields[5]
         self.format = fields[6]
         self.width = (fields[7] and int(fields[7])) or None
-        self.sorted = datatypes.str2bool(fields[8], default_value=False)
+        self.sorted = str2bool(fields[8], default_value=False)
         self.order = str2enum(fields[9], gtk.SORT_ASCENDING) \
                      or gtk.SORT_ASCENDING
         # XXX: expand, remember to sync with __str__
@@ -343,7 +345,6 @@ class List(gtk.ScrolledWindow):
         # menu
         self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
 
-        self._columns_created = False
         self._columns_configured = False
         self._autosize = True
         
@@ -426,17 +427,6 @@ class List(gtk.ScrolledWindow):
                             name)
         return tp
     
-    def _create_columns(self):
-        """Create the treeview columns"""
-        if self._columns_created:
-            return
-        
-        for column in self._columns:
-            self._create_column(column)
-
-        self._columns_created = True
-        self._columns_configured = False
-        
     def _create_column(self, column):
         treeview_column = gtk.TreeViewColumn()
         # we need to set our own widget because otherwise
@@ -454,7 +444,8 @@ class List(gtk.ScrolledWindow):
         button = self._get_column_button(treeview_column)
         button.connect('button-release-event',
                        self._on_header__button_release_event)
-
+        return treeview_column
+    
     def _setup_columns(self):
         if self._columns_configured:
             return
@@ -465,7 +456,15 @@ class List(gtk.ScrolledWindow):
         self._columns_configured = True
 
     def _setup_column(self, column):
+        # You can't subclass bool, so this is okay
+        if (column.data_type is bool and column.format):
+            raise TypeError("format is not supported for boolean columns") 
 
+        index = self._columns.index(column)
+        treeview_column = self.treeview.get_column(index)
+        if treeview_column is None:
+            treeview_column = self._create_column(column)  
+            
         renderer = self._create_best_renderer_for_type(column)
         
         justify = column.justify
@@ -488,12 +487,6 @@ class List(gtk.ScrolledWindow):
                 raise AssertionError
             renderer.set_property("xalign", xalign)
             
-        # You can't subclass bool, so this is okay
-        if (column.data_type is bool and column.format):
-            raise TypeError("format is not supported for boolean columns") 
-
-        index = self._columns.index(column)
-        treeview_column = self.treeview.get_column(index)
         treeview_column.pack_start(renderer)
         treeview_column.set_cell_data_func(renderer, self._cell_data_func,
                                            column)
@@ -600,7 +593,6 @@ class List(gtk.ScrolledWindow):
 
         self._popup.clean()
 
-        self._columns_created = False
         self._columns_configured = False
         
     # selection methods
@@ -710,7 +702,6 @@ class List(gtk.ScrolledWindow):
 
         if not self._has_enough_type_information():
             self._guess_types(instance_list[0])
-            self._create_columns()
             self._setup_columns()
             
         for instance in instance_list:
@@ -832,7 +823,6 @@ class List(gtk.ScrolledWindow):
                 success = c.set_from_string(col)
                 if success:
                     self._columns.append(c)
-                
         elif isinstance(value, (list, tuple)):
             self._columns = value
             self._columns_string = '^'.join([str(col) for col in value])
@@ -840,7 +830,6 @@ class List(gtk.ScrolledWindow):
             raise ValueError("value should be a string of a list of columns")
 
         self._clear_columns()
-        self._create_columns()
         if self._has_enough_type_information():
             self._setup_columns()
         
@@ -864,7 +853,6 @@ class List(gtk.ScrolledWindow):
 
         if not self._has_enough_type_information():
             self._guess_types(instance)
-            self._create_columns()
             self._setup_columns()
 
         # Freeze and save original selection mode to avoid blinking

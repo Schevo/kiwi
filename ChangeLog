@@ -1,3 +1,13 @@
+2005-05-30  Johan Dahlin  <jdahlin@async.com.br>
+
+	* Kiwi2/Widgets/List.py:
+	* Kiwi2/Widgets/WidgetProxy.py:
+	* Kiwi2/Widgets/datatypes.py:
+
+	Clean up datatypes. Introduce ConverterRegistry which is global object
+	you can use to convert to and from strings. Use the new API 
+	everywhere, cleanup WidgetProxy a little bit.
+
 2005-05-25  Johan Dahlin  <jdahlin@async.com.br>
 
 	* Kiwi2/Views.py (SlaveView.attach_slave): Change show_all 

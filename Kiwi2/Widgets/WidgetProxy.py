@@ -30,9 +30,8 @@ import time
 
 from Kiwi2 import _warn, ValueUnset
 from Kiwi2.initgtk import gtk, gobject
-from Kiwi2.Widgets import datatypes
 from Kiwi2.utils import gsignal, gproperty, set_background, merge_colors
-from Kiwi2.Widgets.datatypes import ValidationError
+from Kiwi2.Widgets.datatypes import ValidationError, converter
 
 
 MERGE_COLORS_DELAY = 100
@@ -71,9 +70,8 @@ class Mixin(object):
         """
         if data is ValueUnset or data is None:
             return
-        
         elif not isinstance(data, self._data_type):
-            raise TypeError("%s: Data is supposed to be a %s but it is %s: %s" \
+            raise TypeError("%s: Data is supposed to be a %s but it is %s: %s" 
                             % (self.name, self._data_type, type(data), data))
 
     def read(self):
@@ -93,41 +91,39 @@ class Mixin(object):
 
     def do_set_property(self, pspec, value):
         prop_name = pspec.name.replace("-", "_")
-        try:
-            getattr(self, "set_%s" % prop_name)(value)
-        except AttributeError:
+        func = getattr(self, "set_%s" % prop_name)
+        if not func:
             raise AttributeError("Invalid property name: %s" % pspec.name)
-        
+        return func(value)
+    
     def get_data_type(self):
         return self._data_type
 
-    def set_data_type(self, data_type):
+    def set_data_type(self, obj):
         """Set the data type for the widget
         
         data_type can be None, a type object or a string with the name of the
         type object, so None, "<type 'str'>" or 'str'
         """
-        if data_type is None:
+        print self, 'set_data_type', obj
+        if obj is None:
             self._data_type = None
             return
 
-        error_msg = " is not supported. Supported types are: %s" % \
-                    ', '.join(datatypes.supported_types_names)
+        data_type = None
+        for t in converter.get_list():
+            if t.type == obj or t.type.__name__ == obj:
+                data_type = t.type
+                break
+
+        assert not isinstance(data_type, str), data_type
         
-        # we allow data_type to be a string with the name of the type
-        if isinstance(data_type, basestring):
-            if not data_type in datatypes.supported_types_names:
-                raise TypeError("%s %s" % (data_type, error_msg))
+        if not data_type:
+            type_names = converter.get_supported_types_names()
+            raise TypeError("%s is not supported. Supported types are: %s"
+                            % (obj, ', '.join(type_names)))
 
-            else:
-                ind = datatypes.supported_types_names.index(data_type)
-                self._data_type = datatypes.supported_types[ind]
-                
-        elif data_type not in datatypes.supported_types:
-            raise TypeError("%s %s" % (data_type, error_msg))
-
-        else:
-            self._data_type = data_type
+        self._data_type = data_type
 
     def get_model_attribute(self):
         return self._model_attribute
@@ -140,9 +136,9 @@ class Mixin(object):
 
     def set_default_value(self, value):
         if isinstance(value, basestring):
-            self._default_value = self.str2type(value)
-        else:
-            self._default_value = value
+            value = self.str2type(value)
+            
+        self._default_value = value
     
     def str2type(self, data):
         """Convert a string to our data type.
@@ -158,7 +154,7 @@ class Mixin(object):
         # if the user clear the widget we should not raise a conversion error
         if data == '':
             return self._default_value
-        return datatypes.converters[datatypes.FROM_STR][self._data_type](data)
+        return converter.from_string(self._data_type, data)
 
     def type2str(self, data):
         """Convert a value to a string"""
@@ -166,7 +162,7 @@ class Mixin(object):
             msg = "You must set the data type before converting a type"
             raise TypeError(msg)
         assert isinstance(data, self._data_type)
-        return datatypes.converters[datatypes.TO_STR][self._data_type](data)
+        return converter.as_string(self._data_type, data)
 
 ERROR_COLOR = "#ffa5a5"
 GOOD_COLOR = "white"
@@ -291,7 +287,8 @@ class MixinSupportValidation(Mixin):
             self._complaint_checker_id = \
                 gobject.idle_add(self._check_for_complaints)
             self._get_cursor_position_id = \
-                gobject.timeout_add(CURSOR_POS_CHECKING_DELAY, self._get_cursor_position)
+                gobject.timeout_add(CURSOR_POS_CHECKING_DELAY,
+                                    self._get_cursor_position)
 
     def _check_for_complaints(self):
         """Check for existing complaints and when to start complaining is case
@@ -343,8 +340,8 @@ class MixinSupportValidation(Mixin):
 
     def _get_cursor_position(self):
         """If the input is wrong (as consequence the icon is been displayed),
-        this method reads the mouse cursor position and checks if it's on top of
-        the information icon
+        this method reads the mouse cursor position and checks if it's
+        on top of the information icon
         """
         if not self._info_icon_position:
             self._error_tooltip.disappear()
