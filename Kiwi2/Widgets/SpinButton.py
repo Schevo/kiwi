@@ -45,8 +45,8 @@ class SpinButton(gtk.SpinButton, WidgetProxy.MixinSupportValidation):
     def __init__(self):
         # since the default data_type is str we need to set it to int 
         # or float for spinbuttons
-        WidgetProxy.MixinSupportValidation.__init__(self, data_type=int)
         gtk.SpinButton.__init__(self)
+        WidgetProxy.MixinSupportValidation.__init__(self, data_type=int)
         
         # due to changes on pygtk 2.6 we have to make some ajustments here
         if gtk.pygtk_version < (2,6):
