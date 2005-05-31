@@ -162,7 +162,7 @@ class Mixin(object):
             msg = "You must set the data type before converting a type"
             raise TypeError(msg)
         assert isinstance(data, self._data_type)
-        return converter.as_string(self._data_type, data)
+        return converter.to_string(self._data_type, data)
 
 ERROR_COLOR = "#ffa5a5"
 GOOD_COLOR = "white"

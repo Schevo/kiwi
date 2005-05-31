@@ -36,15 +36,12 @@ from Kiwi2.utils import gsignal, gproperty
 # Minimum number of rows where we show busy cursor when sorting numeric columns
 MANY_ROWS = 1000
 
+str2type = datatypes.converter.str_to_type
+
 def str2enum(value_name, enum_class):
     for value, enum in enum_class.__enum_values__.items():
         if value_name in (enum.value_name, enum.value_nick):
             return enum
-
-
-def str2type(value,
-             from_string=datatypes.converter.from_string):
-    return from_string(str, value)
 
 def str2bool(value, default_value=False,
              from_string=datatypes.converter.from_string):
