@@ -554,7 +554,7 @@ class List(gtk.ScrolledWindow):
         instance = model.get_value(iter, 0)
         data = kgetattr(instance, definition.attribute, None)
         if definition.format:
-            data = datatypes.format(definition.format, data)
+            data = datatypes.lformat(definition.format, data)
         cellrenderer.set_property(renderer_prop, data)
 
     def _on_header__button_release_event(self, button, event):

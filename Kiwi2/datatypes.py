@@ -37,7 +37,6 @@ class ValidationError(Exception):
 locale.setlocale(locale.LC_ALL, '') # this set the user locale ( $LANG )
 
 def lformat(format, value):
-    print format, value
     return locale.format(format, value, 1)
 
 class ConverterRegistry:
