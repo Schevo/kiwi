@@ -27,7 +27,7 @@ from datetime import date
 import locale
 import time
 
-__all__ = ['ValidationError', 'format', 'converter']
+__all__ = ['ValidationError', 'lformat', 'converter']
 
 class ValidationError(Exception):
     pass
@@ -36,7 +36,8 @@ class ValidationError(Exception):
 # locale so we need to set the locale to that one
 locale.setlocale(locale.LC_ALL, '') # this set the user locale ( $LANG )
 
-def format(format, value):
+def lformat(format, value):
+    print format, value
     return locale.format(format, value, 1)
 
 class ConverterRegistry:
@@ -55,13 +56,16 @@ class ConverterRegistry:
 
     def get_list(self):
         return self._converters.values()
-    
-    def to_string(self, converter_type, data, *args, **kwargs):
+
+    def as_string(self, converter_type, data, *args, **kwargs):
         c = self._converters[converter_type]
-        if c.to_string is None:
+        if c.as_string is None:
             return data
 
-        return c.to_string(data, *args, **kwargs)
+        assert isinstance(data, c.type), ('data "%s" must be of %r not %r' % (
+            data, c.type, type(data)))
+        
+        return c.as_string(data, *args, **kwargs)
             
     def from_string(self, converter_type, data, *args, **kwargs):
         c = self._converters[converter_type]
@@ -70,21 +74,28 @@ class ConverterRegistry:
 
         return c.from_string(data, *args, **kwargs)
 
+    def str_to_type(self, value):
+        for c in self._converters.values():
+            if c.type.__name__ == value:
+                return c.type
+
 # Global converter, can be accessed from outside
 converter = ConverterRegistry()
 
 
 class StringConverter:
     type = str
-    
-    as_string = None
+
+    as_string = str
     from_string = None
 converter.add(StringConverter)
 
 class IntConverter:
     type = int
 
-    as_string = str
+    def as_string(self, value, format='%d'):
+        """Convert a float to a string"""
+        return lformat(format, value)
 
     def from_string(self, value):
         "Convert a string to an integer"
@@ -97,7 +108,7 @@ converter.add(IntConverter)
 class BoolConverter:
     type = bool
     
-    as_string = str
+    as_string = lambda s, value, format=None: str
 
     def from_string(self, value, default_value=True):
         "Convert a string to a boolean"
@@ -115,9 +126,9 @@ class FloatConverter:
     def __init__(self):
         self._locale_dictionary = locale.localeconv()
         
-    def as_string(self, value):
+    def as_string(self, value, format='%f'):
         """Convert a float to a string"""
-        return format('%f', value)
+        return lformat(format, value)
 
     def from_string(self, value):
         """Convert a string to a float"""
@@ -170,9 +181,12 @@ class DateConverter:
             tmp = tmp.replace(code, replacement)
         self._readable_format = tmp
         
-    def as_string(self, value):
+    def as_string(self, value, format=None):
         "Convert a date to a string"
-        return value.strftime(self._format)
+        if format is None:
+            format = self._format
+            
+        return value.strftime(format)
     
     def from_string(self, value):
         "Convert a string to a date"
