@@ -39,12 +39,14 @@ MANY_ROWS = 1000
 str2type = datatypes.converter.str_to_type
 
 def str2enum(value_name, enum_class):
-    for value, enum in enum_class.__enum_values__.items():
+    "converts a string to a enum"
+    for _, enum in enum_class.__enum_values__.items():
         if value_name in (enum.value_name, enum.value_nick):
             return enum
 
 def str2bool(value, default_value=False,
              from_string=datatypes.converter.from_string):
+    "converts a boolean to a enum"
     return from_string(bool, value, default_value)
 
 class Column:
