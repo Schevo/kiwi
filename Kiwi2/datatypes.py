@@ -85,7 +85,9 @@ converter = ConverterRegistry()
 class StringConverter:
     type = str
 
-    as_string = str
+    def as_string(self, value, format='%s'):
+        return format % value
+
     from_string = None
 converter.add(StringConverter)
 
@@ -170,6 +172,9 @@ class DateConverter:
     type = date
     
     def __init__(self):
+        self.update_format()
+
+    def update_format(self):
         self._format = locale.nl_langinfo(locale.D_FMT)
 
         tmp = self._format[:]
@@ -179,7 +184,7 @@ class DateConverter:
                                   ('%d', 'dd')):
             tmp = tmp.replace(code, replacement)
         self._readable_format = tmp
-        
+
     def as_string(self, value, format=None):
         "Convert a date to a string"
         if format is None:

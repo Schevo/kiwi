@@ -1,9 +1,9 @@
 # This example illustrates the use of entries with validations
 
 
-from Kiwi2 import Delegates
+from Kiwi2 import Delegates, datatypes
 from Kiwi2.initgtk import gtk, quit_if_last
-from Kiwi2.Widgets import Entry, datatypes
+from Kiwi2.Widgets import Entry
 
 class Person:
     pass
@@ -21,6 +21,7 @@ class Form(Delegates.Delegate):
         self.nationality.prefill(['Brazilian', 'Other'])
         self.sex.prefill(('Male', 'Female'))
         self.register_validate_function(self.validity)
+        self.height.set_format('%4.4f')
         
     # here we define our custom validation. When a user types anything,
     # the validate signal calls methods with the signature 
@@ -34,7 +35,7 @@ class Form(Delegates.Delegate):
     def on_height__validate(self, widget, data):
         if data > 50:
             return datatypes.ValidationError("The name is too long")
-    
+        
     def on_weight__validate(self, widget, data):
         if float(data) > 90:
             # this is really not the type of validation that you would use :)
@@ -46,7 +47,9 @@ class Form(Delegates.Delegate):
 
 person = Person()
 form = Form()
-proxy = form.add_proxy(person, ['name', 'age', 'birthdate', 'height', 'weight', 'about', 'nationality'])
+proxy = form.add_proxy(person, ['name', 'age', 'birthdate',
+                                'height', 'weight', 'about',
+                                'nationality'])
 form.show_all()
 
 def on_ok_btn_clicked(widget):

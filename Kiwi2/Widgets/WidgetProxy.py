@@ -52,6 +52,7 @@ class Mixin(object):
         self._default_value = None
         self._data_type = None
         self._model_attribute = None
+        self._data_format = None
         # this attibute will be set to the view that owns the widget
         self.owner = None
         
@@ -59,6 +60,9 @@ class Mixin(object):
         self.set_data_type(data_type)
         self.set_model_attribute(model_attribute)
         self.set_default_value(default_value)
+
+    def set_data_format(self, format):
+        self._data_format = format
         
     def update(self, data):
         """Set the content of the widget with @data.
@@ -161,9 +165,15 @@ class Mixin(object):
         if self._data_type is None:
             msg = "You must set the data type before converting a type"
             raise TypeError(msg)
-        assert isinstance(data, self._data_type)
-        return converter.as_string(self._data_type, data)
 
+        assert isinstance(data, self._data_type)
+
+        kwargs = {}
+        if self._data_format:
+            kwargs['format'] = self._data_format
+
+        return converter.as_string(self._data_type, data, **kwargs)
+        
 ERROR_COLOR = "#ffa5a5"
 GOOD_COLOR = "white"
 
