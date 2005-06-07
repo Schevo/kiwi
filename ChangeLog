@@ -1,3 +1,10 @@
+2005-06-07  Henrique Romano  <henrique@async.com.br>
+
+	* Kiwi2/Proxies.py: Also block/unblock all signals connected when
+	updating widgets.
+	* Kiwi2/Views.py: Allow signal_name to be None, if so block/unblock all
+	the connected
+
 2005-06-01  Henrique Romano  <henrique@async.com.br>
 
 	reviwed by: Johan Dahlin  <jdahlin@async.com.br>

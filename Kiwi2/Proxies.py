@@ -513,7 +513,9 @@ class Proxy:
 
         if block:
             block_widget(widget)
+            self.view.handler_block(widget)
             widget.update(value)
+            self.view.handler_unblock(widget)
             unblock_widget(widget)
         else:
             widget.update(value)

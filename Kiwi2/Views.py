@@ -176,13 +176,21 @@ class SignalBroker(object):
             self._autoconnected[widget].append((signal, signal_id))
 
     def handler_block(self, widget, signal_name):
-        for signal, signal_id in self._autoconnected[widget]:
-            if signal == signal_name:
+        signals = self._autoconnected
+        if not widget in signals:
+            return
+            
+        for signal, signal_id in signals[widget]:
+            if signal_name is None or signal == signal_name:
                 widget.handler_block(signal_id)
 
     def handler_unblock(self, widget, signal_name):
-        for signal, signal_id in self._autoconnected[widget]:
-            if signal == signal_name:
+        signals = self._autoconnected
+        if not widget in signals:
+            return
+        
+        for signal, signal_id in signals[widget]:
+            if signal_name is None or signal == signal_name:
                 widget.handler_unblock(signal_id)
 
     def disconnect_autoconnected(self):
@@ -657,10 +665,10 @@ class SlaveView(gobject.GObject):
         autoconnect_signals()"""
         self.__broker.disconnect_autoconnected()
         
-    def handler_block(self, widget, signal_name):
+    def handler_block(self, widget, signal_name=None):
         self.__broker.handler_block(widget, signal_name)
 
-    def handler_unblock(self, widget, signal_name):
+    def handler_unblock(self, widget, signal_name=None):
         self.__broker.handler_unblock(widget, signal_name)
         
     #
