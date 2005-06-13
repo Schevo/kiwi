@@ -50,16 +50,10 @@ class TextView(gtk.TextView, WidgetProxy.MixinSupportValidation):
                                 self._on_textbuffer__changed)
         self.set_buffer(self.textbuffer)
         
-        self.connect("key-release-event", self._key_release_event)
-        
         # due to changes on pygtk 2.6 we have to make some ajustments here
         if gtk.pygtk_version < (2,6):
             self.do_expose_event = self.chain
     
-    def _key_release_event(self, *args):
-        self._last_change_time = time.time()
-        self.emit('content-changed')
-
     def _on_textbuffer__changed(self, textbuffer):
         self.emit('content-changed')
         self.read()
