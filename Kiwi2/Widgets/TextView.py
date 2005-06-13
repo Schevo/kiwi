@@ -55,6 +55,7 @@ class TextView(gtk.TextView, WidgetProxy.MixinSupportValidation):
             self.do_expose_event = self.chain
     
     def _on_textbuffer__changed(self, textbuffer):
+        self._last_change_time = time.time()
         self.emit('content-changed')
         self.read()
 
