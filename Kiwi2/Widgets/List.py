@@ -331,6 +331,16 @@ class List(gtk.ScrolledWindow):
     #  - sorted: if the data is sorted by this column. Default to False
     #  - order: one of 'ascending', 'descending' or ''. Default to ''
     gproperty('column-definitions', str, nick="ColumnDefinitions")
+
+    # This is the selection mode of the list, must be one of:
+    #   gtk.SELECTION_NONE	No selection allowed.
+    #   gtk.SELECTION_SINGLE	A single selection allowed by clicking.
+    #   gtk.SELECTION_BROWSE	A single selection allowed by browsing
+    #                           with the pointer.
+    #   gtk.SELECTION_MULTIPLE	Multiple items can be selected at once.
+    gproperty('selection-mode', gtk.SelectionMode,
+              default=gtk.SELECTION_BROWSE,
+              nick="SelectionMode")
     
     def __init__(self, columns=[],
                  instance_list=None,
@@ -834,12 +844,16 @@ class List(gtk.ScrolledWindow):
     def do_get_property(self, pspec):
         if pspec.name == 'column-definitions':
             return self.get_columns()
+        elif pspec.name == 'selection-mode':
+            return self.get_selection_mode()
         else:
             raise AttributeError('Unknown property %s' % pspec.name)
 
     def do_set_property(self, pspec, value):
         if pspec.name == 'column-definitions':
             self.set_columns(value)
+        elif pspec.name == 'selection-mode':
+            self.set_selection_mode(value)
         else:
             raise AttributeError('Unknown property %s' % pspec.name)
     
@@ -906,6 +920,7 @@ class List(gtk.ScrolledWindow):
     def set_selection_mode(self, mode):
         selection = self.treeview.get_selection()
         if selection:
+            self.notify('selection-mode')
             return selection.set_mode(mode)
 
     def unselect_all(self):

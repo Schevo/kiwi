@@ -10,7 +10,10 @@
       <function name="fill-empty" type="ignore" />
       <properties>
 
-        <property id="column-definitions" name="Column Definitions" translatable="False" adaptor-class="ColumnDefinitionsAdaptor">
+        <property id="column-definitions" 
+                  name="Column Definitions" 
+                  translatable="False" 
+                  adaptor-class="ColumnDefinitionsAdaptor">
           <type>String</type>
           <function name="get" type="ignore"/>
           <function name="set" type="override"/>
@@ -20,6 +23,8 @@
           </editor>
 
         </property>
+        <property id="selection-mode" 
+                  name="Selection Mode"/>
         <property id="hadjustment" disabled="True"/>
         <property id="vadjustment" disabled="True"/>
 
@@ -223,7 +228,6 @@
     <glade-widget-class-ref name="Kiwi2+Widgets+RadioButton+RadioButton"/>
     <glade-widget-class-ref name="Kiwi2+Widgets+SpinButton+SpinButton"/>
     <glade-widget-class-ref name="Kiwi2+Widgets+TextView+TextView"/>
-
   </glade-widget-group>
   
 </glade-catalog>
