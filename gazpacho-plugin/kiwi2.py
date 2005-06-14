@@ -1,4 +1,4 @@
-# Copyright (C) 2005 by Async
+# Copyright (C) 2005 by Async Open Source
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public License
@@ -49,16 +49,15 @@ class DataTypeAdaptor(object):
         combo.set_data('connection-id', connection_id)
         model = combo.get_model()
         value = kiwiwidget.get_property('data-type')
-        it = model.get_iter_first()
-        while it:
-            if value == model.get_value(it, 1):
-                combo.set_active_iter(it)
+        for row in model:
+            if row[1] == value:
+                combo.set_active_iter(row.iter)
                 break
-            it = model.iter_next(it)
-
+            
     def _editor_edit(self, combo, kiwilist, proxy, context):
+        model = combo.get_model()
         active_iter = combo.get_active_iter()
-        value = combo.get_model().get_value(active_iter, 1)
+        value = model.get_value(active_iter, 1)
         proxy.set_value(value)
 
     def save(self, context, widget):
@@ -93,9 +92,8 @@ class ColumnDefinitionsAdaptor(object):
         return button
 
     def update_editor(self, context, button, kiwilist, proxy):
-        print 'updating editor'
         connection_id = button.get_data('connection-id')
-        if (connection_id != -1):
+        if connection_id != -1:
             button.disconnect(connection_id)
         connection_id = button.connect('clicked', self._editor_edit, kiwilist,
                                        proxy, context)
@@ -151,15 +149,15 @@ class ListColumnDefinitionsEditor(CustomPropertyEditor):
         self.treeview.set_size_request(580, 300)
         selection = self.treeview.get_selection()
         selection.connect('changed', self._on_selection__changed)
-        for (i, title,) in enumerate(('Attribute',
-         'Title',
-         'Data type')):
+        for i, title in enumerate(('Attribute',
+                                      'Title',
+                                      'Data type')):
             self.treeview.append_column(self._create_text_column(title, i))
 
         self.treeview.append_column(self._create_bool_column('Visible', 3))
-        for (i, title,) in enumerate(('Justify',
-         'Tooltip',
-         'Format')):
+        for i, title in enumerate(('Justify',
+                                      'Tooltip',
+                                      'Format')):
             self.treeview.append_column(self._create_text_column(title,
                                                                  (i + 4)))
 
@@ -211,16 +209,20 @@ class ListColumnDefinitionsEditor(CustomPropertyEditor):
     def _load_columns(self):
         self.model.clear()
         cd = self.gwidget.get_glade_property('column-definitions').value
-        if (not cd):
-            return 
+        if not cd:
+            return
+        
         for col in cd.split('^'):
-            (attr, title, data_type, visible, justify, tooltip, format, width,
-             sorted, order) = col.split('|')
+            (attr, title, data_type,
+             visible, justify, tooltip,
+             format, width, sorted, order) = col.split('|')
+            
             visible = get_bool_from_string_with_default(visible, True)
             width = int(width)
             sorted = get_bool_from_string_with_default(sorted, False)
-            self.model.append((attr, title, data_type, visible, justify,
-             tooltip, format, width, sorted, order))
+            self.model.append((attr, title, data_type,
+                               visible, justify, tooltip,
+                               format, width, sorted, order))
 
     def _on_add_clicked(self, button):
         row_iter = self.model.append(self._get_default_values())
@@ -230,67 +232,84 @@ class ListColumnDefinitionsEditor(CustomPropertyEditor):
         self._update_proxy()
 
     def _on_remove_clicked(self, button):
-        (model, selected_iter,) = self.treeview.get_selection().get_selected()
-        if (selected_iter is not None):
+        model, selected_iter = self.treeview.get_selection().get_selected()
+        if selected_iter:
             model.remove(selected_iter)
             self._update_proxy()
 
     def _on_up_clicked(self, button):
-        (model, selected_iter,) = self.treeview.get_selection().get_selected()
-        if (selected_iter is not None):
-            path = self.model.get_path(selected_iter)
-            prev_iter = self.model.get_iter(((path[0] - 1)))
-            if (prev_iter is not None):
-                model.swap(prev_iter, selected_iter)
-                self._update_proxy()
+        model, selected_iter = self.treeview.get_selection().get_selected()
+        if not selected_iter:
+            return
+        
+        path = self.model.get_path(selected_iter)
+        prev_iter = self.model.get_iter(((path[0] - 1)))
+        if not prev_iter:
+            return
+        
+        model.swap(prev_iter, selected_iter)
+        self._update_proxy()
+        self._update_buttons()
 
     def _on_down_clicked(self, button):
-        (model, selected_iter,) = self.treeview.get_selection().get_selected()
-        if (selected_iter is not None):
-            next_iter = model.iter_next(selected_iter)
-            if (next_iter is not None):
-                model.swap(selected_iter, next_iter)
-                self._update_proxy()
+        model, selected_iter = self.treeview.get_selection().get_selected()
+        if not selected_iter:
+            return
+        
+        next_iter = model.iter_next(selected_iter)
+        if not next_iter:
+            return
+        
+        model.swap(selected_iter, next_iter)
+        self._update_proxy()
+        self._update_buttons()
 
     def _on_text_renderer__edited(self, renderer, path, new_text, col_index):
-        row_iter = self.model.get_iter(path)
         value = new_text
-        if (col_index == WIDTH):
+        if col_index == WIDTH:
             try:
                 value = int(new_text)
             except ValueError:
-                return 
-        self.model.set_value(row_iter, col_index, value)
-        if (col_index == ATTRIBUTE):
-            title = self.model.get_value(row_iter, TITLE)
-            if (not title):
-                self.model.set_value(row_iter, TITLE, value.capitalize())
+                return
+
+        row = self.model[path[0]]
+        row[col_index] = value
+        if col_index == ATTRIBUTE:
+            title = row[TITLE]
+            if not title:
+                row[TITLE] = value.capitalize()
         self._update_proxy()
 
     def _on_toggle_renderer__toggled(self, renderer, path, col_index):
-        row_iter = self.model.get_iter(path)
-        old_value = self.model.get_value(row_iter, col_index)
-        self.model.set_value(row_iter, col_index, (not old_value))
+        row = self.model[path[0]]
+        row[col_index] = not row[col_index]
         self._update_proxy()
 
     def _on_selection__changed(self, selection):
-        (model, selected_iter,) = selection.get_selected()
-        if (selected_iter is not None):
-            self.remove.set_sensitive(True)
-            path = model.get_path(selected_iter)
-            size = len(model)
-            if (path[0] == 0):
-                self.up.set_sensitive(False)
-                if (size > 1):
-                    self.down.set_sensitive(True)
-            if (path[0] == (size - 1)):
-                self.down.set_sensitive(False)
-                if (size > 1):
-                    self.up.set_sensitive(True)
-            if ((path[0] > 0) and (path[0] < (size - 1))):
-                self.up.set_sensitive(True)
-                self.down.set_sensitive(True)
-        else:
+        self._update_buttons()
+
+    def _update_buttons(self):
+        selection = self.treeview.get_selection()
+        model, selected_iter = selection.get_selected()
+        if not selected_iter:
+            self.remove.set_sensitive(False)
             self.down.set_sensitive(False)
             self.up.set_sensitive(False)
-            self.remove.set_sensitive(False)
+            return
+        
+        self.remove.set_sensitive(True)
+        path = model.get_path(selected_iter)[0]
+        size = len(model)
+        if path == 0:
+            self.up.set_sensitive(False)
+            if size > 1:
+                self.down.set_sensitive(True)
+                
+        if path == size - 1:
+            self.down.set_sensitive(False)
+            if size > 1:
+                self.up.set_sensitive(True)
+                
+        if path > 0 and path < (size - 1):
+            self.up.set_sensitive(True)
+            self.down.set_sensitive(True)
