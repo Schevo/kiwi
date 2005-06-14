@@ -85,10 +85,12 @@ converter = ConverterRegistry()
 class StringConverter:
     type = str
 
+    def from_string(self, value):
+        return str(value)
+    
     def as_string(self, value, format='%s'):
         return format % value
 
-    from_string = None
 converter.add(StringConverter)
 
 class IntConverter:
