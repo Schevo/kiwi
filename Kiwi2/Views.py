@@ -390,7 +390,7 @@ class SlaveView(gobject.GObject):
         """Retrieves the named widget from the View"""
         name = string.replace(name,'.','_')
         widget = getattr(self, name, None)
-        if not widget:
+        if widget is None:
             raise AttributeError("Widget %s not found in view %s"
                                  % (name, self))
         if not isinstance(widget, gtk.Widget):
@@ -439,7 +439,7 @@ class SlaveView(gobject.GObject):
             - widgets: a list of widget names to be searched through
         """
         widget = self.get_topmost_widget(widgets, can_focus=1)
-        if widget: 
+        if widget is not None: 
             widget.grab_focus()
         # So it can be idle_added safely
         return False

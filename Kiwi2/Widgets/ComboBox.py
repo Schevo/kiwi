@@ -53,6 +53,9 @@ class ComboProxyMixin(object):
         model = gtk.ListStore(str, object)
         self.set_model(model)
 
+    def __nonzero__(self):
+        return True
+    
     def __len__(self):
         return len(self.get_model())
     
@@ -138,7 +141,7 @@ class ComboProxyMixin(object):
         else:
             raise KeyError("No item correspond to label %s in the combo %s"
                            % (label, self.name))
-    
+
     def select_item_by_data(self, data):
         model = self.get_model()
         for row in model:
@@ -152,7 +155,7 @@ class ComboProxyMixin(object):
             else:
                 raise KeyError("No item correspond to data %r in the combo %s" 
                                % (data, self.name))
-            
+
     def get_model_items(self):
         model = self.get_model()
         items = {}
