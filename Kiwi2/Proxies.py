@@ -290,7 +290,7 @@ class OldVirtualProxy:
         # XXX: this will need to be changed for composition
 
         attrs = []
-        if widgets is not None:
+        if not widgets:
             widgets = getattr(self, 'widgets', [])[:]
         #widgets = (widgets or self.widgets or [])[:]
         
