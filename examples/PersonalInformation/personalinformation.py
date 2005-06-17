@@ -1,5 +1,6 @@
 # This example illustrates the use of entries with validations
 
+import datetime
 
 from Kiwi2 import Delegates, datatypes
 from Kiwi2.initgtk import gtk, quit_if_last
@@ -18,10 +19,10 @@ class Form(Delegates.Delegate):
                                              'sex', 'nationality', 'ok_btn'],
                                     delete_handler=quit_if_last)
     
-        self.nationality.prefill(['Brazilian', 'Other'])
+        self.nationality.prefill(['Brazilian', 'Yankee', 'Other'])
         self.sex.prefill(('Male', 'Female'))
         self.register_validate_function(self.validity)
-        self.height.set_format('%4.4f')
+        self.height.set_data_format('%4.4f')
         
     # here we define our custom validation. When a user types anything,
     # the validate signal calls methods with the signature 
@@ -33,8 +34,8 @@ class Form(Delegates.Delegate):
             return datatypes.ValidationError("The name is too long")
     
     def on_height__validate(self, widget, data):
-        if data > 50:
-            return datatypes.ValidationError("The name is too long")
+        if data > 200:
+            return datatypes.ValidationError("The height is too tall")
         
     def on_weight__validate(self, widget, data):
         if float(data) > 90:
@@ -43,9 +44,18 @@ class Form(Delegates.Delegate):
             return datatypes.ValidationError("Dude! You need to lose some weight!")
     
     def validity(self, valid):
+        print 'validity() called with value ', valid
         self.ok_btn.set_sensitive(valid)
 
 person = Person()
+person.name = 'John Doe'
+person.age = 36
+person.birthdate = datetime.datetime(year=1969, month=2, day=20)
+person.height = 183.0
+person.weight = 86.0
+person.nationality = 'Yankee'
+person.about = 'Kinda fat'
+
 form = Form()
 proxy = form.add_proxy(person, ['name', 'age', 'birthdate',
                                 'height', 'weight', 'about',
