@@ -1,3 +1,19 @@
+2005-06-18  Johan Dahlin  <jdahlin@async.com.br>
+
+	* Kiwi2/Proxies.py:
+	* Kiwi2/Views.py:
+	* Kiwi2/Widgets/ComboBox.py:
+	* Kiwi2/Widgets/Entry.py:
+	* Kiwi2/Widgets/SpinButton.py:
+	* Kiwi2/Widgets/TextView.py:
+	* Kiwi2/Widgets/WidgetProxy.py:
+	* examples/PersonalInformation/personalinformation.py:
+
+	Rework validation. Only validate when the model content changes.
+	Simplify internal implementation of validation.
+	Fix ComboBoxEntry validation once for all.
+	Updated example and added comments and docstrings
+	
 2005-06-14  Johan Dahlin  <jdahlin@async.com.br>
 
 	* gazpacho-plugin/kiwi2.py: Clean up and fix a bug, when moving rows

@@ -33,8 +33,8 @@ import string, sys
 from Kiwi2 import _warn, get_decimal_separator, ValueUnset
 from Kiwi2 import standard_widgets
 from Kiwi2.initgtk import gtk
-
 from Kiwi2.accessors import kgetattr, ksetattr, clear_attr_cache
+from Kiwi2.Widgets import WidgetProxy
 
 #
 # Warning system
@@ -616,7 +616,16 @@ class Proxy:
             widget.owner = self.view
 
     def _on_widget__content_changed(self, widget):
+        """This is called as soon as the content of one of the widget
+        changes, the widgets tries fairly hard to not emit when it's not
+        neccessary"""
+        
         data = widget.read()
+
+        # Data has changed, start validation process
+        if isinstance(widget, WidgetProxy.MixinSupportValidation):
+            widget.validate_data(data)
+
         # only update the model if the data is correct
         if data is not ValueUnset:
             self._update_model(widget, data)
@@ -684,6 +693,12 @@ class Proxy:
                 tweak_function(attribute, value)
             else:
                 self.update(attribute, value, block=True)
+
+            # The initial value of the model is set, at this point
+            # we'll do an initial validation check
+            if isinstance(widget, WidgetProxy.MixinSupportValidation):
+                value = widget.read()
+                widget.validate_data(value)
 
     def _register_proxy_in_model(self, attribute):
         model = self.model

@@ -304,12 +304,14 @@ class SlaveView(gobject.GObject):
         self.slaves = {}
 
     # Global validations
-    def check_widgets_validity(self):
+    def notify_validity(self):
         """Checks if there are widgets with invalid data.
         Calls the registered validate function
         """
+        
         if self._validate_function is None:
             return
+        
         valid = True
         for widget_name in self.widgets:
             widget = self.get_widget(widget_name)

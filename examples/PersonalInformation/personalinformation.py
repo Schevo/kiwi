@@ -41,10 +41,14 @@ class Form(Delegates.Delegate):
         if float(data) > 90:
             # this is really not the type of validation that you would use :)
             # anyway, it's just for reference
-            return datatypes.ValidationError("Dude! You need to lose some weight!")
+            return datatypes.ValidationError("Dude! You need to lose "
+                                             "some weight!")
+    
+    def on_nationality__validate(self, widget, data):
+        if data != 'Yankee':
+            return datatypes.ValidationError("Go home terrorist!")
     
     def validity(self, valid):
-        print 'validity() called with value ', valid
         self.ok_btn.set_sensitive(valid)
 
 person = Person()

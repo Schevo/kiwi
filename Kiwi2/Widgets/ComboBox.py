@@ -229,8 +229,6 @@ class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin,
     # not the combo box itself.
     #gsignal('expose-event', 'override')
     
-    gsignal('changed', 'override')
-    
     gproperty("list-writable", bool, False, 
               "List Writable", gobject.PARAM_READWRITE)
     
@@ -279,11 +277,6 @@ class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin,
             self.append_item(text)
             self._update_selection(text)
      
-    def do_changed(self):
-        self._last_change_time = time.time()
-        self.emit('content-changed')
-        self.chain()
-    
     def _on__key_release_event(self, widget, event):
         """Checks for "Enter" key presses and add the entry text to 
         the combo list if the combo list is set as editable.
@@ -305,17 +298,19 @@ class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin,
 
     def _on_child_entry__changed(self, widget):
         """Called when something on the entry changes"""
+        if not widget.get_text():
+            return
+
         self._last_change_time = time.time()
         self.emit('content-changed')
 
     def read(self):
-        text = self.child.get_text()
-        self._validate_data(text)
-        return self._validate_data(text)
+        return self.child.get_text()
 
-    def do_validate(self, data):
+    def before_validate(self, data):
         """ComboBoxEntry has a validate default handler that check if the
         text of the entry is an item of the list"""
+        print 'DO_VALIDATE called', data
         items = self.get_model_items()
 
         if data is None or not data.strip():
@@ -323,13 +318,13 @@ class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin,
 
         if data not in items.keys():
             if self._list_writable:
-                error = ValidationError("Entered value not in list. "
-                                        "To add an item, type "
-                                        "the value and press enter")
+                msg = ("Entered value not in list. "
+                       "To add an item, type "
+                       "the value and press enter")
             else:
-                error = ValidationError("Entered value not in list")
-            return error
-    
+                msg = "Entered value not in list"
+            raise ValidationError(msg)
+
     def update(self, data):
         # first, trigger some basic validation
         WidgetProxy.Mixin.update(self, data)

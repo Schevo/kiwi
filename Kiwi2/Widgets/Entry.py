@@ -74,15 +74,12 @@ class Entry(gtk.Entry, WidgetProxy.MixinSupportValidation):
         self._last_change_time = time.time()
         self.chain()
         self.emit('content-changed')
-        
+
     def read(self):
         """Called after each character is typed. If the input is wrong start 
         complaining
         """
-        text = self.get_text()
-        data = self._validate_data(text)
-        
-        return data
+        return self.get_text()
 
     def update(self, data):
         WidgetProxy.MixinSupportValidation.update(self, data)

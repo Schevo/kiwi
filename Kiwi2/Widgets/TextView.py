@@ -69,8 +69,7 @@ class TextView(gtk.TextView, WidgetProxy.MixinSupportValidation):
         else:
             self._draw_mandatory_icon = False
         
-        data = self._validate_data(text)
-        return data
+        return text
                     
     def update(self, data):
         # first, trigger some basic validation

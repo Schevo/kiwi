@@ -233,7 +233,10 @@ class MixinSupportValidation(Mixin):
         if widget is None:
             widget = self
         self._widget_to_draw = widget
-    
+
+        self.before_validate = None
+        self.owner = None
+        
     def get_mandatory(self):
         """Checks if the Kiwi Widget is set to mandatory"""
         return self._mandatory
@@ -244,26 +247,39 @@ class MixinSupportValidation(Mixin):
         """
         self._mandatory = mandatory
 
-    def _validate_data(self, text):
+    def validate_data(self, text):
         """Checks if the data is valid.
         
         Validates data-type and custom validation.
         text - needs to be a string
         returns the widget data-type
         """
+
+        # check if we should draw the mandatory icon
+        # this need to be done before any data conversion because we
+        # we don't want to end drawing two icons
+        if text is None or text == '':
+            self._blank_data = True
+        else:
+            self._blank_data = False
+
+        self.draw_mandatory_icon_if_needed()            
+
+        data = self.str2type(text)
+
         try:
-            # check if we should draw the mandatory icon
-            # this need to be done before any data conversion because we
-            # we don't want to end drawing two icons
-            if text is None or text == '':
-                self._blank_data = True
-            else:
-                self._blank_data = False
+            # Callbacks, this is a rather complex process
 
-            self.draw_mandatory_icon_if_needed()            
+            # Step 1: A WidgetProxy subclass can implement a before_validate
+            #         callback which is called before user functions.
+            #         For example, check if the value is in the combo
+            if self.before_validate:
+                self.before_validate(data)
 
-            data = self.str2type(text)
-
+            # Step 2: Call a user handler, where the normal logic is
+            #         specified, due to a bug in PyGTK, we can nest
+            #         exceptions properly, so we have to use the return
+            #         value for the exceptions
             if data is not None:
                 # this signal calls the on_widgetname__validate method of the 
                 # view class and gets the exception (if any).
@@ -275,20 +291,19 @@ class MixinSupportValidation(Mixin):
             # the user
             self._stop_complaining()
 
-            # check if the remaining widgets are ok
-            self._check_widgets_validity()
-            
         except ValidationError, e:
+            # Show the error icon
             self._validation_error(e)
-            return ValueUnset
-        
-        return data
 
+        # Step 3: Inform the user code wether their widgets
+        #         are valid or not
+        self._notify_validity()
+            
     def _validation_error(self, e):
         if self._invalid_data:
             self._blank_data = False
             # check if the remaining widgets are ok
-            self._check_widgets_validity()
+            self._notify_validity()
         
         self._invalid_data = True
         self._validation_error_message = str(e)
@@ -423,9 +438,9 @@ class MixinSupportValidation(Mixin):
                                 winw - pixw, (winh - pixh)/2, 
                                 pixw, pixh)
 
-    def _check_widgets_validity(self):
-        if getattr(self, 'owner', None):
-            self.owner.check_widgets_validity()
+    def _notify_validity(self):
+        if self.owner:
+            self.owner.notify_validity()
 
     def is_correct(self):
         if self._invalid_data:

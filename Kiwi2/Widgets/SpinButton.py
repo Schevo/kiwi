@@ -41,7 +41,6 @@ class SpinButton(gtk.SpinButton, WidgetProxy.MixinSupportValidation):
     # mandatory widgets need to have this signal connected
     gsignal('expose-event', 'override')
     
-    
     def __init__(self):
         # since the default data_type is str we need to set it to int 
         # or float for spinbuttons
@@ -52,7 +51,8 @@ class SpinButton(gtk.SpinButton, WidgetProxy.MixinSupportValidation):
         if gtk.pygtk_version < (2,6):
             self.chain_expose = self.chain
         else:
-            self.chain_expose = lambda e: gtk.SpinButton.do_expose_event(self, e)
+            self.chain_expose = \
+                              lambda e: gtk.SpinButton.do_expose_event(self, e)
         
     def set_data_type(self, data_type):
         """Overriden from super class. Since spinbuttons should
@@ -66,15 +66,12 @@ class SpinButton(gtk.SpinButton, WidgetProxy.MixinSupportValidation):
             raise TypeError("SpinButtons only accept integer or float values")
         
     def do_changed(self):
-        self._last_change_time = time.time()        
+        self._last_change_time = time.time()
         self.emit('content-changed')
         self.chain()
 
     def read(self):
-        text = self.get_text()
-        data = self._validate_data(text)
-
-        return data
+        return self.get_text()
 
     def update(self, data):
         WidgetProxy.MixinSupportValidation.update(self, data)
