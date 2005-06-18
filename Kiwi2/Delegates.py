@@ -25,11 +25,7 @@
 
 """Defines the Delegate classes that are included in the Kiwi Framework."""
 
-from Kiwi2 import ValueUnset
 from Kiwi2.Views import SlaveView, BaseView
-from Kiwi2.Widgets import List
-from Kiwi2.initgtk import gtk
-from Kiwi2.accessors import kgetattr
 from Controllers import BaseController
 
 class SlaveDelegate(SlaveView, BaseController):

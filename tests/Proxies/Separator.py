@@ -1,12 +1,10 @@
 #!/usr/bin/env python
-import sys, pprint
+import sys
 sys.path.insert(0, "../..")
 
 DEBUG = 0
 if len(sys.argv) > 1:
     DEBUG = 1
-
-from mx import DateTime
 
 from Kiwi import set_decimal_separator
 from Kiwi.initgtk import gtk

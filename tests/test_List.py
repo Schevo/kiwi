@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 
-from utils import refresh_gui
+import unittest
+
+import gtk
 
 from Kiwi2.Widgets.List import List, Column
-from Kiwi2.initgtk import gtk, quit_if_last
-
-import unittest
+from utils import refresh_gui
 
 class Person:
     def __init__(self, name, age):

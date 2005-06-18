@@ -1,9 +1,7 @@
 #!/usr/bin/env python
-from utils import refresh_gui
+import unittest
 
 from Kiwi2.Widgets import CheckButton
-
-import unittest
 
 class CheckButtonTest(unittest.TestCase):
     def testForBool(self):

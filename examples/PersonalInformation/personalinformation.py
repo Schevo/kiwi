@@ -4,7 +4,6 @@ import datetime
 
 from Kiwi2 import Delegates, datatypes
 from Kiwi2.initgtk import gtk, quit_if_last
-from Kiwi2.Widgets import Entry
 
 class Person:
     pass

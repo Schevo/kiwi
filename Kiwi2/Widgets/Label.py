@@ -24,10 +24,12 @@
 
 """Defines an enhanced version of GtkLabel"""
 
-from Kiwi2.initgtk import gtk, gobject
+import gobject
+import gtk
+
+from Kiwi2 import ValueUnset
 from Kiwi2.Widgets import WidgetProxy
-from Kiwi2.utils import gsignal, gproperty, set_foreground
-from Kiwi2 import _warn, ValueUnset
+from Kiwi2.utils import set_foreground
 
 class Label(gtk.Label, WidgetProxy.Mixin):
     WidgetProxy.implementsIProxy()

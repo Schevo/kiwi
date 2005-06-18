@@ -1,9 +1,7 @@
 #!/usr/bin/env python
-from utils import refresh_gui
+import unittest
 
 from Kiwi2.Widgets import SpinButton
-
-import unittest
 
 class SpinButtonTest(unittest.TestCase):
     def testForIntFloat(self):

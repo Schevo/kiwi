@@ -1,12 +1,9 @@
 #!/usr/bin/env python
-from utils import refresh_gui
-
-from Kiwi2.Widgets import Entry, datatypes
-from Kiwi2 import ValueUnset
 import unittest
-import time
 
-import datetime
+from Kiwi2 import ValueUnset
+from Kiwi2.Widgets import Entry, datatypes
+
 class EntryTest(unittest.TestCase):
     def set_locale(self):
         

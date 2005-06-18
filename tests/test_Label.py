@@ -1,9 +1,7 @@
 #!/usr/bin/env python
-from utils import refresh_gui
+import unittest
 
 from Kiwi2.Widgets import Label
-
-import unittest
 
 class LabelTest(unittest.TestCase):
     def testAttr(self):

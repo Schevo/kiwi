@@ -1,7 +1,8 @@
+import gtk
+
 from Kiwi2.Widgets.Wizard import PluggableWizard
 from Kiwi2.Widgets.Wizard import WizardStep
-from Kiwi2.initgtk import gtk, quit_if_last
-from Kiwi2.Delegates import Delegate, SlaveDelegate
+from Kiwi2.Delegates import SlaveDelegate
 
 #
 # First lets set up the slaves that will be used on each step of the wizard
@@ -112,4 +113,3 @@ if __name__ == "__main__":
     survey = ITSurvey()
     survey.show_all()
     gtk.main()
-        

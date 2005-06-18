@@ -29,11 +29,16 @@
 Defines the View classes that are included in the Kiwi Framework, which
 are the base of Delegates and Proxies.
 """
-import os, string, sys
+
+import os
+import string
+
+import gobject
+import gtk
 
 from Kiwi2 import _warn, get_gladepath, get_imagepath
 from Kiwi2.utils import gsignal
-from Kiwi2.initgtk import _non_interactive, gtk, gobject, quit_if_last
+from Kiwi2.initgtk import _non_interactive, quit_if_last
 from Kiwi2.Proxies import Proxy
 from Kiwi2.Widgets import WidgetProxy
 

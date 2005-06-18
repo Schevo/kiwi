@@ -5,7 +5,7 @@
 # Proxies (a Frame).
 #
 
-import sys, pprint
+import sys
 sys.path.insert(0, "../..")
 
 DEBUG = 0

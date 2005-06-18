@@ -1,9 +1,13 @@
 #!/usr/bin/env python
+
 import os
+
+import gtk
+
 from Kiwi2 import utils
 from Kiwi2.Delegates import Delegate, SlaveDelegate
-from Kiwi2.Widgets.List import List, Column
-from Kiwi2.initgtk import gtk, quit_if_last
+from Kiwi2.initgtk import quit_if_last
+
 class NewsItem:
     def __init__(self, title, author, url):
         self.title, self.author, self.url = title, author, url
@@ -72,7 +76,7 @@ class Shell(Delegate):
 
 url = None
 
-import pdb
+#import pdb
 #pdb.run('Shell()')
 shell = Shell()
 shell.show()

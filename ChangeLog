@@ -1,5 +1,32 @@
 2005-06-18  Johan Dahlin  <jdahlin@async.com.br>
 
+	* Kiwi2/Delegates.py:
+	* Kiwi2/Proxies.py:
+	* Kiwi2/Views.py:
+	* Kiwi2/Widgets/Entry.py:
+	* Kiwi2/Widgets/Label.py:
+	* Kiwi2/Widgets/SpinButton.py:
+	* Kiwi2/Widgets/TextView.py:
+	* Kiwi2/Widgets/WidgetProxy.py:
+	* Kiwi2/__init__.py:
+	* examples/News/news2.py:
+	* examples/News/news4.py:
+	* examples/PersonalInformation/personalinformation.py:
+	* examples/Wizard/survey.py:
+	* tests/Proxies/None.py:
+	* tests/Proxies/Separator.py:
+	* tests/test_Action.py:
+	* tests/test_CheckButton.py:
+	* tests/test_Entry.py:
+	* tests/test_Label.py:
+	* tests/test_List.py:
+	* tests/test_SpinButton.py:
+
+	Remove unused imports. Clean up the rest we touched
+	Remove Proxies.OldVirtualProxy
+	
+2005-06-18  Johan Dahlin  <jdahlin@async.com.br>
+
 	* Kiwi2/Proxies.py:
 	* Kiwi2/Views.py:
 	* Kiwi2/Widgets/ComboBox.py:

@@ -31,48 +31,27 @@ Kiwi includes a Framework and a set of enhanced widgets, including CList, Option
     - Website: U{http://www.async.com.br/projects/kiwi/}
     - Organization: Async Open Source
 """            
-USE_MX = False
+
+import os
+import string
+import sys
 
 class ValueUnset:
     """To differentiate from places where None is a valid default. Used
     mainly in the Kiwi Proxy"""
     pass
 
-def get_decimal_separator():
-    return '.'
-
-from Kiwi2.initgtk import gtk
-#from Kiwi2.WidgetProxies import Entry, Text, CheckButton, OptionMenu
-
 from Kiwi2.version import version
 kiwi_version = version
-
-#from Kiwi2.Widgets import List, Entry
-
-standard_widgets = {
-#    gtk.Entry        : Entry,
-    #gtk.Combo        : Entry.ComboProxy,
-    #gtk.Label        : Entry.LabelProxy,
-    #gtk.SpinButton   : Entry.SpinButtonProxy,
-
-    #gtk.ToggleButton : CheckButton.ToggleButtonProxy,
-    #gtk.CheckButton  : CheckButton.CheckButtonProxy,
-
-    #gtk.Text         : Text.TextProxy,
-    #gtk.OptionMenu   : OptionMenu.OptionMenuProxy,
-}
 
 # Kiwi Combo, GtkRadioButton are non-standard and are handled specially
 # inside AbstractProxy
 
-from sys import stderr
 
 def _warn(msg):
-    stderr.write("Kiwi warning: "+msg+"\n")
+    sys.stderr.write("Kiwi warning: "+msg+"\n")
 
 gladepath = []
-
-import os
 
 if os.environ.has_key('KIWI_GLADE_PATH'):
     gladepath = os.environ['KIWI_GLADE_PATH'].split(':')

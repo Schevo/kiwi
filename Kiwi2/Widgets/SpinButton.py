@@ -28,9 +28,11 @@
 
 import time
 
-from Kiwi2.initgtk import gtk, gobject
+import gobject
+import gtk
+
 from Kiwi2.Widgets import WidgetProxy
-from Kiwi2.utils import gsignal, gproperty
+from Kiwi2.utils import gsignal
 from Kiwi2 import ValueUnset
 
 class SpinButton(gtk.SpinButton, WidgetProxy.MixinSupportValidation):
