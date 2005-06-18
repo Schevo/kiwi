@@ -266,9 +266,11 @@ class MixinSupportValidation(Mixin):
 
         self.draw_mandatory_icon_if_needed()            
 
-        data = self.str2type(text)
 
         try:
+            # This can raise validation error
+            data = self.str2type(text)
+            
             # Callbacks, this is a rather complex process
 
             # Step 1: A WidgetProxy subclass can implement a before_validate
@@ -299,7 +301,9 @@ class MixinSupportValidation(Mixin):
         # Step 3: Inform the user code wether their widgets
         #         are valid or not
         self._notify_validity()
-            
+
+        return data
+    
     def _validation_error(self, e):
         if self._invalid_data:
             self._blank_data = False

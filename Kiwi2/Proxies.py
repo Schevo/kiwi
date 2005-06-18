@@ -241,7 +241,7 @@ class Proxy:
 
         # Data has changed, start validation process
         if isinstance(widget, WidgetProxy.MixinSupportValidation):
-            widget.validate_data(data)
+            data = widget.validate_data(data)
 
         # only update the model if the data is correct
         if data is not ValueUnset:
