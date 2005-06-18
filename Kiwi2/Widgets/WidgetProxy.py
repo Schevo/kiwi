@@ -297,7 +297,8 @@ class MixinSupportValidation(Mixin):
         except ValidationError, e:
             # Show the error icon
             self._validation_error(e)
-
+            data = ValueUnset
+            
         # Step 3: Inform the user code wether their widgets
         #         are valid or not
         self._notify_validity()
