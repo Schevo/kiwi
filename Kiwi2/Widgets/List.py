@@ -28,9 +28,11 @@
 
 import datetime
 
-from Kiwi2.accessors import kgetattr
+import gobject
+import gtk
+
 from Kiwi2 import datatypes, ValueUnset
-from Kiwi2.initgtk import gtk, gobject
+from Kiwi2.accessors import kgetattr
 from Kiwi2.utils import gsignal, gproperty
 
 # Minimum number of rows where we show busy cursor when sorting numeric columns

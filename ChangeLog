@@ -1,6 +1,18 @@
 2005-06-18  Johan Dahlin  <jdahlin@async.com.br>
 
 	* Kiwi2/Delegates.py:
+	* Kiwi2/Models.py:
+	* Kiwi2/Proxies.py:
+	* Kiwi2/Widgets/CheckButton.py:
+	* Kiwi2/Widgets/List.py:
+	* Kiwi2/Widgets/RadioButton.py:
+	* Kiwi2/Widgets/Wizard.py:
+
+	More imports cleanup, remove unused cruft.
+
+2005-06-18  Johan Dahlin  <jdahlin@async.com.br>
+
+	* Kiwi2/Delegates.py:
 	* Kiwi2/Proxies.py:
 	* Kiwi2/Views.py:
 	* Kiwi2/Widgets/Entry.py:

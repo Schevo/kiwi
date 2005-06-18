@@ -21,7 +21,8 @@
 # Author(s): Christian Reis <kiko@async.com.br>
 #
 
-import pickle, os
+import os
+import pickle
 
 from Kiwi2 import _warn
 #

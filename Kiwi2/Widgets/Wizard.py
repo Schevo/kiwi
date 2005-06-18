@@ -22,9 +22,10 @@
 #            Evandro Vale Miquelito <evandro@async.com.br>
 #            
 
-from Kiwi2.initgtk import gtk, quit_if_last
-from Kiwi2.Delegates import Delegate
+import gtk
 
+from Kiwi2.initgtk import quit_if_last
+from Kiwi2.Delegates import Delegate
 
 class WizardStep:
     """ This class must be inherited by the steps """
@@ -61,7 +62,8 @@ class PluggableWizard(Delegate):
     retval = None
     def __init__(self, title, first_step, size=None):
         self._create_gui()
-        Delegate.__init__(self, delete_handler=quit_if_last, toplevel=self.wizard)
+        Delegate.__init__(self, delete_handler=quit_if_last,
+                          toplevel=self.wizard)
         self.set_title(title)
         self.first_step = first_step
         if size:

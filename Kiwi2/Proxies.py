@@ -34,34 +34,6 @@ from Kiwi2 import _warn, ValueUnset
 from Kiwi2.accessors import kgetattr, ksetattr, clear_attr_cache
 from Kiwi2.Widgets import WidgetProxy
 
-#
-# Warning system
-#
-
-PROXY_WARNINGS = 1
-ATTR_WARNINGS = 0
-
-def set_proxy_warnings(state=True):
-    """ Enable warnings to be emitted from Proxies when incorrect (or very
-    unusual) use is detected. This should always be enabled, as it is a
-    good way of detecting programming errors.
-    """
-    global PROXY_WARNINGS
-    PROXY_WARNINGS = state
-
-def set_attr_warnings(state=True):
-    """ Enables warnings for direct attribute access. If called, all direct
-    accesses done to the model instance will be warned. Use this to
-    check for the completeness of your model accessor API, if you have
-    decided to define one.
-    """
-    global ATTR_WARNINGS
-    ATTR_WARNINGS = state
-
-def _attrwarn(msg):
-    if ATTR_WARNINGS:
-        _warn(msg)
-
 def block_widget(widget):
     """Blocks the signal handler of the 'content-changed' signal on widget"""
     connection_id = widget.get_data('content-changed-id')
