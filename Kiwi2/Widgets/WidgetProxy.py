@@ -345,7 +345,7 @@ class MixinSupportValidation(Mixin):
         t_id = gobject.timeout_add(MERGE_COLORS_DELAY, func)
         self._background_timeout_id = t_id
         
-        return True # call back us again please
+        return False
         
     def _stop_complaining(self):
         """If the input is corrected this method stop some activits that

@@ -1,5 +1,9 @@
 2005-06-18  Johan Dahlin  <jdahlin@async.com.br>
 
+	* Kiwi2/Widgets/WidgetProxy.py
+	(MixinSupportValidation._check_for_complaints): quit the idle, stops
+	us from eating up the CPU. 
+
 	* Kiwi2/Delegates.py:
 	* Kiwi2/Models.py:
 	* Kiwi2/Proxies.py:
