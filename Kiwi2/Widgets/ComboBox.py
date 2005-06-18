@@ -310,7 +310,6 @@ class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin,
     def before_validate(self, data):
         """ComboBoxEntry has a validate default handler that check if the
         text of the entry is an item of the list"""
-        print 'DO_VALIDATE called', data
         items = self.get_model_items()
 
         if data is None or not data.strip():
