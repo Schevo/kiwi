@@ -14,14 +14,17 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-root_library = 'Kiwi2.Widgets'
-widget_prefix = 'Kiwi'
+from datetime import date
+from gettext import gettext as _
+
 import gtk
+
 from gazpacho.custompropertyeditor import CustomPropertyEditor
 from gazpacho.util import get_bool_from_string_with_default
 from gazpacho.widget import get_widget_from_gtk_widget
 
-from datetime import date
+root_library = 'Kiwi2.Widgets'
+widget_prefix = 'Kiwi'
 
 class DataTypeAdaptor(object):
     def create_editor(self, context):
