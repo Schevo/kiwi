@@ -235,7 +235,6 @@ class MixinSupportValidation(Mixin):
             widget = self
         self._widget_to_draw = widget
 
-        self.before_validate = None
         self.owner = None
         
     def get_mandatory(self):
@@ -248,6 +247,9 @@ class MixinSupportValidation(Mixin):
         """
         self._mandatory = mandatory
 
+    def before_validate(self, data):
+        pass
+    
     def validate_data(self, text):
         """Checks if the data is valid.
         
@@ -279,10 +281,9 @@ class MixinSupportValidation(Mixin):
             if self.before_validate:
                 self.before_validate(data)
 
-            # Step 2: Call a user handler, where the normal logic is
-            #         specified, due to a bug in PyGTK, we can nest
-            #         exceptions properly, so we have to use the return
-            #         value for the exceptions
+            # Step 2: The widgets themselves have now validated the data
+            #         Next step is to call the application specificed
+            #         checks, which are found in the view.
             if data is not None:
                 # this signal calls the on_widgetname__validate method of the 
                 # view class and gets the exception (if any).
