@@ -327,7 +327,10 @@ class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin,
         text = self.child.get_text()
         if not text.strip():
             return
-        
+
+        # XXX: Fix this to work in string and data mode
+        return
+    
         if text in self.get_model_items():
             return
         
