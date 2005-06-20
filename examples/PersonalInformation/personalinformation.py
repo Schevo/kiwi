@@ -18,7 +18,9 @@ class Form(Delegates.Delegate):
                                              'sex', 'nationality', 'ok_btn'],
                                     delete_handler=quit_if_last)
     
-        self.nationality.prefill(['Brazilian', 'Yankee', 'Other'])
+        self.nationality.prefill([('Brazilian', 1),
+                                  ('Yankee', 2),
+                                  ('Other', 3)])
         self.sex.prefill(('Male', 'Female'))
         self.register_validate_function(self.validity)
         self.height.set_data_format('%4.4f')
@@ -44,7 +46,7 @@ class Form(Delegates.Delegate):
                                              "some weight!")
     
     def on_nationality__validate(self, widget, data):
-        if data != 'Yankee':
+        if data != 2:
             return datatypes.ValidationError("Go home terrorist!")
     
     def validity(self, valid):
@@ -56,7 +58,7 @@ person.age = 36
 person.birthdate = datetime.datetime(year=1969, month=2, day=20)
 person.height = 183.0
 person.weight = 86.0
-person.nationality = 'Yankee'
+person.nationality = 2
 person.about = 'Kinda fat'
 
 form = Form()

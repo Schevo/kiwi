@@ -250,31 +250,30 @@ class MixinSupportValidation(Mixin):
     def before_validate(self, data):
         pass
     
-    def validate_data(self, text):
+    def validate_data(self, data):
         """Checks if the data is valid.
         
         Validates data-type and custom validation.
-        text - needs to be a string
+        data - the data to validate
         returns the widget data-type
         """
 
-        # check if we should draw the mandatory icon
+        # check if we should draw the man a stringdatory icon
         # this need to be done before any data conversion because we
         # we don't want to end drawing two icons
-        if text is None or text == '':
+        if data is None or data == '':
             self._blank_data = True
         else:
             self._blank_data = False
 
         self.draw_mandatory_icon_if_needed()            
 
-
         try:
-            # This can raise validation error
-            data = self.str2type(text)
-            
+            if isinstance(data, basestring):
+                data = self.str2type(data)
+                
             # Callbacks, this is a rather complex process
-
+            
             # Step 1: A WidgetProxy subclass can implement a before_validate
             #         callback which is called before user functions.
             #         For example, check if the value is in the combo
