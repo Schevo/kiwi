@@ -9,14 +9,13 @@ myself = os.path.abspath(__file__)
 testdir =  os.path.dirname(myself)
 if testdir not in sys.path:
     sys.path.append(testdir)
+sys.path.insert(0, os.path.join(testdir, '..'))
     
 print 'Running tests on', testdir
 
 suite = unittest.TestSuite()
 
-for file in glob.glob(os.path.join(testdir, '*.py')):
-    if myself == file:
-        continue
+for file in glob.glob(os.path.join(testdir, 'test_*.py')):
     filename = os.path.basename(file)
     modulename = os.path.splitext(filename)[0]
     mod = __import__(modulename, globals(), locals())
