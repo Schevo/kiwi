@@ -2,21 +2,24 @@
 
 import datetime
 
-from kiwi import Delegates, datatypes
-from kiwi.initgtk import gtk, quit_if_last
+import gtk
+
+from kiwi.datatypes import ValidationError
+from kiwi.initgtk import quit_if_last
+from kiwi.ui.delegates import Delegate
 
 class Person:
     pass
 
-class Form(Delegates.Delegate):
+class Form(Delegate):
 
     def __init__(self):
-        Delegates.Delegate.__init__(self, 
-                                    gladefile="personalinformation",
-                                    widgets=['name', 'age', 'birthdate',
-                                             'height', 'weight', 'about', 
-                                             'sex', 'nationality', 'ok_btn'],
-                                    delete_handler=quit_if_last)
+        Delegate.__init__(self, 
+                          gladefile="personalinformation",
+                          widgets=['name', 'age', 'birthdate',
+                                   'height', 'weight', 'about', 
+                                   'sex', 'nationality', 'ok_btn'],
+                          delete_handler=quit_if_last)
     
         self.nationality.prefill([('Brazilian', 1),
                                   ('Yankee', 2),
@@ -32,22 +35,22 @@ class Form(Delegates.Delegate):
         if len(data) > 20:
             # we need to return an exception that will be displayed on
             # the information tooltip and the delegate option
-            return datatypes.ValidationError("The name is too long")
+            return ValidationError("The name is too long")
     
     def on_height__validate(self, widget, data):
         if data > 200:
-            return datatypes.ValidationError("The height is too tall")
+            return ValidationError("The height is too tall")
         
     def on_weight__validate(self, widget, data):
         if float(data) > 90:
             # this is really not the type of validation that you would use :)
             # anyway, it's just for reference
-            return datatypes.ValidationError("Dude! You need to lose "
+            return ValidationError("Dude! You need to lose "
                                              "some weight!")
     
     def on_nationality__validate(self, widget, data):
         if data != 2:
-            return datatypes.ValidationError("Go home terrorist!")
+            return ValidationError("Go home terrorist!")
     
     def validity(self, valid):
         self.ok_btn.set_sensitive(valid)

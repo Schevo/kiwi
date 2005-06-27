@@ -25,7 +25,6 @@
 #            Daniel Saran R. da Cunha <daniel@async.com.br>
 #
 
-import sys
 import time
 
 import gtk
@@ -33,6 +32,7 @@ import gobject
 
 from kiwi import ValueUnset
 from kiwi.datatypes import ValidationError, converter
+from kiwi.interfaces import Mixin, MixinSupportValidation
 from kiwi.utils import set_background, merge_colors
 
 MERGE_COLORS_DELAY = 100
@@ -40,7 +40,7 @@ CURSOR_POS_CHECKING_DELAY = 200
 
 __pychecker__ = 'no-classattr'
 
-class Mixin(object):
+class WidgetMixin(Mixin):
     """This class is a mixin that provide a common interface for KiwiWidgets.
 
     Usually the Proxy class need to set and get data from the widgets. It also
@@ -187,7 +187,7 @@ INFO_ICON = gtk.STOCK_DIALOG_INFO
 # amount of time until we complain if the data is wrong (seconds)
 COMPLAIN_DELAY = 1
 
-class MixinSupportValidation(Mixin):
+class WidgetMixinSupportValidation(WidgetMixin, MixinSupportValidation):
     """Class used by some Kiwi Widgets that need to support mandatory 
     input and validation features such as custom validation and data-type
     validation.
@@ -199,7 +199,7 @@ class MixinSupportValidation(Mixin):
     
     def __init__(self, data_type=str, model_attribute=None,
                  default_value=None, widget=None):
-        Mixin.__init__(self, data_type, model_attribute, default_value)
+        WidgetMixin.__init__(self, data_type, model_attribute, default_value)
         
         self._error_tooltip = ErrorTooltip(self)
         
@@ -498,51 +498,3 @@ class ErrorTooltip(gtk.Window):
     def disappear(self):
         self.hide()
 
-
-def implementsIProxy():
-    """Add a content-changed signal and a data-type, default-value, 
-    model-attribute properties to the class where this 
-    functions is called.
-    """
-    frame = sys._getframe(1)
-    try:
-        local_namespace = frame.f_locals
-    finally:
-        del frame
-
-    if not '__gsignals__' in local_namespace:
-        dic = local_namespace['__gsignals__'] = {}
-    else:
-        dic = local_namespace['__gsignals__']
-
-    dic['content-changed'] = (gobject.SIGNAL_RUN_LAST, None, ())
-    
-    # the line below is used for triggering custom validation.
-    # if you want a custom validation on a widget make a method on the
-    # view class for each widget that you want to validate.
-    # the method signature is:
-    # def on_widgetname__validate(self, widget, data)
-    dic['validate'] = (gobject.SIGNAL_RUN_LAST, object, (object,))
-
-    if not '__gproperties__' in local_namespace:
-        dic = local_namespace['__gproperties__'] = {}
-    else:
-        dic = local_namespace['__gproperties__']
-
-    dic['data-type'] = (object, 'data-type', 'Data Type',
-                        gobject.PARAM_READWRITE)
-    dic['model-attribute'] = (str, 'model-attribute', 'Model Attribute', '',
-                              gobject.PARAM_READWRITE)
-    dic['default-value'] = (object, 'default-value', 'Default Value',
-                            gobject.PARAM_READABLE)
-
-def implementsIMandatoryProxy():
-    frame = sys._getframe(1)
-    try:
-        local_namespace = frame.f_locals
-    finally:
-        del frame
-
-    dic = local_namespace['__gproperties__']
-    dic['mandatory'] = (bool, 'mandatory', 'Mandatory', False,
-                        gobject.PARAM_READWRITE)

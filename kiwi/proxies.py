@@ -32,7 +32,7 @@ import sys
 
 from kiwi import _warn, ValueUnset
 from kiwi.accessors import kgetattr, ksetattr, clear_attr_cache
-from kiwi.Widgets import WidgetProxy
+from kiwi.interfaces import Mixin, MixinSupportValidation
 
 def block_widget(widget):
     """Blocks the signal handler of the 'content-changed' signal on widget"""
@@ -205,7 +205,7 @@ class Proxy:
                 raise AttributeError("The widget %s was not "
                                      "found in the view %s" % (widget_name, self.view))
             
-            if not isinstance(widget, WidgetProxy.Mixin):
+            if not isinstance(widget, Mixin):
                 continue
 
             data_type = widget.get_property('data-type')
@@ -240,7 +240,7 @@ class Proxy:
         data = widget.read()
 
         # Data has changed, start validation process
-        if isinstance(widget, WidgetProxy.MixinSupportValidation):
+        if isinstance(widget, MixinSupportValidation):
             data = widget.validate_data(data)
 
         # only update the model if the data is correct
@@ -313,7 +313,7 @@ class Proxy:
 
             # The initial value of the model is set, at this point
             # we'll do an initial validation check
-            if isinstance(widget, WidgetProxy.MixinSupportValidation):
+            if isinstance(widget, MixinSupportValidation):
                 value = widget.read()
                 widget.validate_data(value)
 

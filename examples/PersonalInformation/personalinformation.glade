@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <glade-interface>
-    <requires lib="Kiwi2.Widgets"/>
+    <requires lib="kiwi2"/>
     <widget class="GtkWindow" id="personalinformation">
         <property name="title" context="True" translatable="True">Personal Information</property>
         <property name="border_width">12</property>
@@ -43,7 +43,7 @@
                             </packing>
                         </child>
                         <child>
-                            <widget class="Kiwi2+Widgets+ComboBox+ComboBox" id="sex">
+                            <widget class="kiwi+ui+widgets+combobox+ComboBox" id="sex">
                                 <property name="model_attribute">sex</property>
                                 <property name="events"></property>
                                 <property name="data_type">str</property>
@@ -90,7 +90,7 @@
                             </packing>
                         </child>
                         <child>
-                            <widget class="Kiwi2+Widgets+Entry+Entry" id="name">
+                            <widget class="kiwi+ui+widgets+entry+Entry" id="name">
                                 <property name="mandatory">True</property>
                                 <property name="model_attribute">name</property>
                                 <property name="events"></property>
@@ -104,7 +104,7 @@
                             </packing>
                         </child>
                         <child>
-                            <widget class="Kiwi2+Widgets+Entry+Entry" id="age">
+                            <widget class="kiwi+ui+widgets+entry+Entry" id="age">
                                 <property name="mandatory">True</property>
                                 <property name="model_attribute">age</property>
                                 <property name="events"></property>
@@ -120,7 +120,7 @@
                             </packing>
                         </child>
                         <child>
-                            <widget class="Kiwi2+Widgets+Entry+Entry" id="birthdate">
+                            <widget class="kiwi+ui+widgets+entry+Entry" id="birthdate">
                                 <property name="mandatory">True</property>
                                 <property name="model_attribute">birthdate</property>
                                 <property name="events"></property>
@@ -136,7 +136,7 @@
                             </packing>
                         </child>
                         <child>
-                            <widget class="Kiwi2+Widgets+Entry+Entry" id="height">
+                            <widget class="kiwi+ui+widgets+entry+Entry" id="height">
                                 <property name="mandatory">True</property>
                                 <property name="model_attribute">height</property>
                                 <property name="events"></property>
@@ -176,7 +176,7 @@
                             </packing>
                         </child>
                         <child>
-                            <widget class="Kiwi2+Widgets+SpinButton+SpinButton" id="weight">
+                            <widget class="kiwi+ui+widgets+spinbutton+SpinButton" id="weight">
                                 <property name="mandatory">True</property>
                                 <property name="adjustment">0.000000 0.000000 100.000000 1.000000 10.000000 0.000000</property>
                                 <property name="model_attribute">weight</property>
@@ -193,7 +193,7 @@
                             </packing>
                         </child>
                         <child>
-                            <widget class="Kiwi2+Widgets+ComboBox+ComboBoxEntry" id="nationality">
+                            <widget class="kiwi+ui+widgets+combobox+ComboBoxEntry" id="nationality">
                                 <property name="mandatory">True</property>
                                 <property name="model_attribute">nationality</property>
                                 <property name="events"></property>
@@ -238,7 +238,7 @@
                     </packing>
                 </child>
                 <child>
-                    <widget class="Kiwi2+Widgets+TextView+TextView" id="about">
+                    <widget class="kiwi+ui+widgets+textview+TextView" id="about">
                         <property name="mandatory">True</property>
                         <property name="model_attribute">about</property>
                         <property name="border_width">10</property>

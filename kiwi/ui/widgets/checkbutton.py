@@ -30,22 +30,23 @@ import gobject
 import gtk
 
 from kiwi import ValueUnset
-from kiwi.Widgets import WidgetProxy
+from kiwi.interfaces import implementsIProxy
+from kiwi.ui.widgets.proxy import WidgetMixin
 from kiwi.utils import gsignal
 
-class CheckButton(gtk.CheckButton, WidgetProxy.Mixin):
-    WidgetProxy.implementsIProxy()
+class CheckButton(gtk.CheckButton, WidgetMixin):
+    implementsIProxy()
     gsignal('toggled', 'override')
         
     def __init__(self):
         # changed default data_type because checkbuttons can only accept bool values
-        WidgetProxy.Mixin.__init__(self, data_type=bool)
+        WidgetMixin.__init__(self, data_type=bool)
         gtk.CheckButton.__init__(self)
         self.set_property("data-type", bool)
     
     def set_data_type(self, data_type):
         if data_type == bool or data_type is None:
-            WidgetProxy.Mixin.set_data_type(self, data_type)
+            WidgetMixin.set_data_type(self, data_type)
         else:
             raise TypeError, "CheckButtons only accept boolean values"
 
@@ -58,7 +59,7 @@ class CheckButton(gtk.CheckButton, WidgetProxy.Mixin):
 
     def update(self, data):
         # first, trigger some basic validation
-        WidgetProxy.Mixin.update(self, data)
+        WidgetMixin.update(self, data)
         if data is not ValueUnset and data is not None:
             self.set_active(data)
 

@@ -31,13 +31,14 @@ import time
 import gobject
 import gtk
 
-from kiwi.Widgets import WidgetProxy
-from kiwi.utils import gsignal
 from kiwi import ValueUnset
+from kiwi.interfaces import implementsIProxy, implementsIMandatoryProxy
+from kiwi.ui.widgets.proxy import WidgetMixinSupportValidation
+from kiwi.utils import gsignal
 
-class SpinButton(gtk.SpinButton, WidgetProxy.MixinSupportValidation):
-    WidgetProxy.implementsIProxy()
-    WidgetProxy.implementsIMandatoryProxy()
+class SpinButton(gtk.SpinButton, WidgetMixinSupportValidation):
+    implementsIProxy()
+    implementsIMandatoryProxy()
 
     gsignal('changed', 'override')
     # mandatory widgets need to have this signal connected
@@ -47,7 +48,7 @@ class SpinButton(gtk.SpinButton, WidgetProxy.MixinSupportValidation):
         # since the default data_type is str we need to set it to int 
         # or float for spinbuttons
         gtk.SpinButton.__init__(self)
-        WidgetProxy.MixinSupportValidation.__init__(self, data_type=int)
+        WidgetMixinSupportValidation.__init__(self, data_type=int)
         
         # due to changes on pygtk 2.6 we have to make some ajustments here
         if gtk.pygtk_version < (2,6):
@@ -62,7 +63,7 @@ class SpinButton(gtk.SpinButton, WidgetProxy.MixinSupportValidation):
         treatment.
         """
         old_datatype = self._data_type
-        WidgetProxy.MixinSupportValidation.set_data_type(self, data_type)
+        WidgetMixinSupportValidation.set_data_type(self, data_type)
         if self._data_type not in (int, float):
             self._data_type = old_datatype
             raise TypeError("SpinButtons only accept integer or float values")
@@ -76,7 +77,7 @@ class SpinButton(gtk.SpinButton, WidgetProxy.MixinSupportValidation):
         return self.get_text()
 
     def update(self, data):
-        WidgetProxy.MixinSupportValidation.update(self, data)
+        WidgetMixinSupportValidation.update(self, data)
         
         if data is ValueUnset or data is None:
             self.set_text("")

@@ -31,10 +31,11 @@ import gobject
 import gtk
 
 from kiwi import ValueUnset
-from kiwi.Widgets import WidgetProxy
+from kiwi.interfaces import implementsIProxy, implementsIMandatoryProxy
+from kiwi.ui.widgets.proxy import WidgetMixinSupportValidation
 from kiwi.utils import gsignal
 
-class Entry(gtk.Entry, WidgetProxy.MixinSupportValidation):
+class Entry(gtk.Entry, WidgetMixinSupportValidation):
     """The Kiwi Entry widget has many special features that extend the basic
     gtk entry.
     
@@ -49,8 +50,8 @@ class Entry(gtk.Entry, WidgetProxy.MixinSupportValidation):
     entry. When dealing with date and float data-type the information on
     how to fill these entries is displayed according to the current locale.
     """
-    WidgetProxy.implementsIProxy()
-    WidgetProxy.implementsIMandatoryProxy()
+    implementsIProxy()
+    implementsIMandatoryProxy()
 
     gsignal('changed', 'override')
     # mandatory widgets need to have this signal connected
@@ -58,7 +59,7 @@ class Entry(gtk.Entry, WidgetProxy.MixinSupportValidation):
     
     def __init__(self):
         gtk.Entry.__init__(self)
-        WidgetProxy.MixinSupportValidation.__init__(self)
+        WidgetMixinSupportValidation.__init__(self)
         
         if gtk.pygtk_version < (2,6):
             self.chain_expose = self.chain
@@ -82,7 +83,7 @@ class Entry(gtk.Entry, WidgetProxy.MixinSupportValidation):
         return self.get_text()
 
     def update(self, data):
-        WidgetProxy.MixinSupportValidation.update(self, data)
+        WidgetMixinSupportValidation.update(self, data)
 
         if data is ValueUnset or data is None:
             self.set_text("")

@@ -36,7 +36,8 @@ import gtk.keysyms
 
 from kiwi import ValueUnset
 from kiwi.datatypes import ValidationError
-from kiwi.Widgets import WidgetProxy
+from kiwi.interfaces import implementsIProxy, implementsIMandatoryProxy
+from kiwi.ui.widgets.proxy import WidgetMixin, WidgetMixinSupportValidation
 from kiwi.utils import gsignal, gproperty
 
 (COL_COMBO_LABEL,
@@ -239,12 +240,12 @@ class ComboProxyMixin(object):
         model = self.get_model()
         return model.get_value(iter, COL_COMBO_DATA)
     
-class ComboBox(gtk.ComboBox, ComboProxyMixin, WidgetProxy.Mixin):
-    WidgetProxy.implementsIProxy()
+class ComboBox(gtk.ComboBox, ComboProxyMixin, WidgetMixin):
+    implementsIProxy()
     gsignal('changed', 'override')
     
     def __init__(self):
-        WidgetProxy.Mixin.__init__(self)
+        WidgetMixin.__init__(self)
         gtk.ComboBox.__init__(self)
         ComboProxyMixin.__init__(self)
 
@@ -268,7 +269,7 @@ class ComboBox(gtk.ComboBox, ComboProxyMixin, WidgetProxy.Mixin):
         # We dont need validation because the user always
         # choose a valid value
         
-        WidgetProxy.Mixin.update(self, data)
+        WidgetMixin.update(self, data)
         
         if data is ValueUnset or data is None:
             return
@@ -292,9 +293,9 @@ class ComboBox(gtk.ComboBox, ComboProxyMixin, WidgetProxy.Mixin):
 gobject.type_register(ComboBox)
 
 class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin, 
-                    WidgetProxy.MixinSupportValidation):
-    WidgetProxy.implementsIProxy()
-    WidgetProxy.implementsIMandatoryProxy()
+                    WidgetMixinSupportValidation):
+    implementsIProxy()
+    implementsIMandatoryProxy()
     
     # it doesn't make sense to connect to this signal
     # because we want to monitor the entry of the combo
@@ -303,8 +304,7 @@ class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin,
     
     def __init__(self):
         gtk.ComboBoxEntry.__init__(self)
-        WidgetProxy.MixinSupportValidation.__init__(self,
-                                                    widget=self.child)
+        WidgetMixinSupportValidation.__init__(self, widget=self.child)
         ComboProxyMixin.__init__(self)
 
         self.set_text_column(COL_COMBO_LABEL)
@@ -389,7 +389,7 @@ class ComboBoxEntry(gtk.ComboBoxEntry, ComboProxyMixin,
 
     def update(self, data):
         # first, trigger some basic validation
-        WidgetProxy.Mixin.update(self, data)
+        WidgetMixinSupportValidation.update(self, data)
         
         if data is ValueUnset or data is None:
             self.child.set_text("")

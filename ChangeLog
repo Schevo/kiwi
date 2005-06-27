@@ -1,3 +1,25 @@
+2005-06-27  Johan Dahlin  <jdahlin@async.com.br>
+
+	* examples/PersonalInformation/personalinformation.glade:
+	* examples/PersonalInformation/personalinformation.py:
+	* gazpacho-plugin/kiwi2.py:
+	* kiwi/interfaces.py:
+	* kiwi/proxies.py:
+	* kiwi/ui/delegates.py:
+	* kiwi/ui/views.py:
+	* kiwi/ui/widgets/__init__.py:
+	* kiwi/ui/widgets/checkbutton.py:
+	* kiwi/ui/widgets/combobox.py:
+	* kiwi/ui/widgets/datatypes.py:
+	* kiwi/ui/widgets/entry.py:
+	* kiwi/ui/widgets/label.py:
+	* kiwi/ui/widgets/proxy.py:
+	* kiwi/ui/widgets/radiobutton.py:
+	* kiwi/ui/widgets/spinbutton.py:
+	* kiwi/ui/widgets/textview.py:
+
+	Make the personinformation example work again.
+
 2005-06-20  Johan Dahlin  <jdahlin@async.com.br>
 
 	* Kiwi2/Widgets/ComboBox.py:

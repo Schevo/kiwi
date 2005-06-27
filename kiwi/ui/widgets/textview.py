@@ -29,23 +29,24 @@ import time
 import gobject
 import gtk
 
-from kiwi.Widgets import WidgetProxy
-from kiwi.utils import gsignal
 from kiwi import ValueUnset
+from kiwi.interfaces import implementsIProxy, implementsIMandatoryProxy
+from kiwi.ui.widgets.proxy import WidgetMixinSupportValidation
+from kiwi.utils import gsignal
 
 MANDATORY_ICON = gtk.STOCK_EDIT
 INFO_ICON = gtk.STOCK_DIALOG_INFO
 
-class TextView(gtk.TextView, WidgetProxy.MixinSupportValidation):
-    WidgetProxy.implementsIProxy()
-    WidgetProxy.implementsIMandatoryProxy()
+class TextView(gtk.TextView, WidgetMixinSupportValidation):
+    implementsIProxy()
+    implementsIMandatoryProxy()
     
     # mandatory widgets need to have this signal connected
     gsignal('expose-event', 'override')
     
     def __init__(self):
         gtk.TextView.__init__(self)
-        WidgetProxy.MixinSupportValidation.__init__(self)
+        WidgetMixinSupportValidation.__init__(self)
         
         self.textbuffer = gtk.TextBuffer()
         self.textbuffer.connect('changed',
@@ -75,7 +76,7 @@ class TextView(gtk.TextView, WidgetProxy.MixinSupportValidation):
                     
     def update(self, data):
         # first, trigger some basic validation
-        WidgetProxy.MixinSupportValidation.update(self, data)
+        WidgetMixinSupportValidation.update(self, data)
 
         if data is ValueUnset or data is None:
             self.textbuffer.set_text("")

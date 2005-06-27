@@ -37,10 +37,10 @@ import gobject
 import gtk
 
 from kiwi import _warn, get_gladepath, get_imagepath
-from kiwi.utils import gsignal
 from kiwi.initgtk import _non_interactive, quit_if_last
-from kiwi.Proxies import Proxy
-from kiwi.Widgets import WidgetProxy
+from kiwi.interfaces import MixinSupportValidation
+from kiwi.proxies import Proxy
+from kiwi.utils import gsignal
 
 #
 # Gladepath handling
@@ -320,7 +320,7 @@ class SlaveView(gobject.GObject):
         valid = True
         for widget_name in self.widgets:
             widget = self.get_widget(widget_name)
-            if isinstance(widget, WidgetProxy.MixinSupportValidation):
+            if isinstance(widget, MixinSupportValidation):
                 if not widget.is_correct():
                     valid = False
                     break

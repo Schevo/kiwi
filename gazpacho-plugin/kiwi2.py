@@ -21,9 +21,15 @@ import gtk
 
 from gazpacho.custompropertyeditor import CustomPropertyEditor
 from gazpacho.util import get_bool_from_string_with_default
-from gazpacho.widget import get_widget_from_gtk_widget
+from gazpacho.widget import Widget
 
-root_library = 'kiwi.Widgets'
+from kiwi.ui.widgets.combobox import ComboBox, ComboBoxEntry
+from kiwi.ui.widgets.entry import Entry
+from kiwi.ui.widgets.list import List
+from kiwi.ui.widgets.spinbutton import SpinButton
+from kiwi.ui.widgets.textview import TextView
+
+root_library = 'kiwi.ui.widgets'
 widget_prefix = 'Kiwi'
 
 class DataTypeAdaptor(object):
@@ -64,7 +70,7 @@ class DataTypeAdaptor(object):
         proxy.set_value(value)
 
     def save(self, context, widget):
-        gwidget = get_widget_from_gtk_widget(widget)
+        gwidget = Widget.from_widget(widget)
         data_type = gwidget.get_glade_property('data-type')
         # data type is one of (str, float, int, bool)
         return data_type._value.__name__

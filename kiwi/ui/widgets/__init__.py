@@ -18,14 +18,3 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 # USA
 # 
-
-"""Defines enhanced versions of various GTK+ widgets"""
-
-from List import List
-from Entry import Entry
-from Label import Label
-from ComboBox import ComboBox, ComboBoxEntry
-from CheckButton import CheckButton
-from RadioButton import RadioButton
-from SpinButton import SpinButton
-from TextView import TextView
