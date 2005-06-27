@@ -1,10 +1,9 @@
 #!/usr/bin/env python
-from utils import refresh_gui
-
-from kiwi import Delegates
-from kiwi.initgtk import gtk, quit_if_last
-
 import unittest
+import gtk
+
+from kiwi.ui.delegates import Delegate
+from utils import refresh_gui
 
 class A:
     def on_foo__clicked(self, *args):
@@ -29,7 +28,7 @@ class Y:
     def on_foo__clicked(self, *args):
         self.x = "FOO in Y"
 
-class Foo(X,Y,Delegates.Delegate):
+class Foo(X,Y,Delegate):
     widget  = ["foo"]
     def __init__(self):
         self.win = gtk.Window()
@@ -40,8 +39,8 @@ class Foo(X,Y,Delegates.Delegate):
         v.add(self.bar)
         self.win.add(v)
         self.x = self.y = "NOOO"
-        Delegates.Delegate.__init__(self, toplevel=self.win,
-                                    delete_handler=quit_if_last)
+        Delegate.__init__(self, toplevel=self.win,
+                          delete_handler=self.quit_if_last)
 
     def on_foo__clicked(self, *args):
         self.x = "FOO in Foo"
@@ -49,25 +48,25 @@ class Foo(X,Y,Delegates.Delegate):
     def on_bar__clicked(self, *args):
         self.y = "BAR in B"
 
-class ClickCounter(Delegates.Delegate):
+class ClickCounter(Delegate):
     """In this delegate we count the number of clicks we do"""
     def __init__(self):
         self.win = gtk.Window()
         self.button = gtk.Button('Click me!')
         self.win.add(self.button)
-        Delegates.Delegate.__init__(self, toplevel=self.win,
-                                    delete_handler=quit_if_last)
+        Delegate.__init__(self, toplevel=self.win,
+                          delete_handler=self.quit_if_last)
 
         self.clicks = 0
 
     def on_button__clicked(self, *args):
         self.clicks += 1
 
-class GladeClickCounter(Delegates.Delegate):
+class GladeClickCounter(Delegate):
     def __init__(self):
-        Delegates.Delegate.__init__(self, gladefile="simple_button",
-                                    widgets=['button'],
-                                    delete_handler=quit_if_last)
+        Delegate.__init__(self, gladefile="simple_button",
+                          widgets=['button'],
+                          delete_handler=self.quit_if_last)
 
         self.clicks = 0
 

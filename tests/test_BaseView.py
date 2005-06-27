@@ -1,14 +1,14 @@
 #!/usr/bin/env python
+import unittest
+import gtk
+from gtk import keysyms
 
 from utils import refresh_gui
 
-from kiwi.Views import BaseView
-from kiwi.Controllers import BaseController
-from kiwi.initgtk import gtk
-from kiwi import utils
-from gtk import keysyms
-
-import unittest
+from kiwi.controllers import BaseController
+from kiwi.ui.gadgets import set_foreground, get_foreground, \
+                            set_background, get_background
+from kiwi.ui.views import BaseView
 
 class FooView(BaseView):
     widgets = [ "vbox", "label" ]
@@ -56,8 +56,8 @@ class Bar(BaseView, BaseController):
         self.win.add(self.label)
         BaseView.__init__(self, toplevel=self.win)
         BaseController.__init__(self, view=self)
-        utils.set_foreground(self.label, "#CC99FF")
-        utils.set_background(self.win, "#001100")
+        set_foreground(self.label, "#CC99FF")
+        set_background(self.win, "#001100")
 
     def run(self, parent):
         self.show_all(parent)
@@ -112,9 +112,9 @@ class BaseViewTest(unittest.TestCase):
         self.foo.view.button.clicked()
         self.foo.bar.run(self.foo.view)
         refresh_gui()
-        color = utils.get_background(self.foo.bar.win)
+        color = get_background(self.foo.bar.win)
         self.assertEqual(color, "#001100")
-        color = utils.get_foreground(self.foo.bar.label)
+        color = get_foreground(self.foo.bar.label)
         self.assertEqual(color, "#CC99FF")
 
 

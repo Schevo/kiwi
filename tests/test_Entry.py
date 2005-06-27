@@ -1,12 +1,14 @@
 #!/usr/bin/env python
+import utils
+
 import unittest
 
 from kiwi import ValueUnset
-from kiwi.Widgets import Entry, datatypes
+from kiwi import datatypes
+from kiwi.ui.widgets.entry import Entry
 
 class EntryTest(unittest.TestCase):
     def set_locale(self):
-        
         date_format = datatypes.date_format
         
         table = {'%y': '89', 
@@ -20,7 +22,7 @@ class EntryTest(unittest.TestCase):
         
         self.date_format = tmp
         
-    def testValidDataType(self):
+    def _testValidDataType(self):
         
         self.set_locale()
         

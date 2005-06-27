@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 import unittest
 
-from kiwi.Widgets import SpinButton
+import gtk
+
+from kiwi.ui.widgets.spinbutton import SpinButton
 
 class SpinButtonTest(unittest.TestCase):
     def testForIntFloat(self):

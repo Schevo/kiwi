@@ -1,7 +1,9 @@
 #!/usr/bin/env python
+import utils
+
 import unittest
 
-from kiwi.Widgets import ComboBox
+from kiwi.ui.widgets.combobox import ComboBox
 
 class TestComboBox(unittest.TestCase):
     def setUp(self):
