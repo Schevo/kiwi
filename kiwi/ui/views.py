@@ -303,6 +303,8 @@ class SlaveView(gobject.GObject):
         # stores the function that will be called when widgets 
         # validity is checked
         self._validate_function = None
+
+        self.__broker = None
         
         for reserved in ["widgets", "toplevel", "gladefile",
                          "gladename", "tree", "model", "controller"]:
@@ -705,9 +707,14 @@ class SlaveView(gobject.GObject):
         self.__broker.disconnect_autoconnected()
         
     def handler_block(self, widget, signal_name=None):
+        # XXX: Warning, or bail out?
+        if not self.__broker:
+            return
         self.__broker.handler_block(widget, signal_name)
 
     def handler_unblock(self, widget, signal_name=None):
+        if not self.__broker:
+            return
         self.__broker.handler_unblock(widget, signal_name)
         
     #

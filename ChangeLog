@@ -1,5 +1,7 @@
 2005-06-27  Johan Dahlin  <jdahlin@async.com.br>
 
+	* kiwi/ui/views.py: Allow us to function without a broker.
+
 	* kiwi/ui/gadgets.py:
 	* kiwi/ui/widgets/label.py:
 	* kiwi/ui/widgets/proxy.py:
