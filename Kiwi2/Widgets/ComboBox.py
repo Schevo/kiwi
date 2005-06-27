@@ -267,10 +267,12 @@ class ComboBox(gtk.ComboBox, ComboProxyMixin, WidgetProxy.Mixin):
     def update(self, data):
         # We dont need validation because the user always
         # choose a valid value
+        
+        WidgetProxy.Mixin.update(self, data)
+        
         if data is ValueUnset or data is None:
             return
-        
-        if self.mode == COMBO_MODE_STRING:
+        elif self.mode == COMBO_MODE_STRING:
             self.select_item_by_label(data)
         elif self.mode == COMBO_MODE_DATA:
             self.select_item_by_data(data)
