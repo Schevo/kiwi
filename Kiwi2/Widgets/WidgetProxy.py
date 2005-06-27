@@ -76,8 +76,11 @@ class Mixin(object):
         if data is ValueUnset or data is None:
             return
         elif not isinstance(data, self._data_type):
-            raise TypeError("%s: Data is supposed to be a %s but it is %s: %s" 
-                            % (self.name, self._data_type, type(data), data))
+            raise TypeError("%s expects data of type %s, but got %r of type %s" 
+                            % (self.name,
+                               self._data_type.__name__,
+                               data,
+                               type(data).__name__))
 
     def read(self):
         """Get the content of the widget.
