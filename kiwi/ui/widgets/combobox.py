@@ -35,10 +35,9 @@ import gtk
 import gtk.keysyms 
 
 from kiwi import ValueUnset
-from kiwi.datatypes import ValidationError
 from kiwi.interfaces import implementsIProxy, implementsIMandatoryProxy
 from kiwi.ui.widgets.proxy import WidgetMixin, WidgetMixinSupportValidation
-from kiwi.utils import gsignal, gproperty
+from kiwi.utils import gsignal
 
 (COL_COMBO_LABEL,
  COL_COMBO_DATA) = range(2)

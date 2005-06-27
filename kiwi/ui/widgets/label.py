@@ -37,7 +37,7 @@ class Label(gtk.Label, WidgetMixin):
     
     def __init__(self):
         gtk.Label.__init__(self)
-        WidgetProxy.Mixin.__init__(self)
+        WidgetMixin.__init__(self)
         self.set_use_markup(True)
         self._attr_dic = {"style":None, "weight":None, "size":None}
         self._size_list = ('xx-small', 'x-small', 'small', 'medium', 'large', 'x-large', 'xx-large')
@@ -55,7 +55,7 @@ class Label(gtk.Label, WidgetMixin):
 
     def update(self, data):
         # first, trigger some basic validation
-        WidgetProxy.Mixin.update(self, data)
+        WidgetMixin.update(self, data)
 
         if data is not ValueUnset and data is not None:
             self.set_text(self.type2str(data))
