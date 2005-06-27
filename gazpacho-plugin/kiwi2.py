@@ -23,9 +23,12 @@ from gazpacho.custompropertyeditor import CustomPropertyEditor
 from gazpacho.util import get_bool_from_string_with_default
 from gazpacho.widget import Widget
 
+from kiwi.ui.widgets.checkbutton import CheckButton
 from kiwi.ui.widgets.combobox import ComboBox, ComboBoxEntry
 from kiwi.ui.widgets.entry import Entry
+from kiwi.ui.widgets.label import Label
 from kiwi.ui.widgets.list import List
+from kiwi.ui.widgets.radiobutton import RadioButton
 from kiwi.ui.widgets.spinbutton import SpinButton
 from kiwi.ui.widgets.textview import TextView
 
