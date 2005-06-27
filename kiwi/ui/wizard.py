@@ -24,7 +24,7 @@
 
 import gtk
 
-from kiwi.Delegates import Delegate
+from kiwi.ui.delegates import Delegate
 
 class WizardStep:
     """ This class must be inherited by the steps """
