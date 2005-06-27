@@ -34,10 +34,10 @@ import gobject
 import gtk
 import gtk.keysyms 
 
-from Kiwi2 import ValueUnset
-from Kiwi2.datatypes import ValidationError
-from Kiwi2.Widgets import WidgetProxy
-from Kiwi2.utils import gsignal, gproperty
+from kiwi import ValueUnset
+from kiwi.datatypes import ValidationError
+from kiwi.Widgets import WidgetProxy
+from kiwi.utils import gsignal, gproperty
 
 (COL_COMBO_LABEL,
  COL_COMBO_DATA) = range(2)

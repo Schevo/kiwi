@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 import unittest
 
-from Kiwi2 import ValueUnset
-from Kiwi2.Widgets import Entry, datatypes
+from kiwi import ValueUnset
+from kiwi.Widgets import Entry, datatypes
 
 class EntryTest(unittest.TestCase):
     def set_locale(self):

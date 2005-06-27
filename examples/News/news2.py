@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import gtk
 
-from Kiwi2.Widgets.List import List, Column
+from kiwi.Widgets.List import List, Column
 
 class NewsItem:
     """An instance that holds information about a news article."""

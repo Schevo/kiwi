@@ -1,5 +1,5 @@
-from Kiwi2.initgtk import gtk, quit_if_last
-from Kiwi2.Views import BaseView 
+from kiwi.initgtk import gtk, quit_if_last
+from kiwi.Views import BaseView 
 
 class person:
     pass

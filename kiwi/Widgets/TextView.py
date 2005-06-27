@@ -29,9 +29,9 @@ import time
 import gobject
 import gtk
 
-from Kiwi2.Widgets import WidgetProxy
-from Kiwi2.utils import gsignal
-from Kiwi2 import ValueUnset
+from kiwi.Widgets import WidgetProxy
+from kiwi.utils import gsignal
+from kiwi import ValueUnset
 
 MANDATORY_ICON = gtk.STOCK_EDIT
 INFO_ICON = gtk.STOCK_DIALOG_INFO

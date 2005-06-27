@@ -4,9 +4,9 @@ import os
 
 import gtk
 
-from Kiwi2 import utils
-from Kiwi2.Delegates import Delegate, SlaveDelegate
-from Kiwi2.initgtk import quit_if_last
+from kiwi import utils
+from kiwi.Delegates import Delegate, SlaveDelegate
+from kiwi.initgtk import quit_if_last
 
 class NewsItem:
     def __init__(self, title, author, url):

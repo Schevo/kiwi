@@ -29,9 +29,9 @@
 import gobject
 import gtk
 
-from Kiwi2 import ValueUnset
-from Kiwi2.utils import gsignal, gproperty
-from Kiwi2.Widgets import WidgetProxy
+from kiwi import ValueUnset
+from kiwi.utils import gsignal, gproperty
+from kiwi.Widgets import WidgetProxy
 
 class RadioButton(gtk.RadioButton, WidgetProxy.Mixin):
     WidgetProxy.implementsIProxy()

@@ -36,11 +36,11 @@ import string
 import gobject
 import gtk
 
-from Kiwi2 import _warn, get_gladepath, get_imagepath
-from Kiwi2.utils import gsignal
-from Kiwi2.initgtk import _non_interactive, quit_if_last
-from Kiwi2.Proxies import Proxy
-from Kiwi2.Widgets import WidgetProxy
+from kiwi import _warn, get_gladepath, get_imagepath
+from kiwi.utils import gsignal
+from kiwi.initgtk import _non_interactive, quit_if_last
+from kiwi.Proxies import Proxy
+from kiwi.Widgets import WidgetProxy
 
 #
 # Gladepath handling

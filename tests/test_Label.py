@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import unittest
 
-from Kiwi2.Widgets import Label
+from kiwi.Widgets import Label
 
 class LabelTest(unittest.TestCase):
     def testAttr(self):

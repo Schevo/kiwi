@@ -63,7 +63,7 @@ offers extended widgets based upon the original PyGTK widgets.
         Contains a number of examples, most of which are referenced in
         the documentation.
 
-    Kiwi/
+    kiwi/
 
         Contains the module code itself; this is installed into your
         Python's site-packages directory by setup.py.

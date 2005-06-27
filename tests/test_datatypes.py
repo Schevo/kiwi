@@ -2,7 +2,7 @@ import unittest
 import locale
 
 from datetime import date
-from Kiwi2 import datatypes
+from kiwi import datatypes
 
 class DataTypesTest(unittest.TestCase):
 

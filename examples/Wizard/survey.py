@@ -1,8 +1,8 @@
 import gtk
 
-from Kiwi2.Widgets.Wizard import PluggableWizard
-from Kiwi2.Widgets.Wizard import WizardStep
-from Kiwi2.Delegates import SlaveDelegate
+from kiwi.Widgets.Wizard import PluggableWizard
+from kiwi.Widgets.Wizard import WizardStep
+from kiwi.Delegates import SlaveDelegate
 
 #
 # First lets set up the slaves that will be used on each step of the wizard

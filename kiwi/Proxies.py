@@ -30,9 +30,9 @@ to keep the state of a model object synchronized with a View.
 
 import sys
 
-from Kiwi2 import _warn, ValueUnset
-from Kiwi2.accessors import kgetattr, ksetattr, clear_attr_cache
-from Kiwi2.Widgets import WidgetProxy
+from kiwi import _warn, ValueUnset
+from kiwi.accessors import kgetattr, ksetattr, clear_attr_cache
+from kiwi.Widgets import WidgetProxy
 
 def block_widget(widget):
     """Blocks the signal handler of the 'content-changed' signal on widget"""

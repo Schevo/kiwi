@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-from Kiwi2 import Views, Controllers
-from Kiwi2.initgtk import gtk, quit_if_last
+from kiwi import Views, Controllers
+from kiwi.initgtk import gtk, quit_if_last
 
 class FarenControl(Controllers.BaseController):
     def __init__(self, view):

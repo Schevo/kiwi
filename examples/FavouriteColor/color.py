@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-from Kiwi2 import Views
-from Kiwi2.initgtk import gtk, quit_if_last
-from Kiwi2.Widgets import ComboBox
+from kiwi import Views
+from kiwi.initgtk import gtk, quit_if_last
+from kiwi.Widgets import ComboBox
 
 from sets import Set
 

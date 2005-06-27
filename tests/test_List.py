@@ -4,7 +4,7 @@ import unittest
 
 import gtk
 
-from Kiwi2.Widgets.List import List, Column
+from kiwi.Widgets.List import List, Column
 from utils import refresh_gui
 
 class Person:

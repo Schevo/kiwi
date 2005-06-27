@@ -5,15 +5,15 @@ EPYDOC=epydoc
 # No user-serviceable parts below this line
 
 MODULES = \
-	../Kiwi2/__init__.py 		\
-	../Kiwi2/accessors.py 		\
-	../Kiwi2/utils.py 			\
-	../Kiwi2/Controllers.py 	\
-	../Kiwi2/Delegates.py 		\
-	../Kiwi2/Proxies.py 		\
-	../Kiwi2/Models.py 			\
-	../Kiwi2/Views.py 			\
-	../Kiwi2/Widgets/
+	../kiwi/__init__.py 		\
+	../kiwi/accessors.py 		\
+	../kiwi/utils.py 			\
+	../kiwi/Controllers.py 	\
+	../kiwi/Delegates.py 		\
+	../kiwi/Proxies.py 		\
+	../kiwi/Models.py 			\
+	../kiwi/Views.py 			\
+	../kiwi/Widgets/
 
 STYLE="PRE { border-left: 1px dashed blue;		\
 		  border-right: 1px dashed blue;		\
@@ -21,8 +21,8 @@ STYLE="PRE { border-left: 1px dashed blue;		\
 		  border-bottom: 1px dashed blue;		\
 		  padding: 1em; margin-right: 2.5em;	\
 		  margin-left: 2.5em; }"
-NAME=Kiwi2
-URL=http://www.async.com.br/projects/Kiwi2/
+NAME=kiwi
+URL=http://www.async.com.br/projects/kiwi/
 
 all: api
 

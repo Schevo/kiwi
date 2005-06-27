@@ -23,7 +23,7 @@ from gazpacho.custompropertyeditor import CustomPropertyEditor
 from gazpacho.util import get_bool_from_string_with_default
 from gazpacho.widget import get_widget_from_gtk_widget
 
-root_library = 'Kiwi2.Widgets'
+root_library = 'kiwi.Widgets'
 widget_prefix = 'Kiwi'
 
 class DataTypeAdaptor(object):

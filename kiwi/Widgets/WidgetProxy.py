@@ -31,9 +31,9 @@ import time
 import gtk
 import gobject
 
-from Kiwi2 import ValueUnset
-from Kiwi2.datatypes import ValidationError, converter
-from Kiwi2.utils import set_background, merge_colors
+from kiwi import ValueUnset
+from kiwi.datatypes import ValidationError, converter
+from kiwi.utils import set_background, merge_colors
 
 MERGE_COLORS_DELAY = 100
 CURSOR_POS_CHECKING_DELAY = 200

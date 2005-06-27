@@ -30,9 +30,9 @@ import time
 import gobject
 import gtk
 
-from Kiwi2 import ValueUnset
-from Kiwi2.Widgets import WidgetProxy
-from Kiwi2.utils import gsignal
+from kiwi import ValueUnset
+from kiwi.Widgets import WidgetProxy
+from kiwi.utils import gsignal
 
 class Entry(gtk.Entry, WidgetProxy.MixinSupportValidation):
     """The Kiwi Entry widget has many special features that extend the basic

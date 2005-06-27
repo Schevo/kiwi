@@ -6,14 +6,14 @@
 
 from distutils.core import setup
 
-execfile("Kiwi2/version.py")
+execfile("kiwi/version.py")
 
 setup(
-    name = "Kiwi2",
+    name = "kiwi",
     version =  ".".join(map(str, version)),
     description = "A framework and a set of enhanced widgets based on PyGTK",
     long_description = """
-    Kiwi2 offers a set of enhanced widgets for
+    kiwi offers a set of enhanced widgets for
     Python based on PyGTK. It also includes a framework designed to make
     creating Python applications using PyGTK and libglade much
     simpler.""",
@@ -23,8 +23,8 @@ setup(
     url = "http://www.async.com.br/projects/",
     license = "GNU LGPL 2.1 (see COPYING)",
 
-    packages = ['Kiwi2',
-                'Kiwi2.Widgets'],
-    package_dir = {'Kiwi2':'Kiwi2'},
+    packages = ['kiwi',
+                'kiwi.Widgets'],
+    package_dir = {'kiwi':'kiwi'},
     )
 

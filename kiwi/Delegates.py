@@ -25,8 +25,8 @@
 
 """Defines the Delegate classes that are included in the Kiwi Framework."""
 
-from Kiwi2.Views import SlaveView, BaseView
-from Kiwi2.Controllers import BaseController
+from kiwi.Views import SlaveView, BaseView
+from kiwi.Controllers import BaseController
 
 class SlaveDelegate(SlaveView, BaseController):
     """A class that combines view and controller functionality into a

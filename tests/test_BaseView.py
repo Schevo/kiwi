@@ -2,10 +2,10 @@
 
 from utils import refresh_gui
 
-from Kiwi2.Views import BaseView
-from Kiwi2.Controllers import BaseController
-from Kiwi2.initgtk import gtk
-from Kiwi2 import utils
+from kiwi.Views import BaseView
+from kiwi.Controllers import BaseController
+from kiwi.initgtk import gtk
+from kiwi import utils
 from gtk import keysyms
 
 import unittest

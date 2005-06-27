@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 import os
-from Kiwi2 import Delegates
-from Kiwi2 import utils
-from Kiwi2.Widgets.List import List, Column
-from Kiwi2.initgtk import gtk, quit_if_last
+from kiwi import Delegates
+from kiwi import utils
+from kiwi.Widgets.List import List, Column
+from kiwi.initgtk import gtk, quit_if_last
 class NewsItem:
     def __init__(self, title, author, url):
         self.title, self.author, self.url = title, author, url

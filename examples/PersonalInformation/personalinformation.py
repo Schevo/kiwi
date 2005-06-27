@@ -2,8 +2,8 @@
 
 import datetime
 
-from Kiwi2 import Delegates, datatypes
-from Kiwi2.initgtk import gtk, quit_if_last
+from kiwi import Delegates, datatypes
+from kiwi.initgtk import gtk, quit_if_last
 
 class Person:
     pass

@@ -29,9 +29,9 @@
 import gobject
 import gtk
 
-from Kiwi2 import ValueUnset
-from Kiwi2.Widgets import WidgetProxy
-from Kiwi2.utils import gsignal
+from kiwi import ValueUnset
+from kiwi.Widgets import WidgetProxy
+from kiwi.utils import gsignal
 
 class CheckButton(gtk.CheckButton, WidgetProxy.Mixin):
     WidgetProxy.implementsIProxy()

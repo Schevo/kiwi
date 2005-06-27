@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 from utils import refresh_gui
 
-from Kiwi2 import Delegates
-from Kiwi2.initgtk import gtk, quit_if_last
+from kiwi import Delegates
+from kiwi.initgtk import gtk, quit_if_last
 
 import unittest
 

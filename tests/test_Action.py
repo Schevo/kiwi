@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 import unittest
 
-from Kiwi2 import Delegates
-from Kiwi2.initgtk import quit_if_last
+from kiwi import Delegates
+from kiwi.initgtk import quit_if_last
 from utils import refresh_gui
 
 class ActionDelegate(Delegates.Delegate):

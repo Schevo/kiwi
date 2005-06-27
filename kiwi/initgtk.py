@@ -83,7 +83,7 @@ except ImportError:
 _non_interactive = tuple(_non_interactive)
 
 
-# one big difference between Kiwi1 and Kiwi2 is
+# one big difference between Kiwi1 and kiwi is
 # that we are just using one gtk mainloop
 
 def quit_if_last(*args):

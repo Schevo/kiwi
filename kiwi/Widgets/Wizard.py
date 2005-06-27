@@ -24,8 +24,8 @@
 
 import gtk
 
-from Kiwi2.initgtk import quit_if_last
-from Kiwi2.Delegates import Delegate
+from kiwi.initgtk import quit_if_last
+from kiwi.Delegates import Delegate
 
 class WizardStep:
     """ This class must be inherited by the steps """
