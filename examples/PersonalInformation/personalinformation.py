@@ -5,7 +5,6 @@ import datetime
 import gtk
 
 from kiwi.datatypes import ValidationError
-from kiwi.initgtk import quit_if_last
 from kiwi.ui.delegates import Delegate
 
 class Person:
@@ -19,7 +18,7 @@ class Form(Delegate):
                           widgets=['name', 'age', 'birthdate',
                                    'height', 'weight', 'about', 
                                    'sex', 'nationality', 'ok_btn'],
-                          delete_handler=quit_if_last)
+                          delete_handler=self.quit_if_last)
     
         self.nationality.prefill([('Brazilian', 1),
                                   ('Yankee', 2),

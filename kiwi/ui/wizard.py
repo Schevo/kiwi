@@ -24,7 +24,6 @@
 
 import gtk
 
-from kiwi.initgtk import quit_if_last
 from kiwi.Delegates import Delegate
 
 class WizardStep:
@@ -62,7 +61,7 @@ class PluggableWizard(Delegate):
     retval = None
     def __init__(self, title, first_step, size=None):
         self._create_gui()
-        Delegate.__init__(self, delete_handler=quit_if_last,
+        Delegate.__init__(self, delete_handler=self.quit_if_last,
                           toplevel=self.wizard)
         self.set_title(title)
         self.first_step = first_step

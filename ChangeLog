@@ -1,5 +1,16 @@
 2005-06-27  Johan Dahlin  <jdahlin@async.com.br>
 
+	* examples/PersonalInformation/personalinformation.py:
+	* kiwi/initgtk.py:
+	* kiwi/ui/__init__.py:
+	* kiwi/ui/views.py:
+	* kiwi/ui/wizard.py:
+
+	Kill initgtk, move quit_if_last to views and 
+	pygtk.require() to kiwi.ui, adds a warning.
+
+2005-06-27  Johan Dahlin  <jdahlin@async.com.br>
+
 	* examples/PersonalInformation/personalinformation.glade:
 	* examples/PersonalInformation/personalinformation.py:
 	* gazpacho-plugin/kiwi2.py:

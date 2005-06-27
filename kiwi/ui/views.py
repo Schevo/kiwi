@@ -37,10 +37,35 @@ import gobject
 import gtk
 
 from kiwi import _warn, get_gladepath, get_imagepath
-from kiwi.initgtk import _non_interactive, quit_if_last
 from kiwi.interfaces import MixinSupportValidation
 from kiwi.proxies import Proxy
 from kiwi.utils import gsignal
+
+_non_interactive = [
+    gtk.Label, 
+    gtk.Alignment,
+    gtk.AccelLabel,
+    gtk.Arrow,
+    gtk.EventBox,
+    gtk.Fixed,
+    gtk.Frame,
+    gtk.HBox,
+    gtk.HButtonBox,
+    gtk.HPaned,
+    gtk.HSeparator,
+    gtk.Layout,
+    gtk.Progress,
+    gtk.ProgressBar,
+    gtk.ScrolledWindow,
+    gtk.Table,
+    gtk.VBox,
+    gtk.VButtonBox,
+    gtk.VPaned,
+    gtk.VSeparator,
+    gtk.Window, 
+]
+
+_non_interactive = tuple(_non_interactive)
 
 #
 # Gladepath handling
@@ -429,6 +454,13 @@ class SlaveView(gobject.GObject):
             raise AssertionError("You don't want to call show_all on a "
                                  "GazpachoView. Use show() instead.")
         self.toplevel.show_all()
+
+    def quit_if_last(self, *args):
+        windows = [toplevel
+                   for toplevel in gtk.window_list_toplevels()
+                       if toplevel.get_property('type') == gtk.WINDOW_TOPLEVEL]
+        if len(windows) == 1:
+            gtk.main_quit()
 
     def focus_toplevel(self):
         """Focuses the toplevel widget in the view"""
@@ -835,7 +867,7 @@ class BaseView(SlaveView):
         Its method signature allows it to be used as a signal handler.
         """
         self.toplevel.hide()
-        quit_if_last(*args)
+        self.quit_if_last()
 
 #
 #
