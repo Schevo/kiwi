@@ -33,7 +33,7 @@ import gobject
 from kiwi import ValueUnset
 from kiwi.datatypes import ValidationError, converter
 from kiwi.interfaces import Mixin, MixinSupportValidation
-from kiwi.utils import set_background, merge_colors
+from kiwi.ui.gadgets import set_background, merge_colors
 
 MERGE_COLORS_DELAY = 100
 CURSOR_POS_CHECKING_DELAY = 200

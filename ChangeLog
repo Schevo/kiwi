@@ -1,5 +1,14 @@
 2005-06-27  Johan Dahlin  <jdahlin@async.com.br>
 
+	* kiwi/ui/gadgets.py:
+	* kiwi/ui/widgets/label.py:
+	* kiwi/ui/widgets/proxy.py:
+	* kiwi/utils.py:
+
+	Move gtk related functions from kiwi.utils to kiwi.ui.gadgets
+
+2005-06-27  Johan Dahlin  <jdahlin@async.com.br>
+
 	* examples/PersonalInformation/personalinformation.py:
 	* kiwi/initgtk.py:
 	* kiwi/ui/__init__.py:

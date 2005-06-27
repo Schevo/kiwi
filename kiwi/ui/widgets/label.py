@@ -29,8 +29,8 @@ import gtk
 
 from kiwi import ValueUnset
 from kiwi.interfaces import implementsIProxy
+from kiwi.ui.gadgets import set_foreground
 from kiwi.ui.widgets.proxy import WidgetMixin
-from kiwi.utils import set_foreground
 
 class Label(gtk.Label, WidgetMixin):
     implementsIProxy()
