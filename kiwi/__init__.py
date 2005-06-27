@@ -41,7 +41,7 @@ class ValueUnset:
     mainly in the Kiwi Proxy"""
     pass
 
-from kiwi.version import version
+from kiwi.__version__ import version
 kiwi_version = version
 
 # Kiwi Combo, GtkRadioButton are non-standard and are handled specially

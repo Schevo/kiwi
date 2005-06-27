@@ -6,7 +6,7 @@
 
 from distutils.core import setup
 
-execfile("kiwi/version.py")
+execfile("kiwi/__version__.py")
 
 setup(
     name = "kiwi",
@@ -24,7 +24,8 @@ setup(
     license = "GNU LGPL 2.1 (see COPYING)",
 
     packages = ['kiwi',
-                'kiwi.Widgets'],
+                'kiwi.ui',
+                'kiwi.ui.widgets'],
     package_dir = {'kiwi':'kiwi'},
     )
 
