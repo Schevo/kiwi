@@ -87,3 +87,11 @@ def merge_colors(widget, src_color, dst_color, steps=10):
         yield True
 
     yield False
+
+def quit_if_last(*args):
+    windows = [toplevel
+               for toplevel in gtk.window_list_toplevels()
+                   if toplevel.get_property('type') == gtk.WINDOW_TOPLEVEL]
+    if len(windows) == 1:
+        gtk.main_quit()
+

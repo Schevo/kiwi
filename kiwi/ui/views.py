@@ -40,6 +40,7 @@ from kiwi import _warn, get_gladepath, get_imagepath
 from kiwi.interfaces import MixinSupportValidation
 from kiwi.proxies import Proxy
 from kiwi.utils import gsignal
+from kiwi.ui.gadgets import quit_if_last
 
 _non_interactive = [
     gtk.Label, 
@@ -457,13 +458,6 @@ class SlaveView(gobject.GObject):
                                  "GazpachoView. Use show() instead.")
         self.toplevel.show_all()
 
-    def quit_if_last(self, *args):
-        windows = [toplevel
-                   for toplevel in gtk.window_list_toplevels()
-                       if toplevel.get_property('type') == gtk.WINDOW_TOPLEVEL]
-        if len(windows) == 1:
-            gtk.main_quit()
-
     def focus_toplevel(self):
         """Focuses the toplevel widget in the view"""
         # XXX: warn if there is no GdkWindow
@@ -868,6 +862,9 @@ class BaseView(SlaveView):
         if parent is not None:
             self.set_transient_for(parent)
 
+    def quit_if_last(self, *args):
+        quit_if_last(*args)
+        
     def hide_and_quit(self, *args):
         """Hides the current window and breaks the GTK+ event loop if this
         is the last window.
