@@ -1,9 +1,10 @@
 #!/usr/bin/env python
-from kiwi import Views
-from kiwi.initgtk import gtk, quit_if_last
-from kiwi.Widgets import ComboBox
-
 from sets import Set
+
+import gtk
+
+from kiwi.ui.views import BaseView
+from kiwi.ui.widgets.combobox import ComboBox
 
 def load_colors():
     filename = "/usr/X11R6/etc/X11/rgb.txt"
@@ -20,7 +21,7 @@ def load_colors():
 class Color:
     pass
 
-class FavouriteColor(Views.BaseView):
+class FavouriteColor(BaseView):
     def __init__(self):
         win = gtk.Window()
         win.set_title("Silly question")
@@ -32,8 +33,8 @@ class FavouriteColor(Views.BaseView):
         self.combo.set_property('model-attribute', 'color')
         box.pack_start(self.combo, False)
         win.add(box)
-        Views.BaseView.__init__(self, toplevel=win, 
-                                delete_handler=quit_if_last)
+        BaseView.__init__(self, toplevel=win, 
+                          delete_handler=self.quit_if_last)
 
 
 the_color = Color()

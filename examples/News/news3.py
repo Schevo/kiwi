@@ -1,9 +1,13 @@
 #!/usr/bin/env python
 import os
-from kiwi import Delegates
+
+import gtk
+
 from kiwi import utils
-from kiwi.Widgets.List import List, Column
-from kiwi.initgtk import gtk, quit_if_last
+from kiwi.ui.delegates import Delegates, SlaveDelegate
+from kiwi.ui.gadgets import quit_if_last
+from kiwi.ui.widgets.list import List, Column
+
 class NewsItem:
     def __init__(self, title, author, url):
         self.title, self.author, self.url = title, author, url
@@ -23,16 +27,16 @@ news = [
           "http://www.pigdog.org/auto/viva_la_musica/link/2678.html")
 ]
 
-my_columns = [ Column("title", sorted=True, tooltip="Title of article"), 
-               Column("author", tooltip="Author of article"), 
-               Column("url", title="Address", visible=False, 
-                      tooltip="Address of article") ]
+my_columns = [Column("title", sorted=True, tooltip="Title of article"), 
+              Column("author", tooltip="Author of article"), 
+              Column("url", title="Address", visible=False, 
+                     tooltip="Address of article")]
 
-class Shell(Delegates.Delegate):
+class Shell(Delegate):
     widgets = ["ok", "cancel", "header", "footer", "title"]
     def __init__(self):
-        Delegates.Delegate.__init__(self, gladefile="news_shell", 
-                                    delete_handler=quit_if_last)
+        Delegate.__init__(self, gladefile="news_shell", 
+                          delete_handler=quit_if_last)
 
         # paint header and footer; they are eventboxes that hold a
         # label and buttonbox respectively
@@ -44,7 +48,7 @@ class Shell(Delegates.Delegate):
         kiwilist = List(my_columns, news)
         kiwilist.connect('selection-change', self.news_selected)
         kiwilist.connect('double-click', self.double_click)
-        slave = Delegates.SlaveDelegate(toplevel=kiwilist)
+        slave = SlaveDelegate(toplevel=kiwilist)
         
         self.attach_slave("placeholder", slave)
         slave.focus_toplevel() # Must be done after attach

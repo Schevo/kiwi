@@ -1,23 +1,19 @@
 <?xml version="1.0" ?>
 <glade-interface>
-    <requires lib="Kiwi2.Widgets"/>
+    <requires lib="kiwi2"/>
     <widget class="GtkWindow" id="newsform">
         <property name="title" context="True" translatable="True">News Editor</property>
-        <property name="role"></property>
-        <property name="events">all-events-mask | button-motion-mask | button-press-mask | button-release-mask | button1-motion-mask | button2-motion-mask | button3-motion-mask | enter-notify-mask | exposure-mask | focus-change-mask | key-press-mask | key-release-mask | leave-notify-mask | pointer-motion-hint-mask | pointer-motion-mask | property-change-mask | proximity-in-mask | proximity-out-mask | scroll-mask | structure-mask | substructure-mask | visibility-notify-mask</property>
         <child>
             <widget class="GtkTable" id="table1">
                 <property name="row_spacing">6</property>
                 <property name="column_spacing">6</property>
                 <property name="border_width">6</property>
-                <property name="events">all-events-mask | button-motion-mask | button-press-mask | button-release-mask | button1-motion-mask | button2-motion-mask | button3-motion-mask | enter-notify-mask | exposure-mask | focus-change-mask | key-press-mask | key-release-mask | leave-notify-mask | pointer-motion-hint-mask | pointer-motion-mask | property-change-mask | proximity-in-mask | proximity-out-mask | scroll-mask | structure-mask | substructure-mask | visibility-notify-mask</property>
                 <property name="n_rows">4</property>
                 <property name="n_columns">2</property>
                 <property name="visible">True</property>
                 <child>
-                    <widget class="Kiwi2+Widgets+Entry+Entry" id="size">
+                    <widget class="kiwi+ui+widgets+entry+Entry" id="size">
                         <property name="model_attribute">size</property>
-                        <property name="events">all-events-mask | button-motion-mask | button-press-mask | button-release-mask | button1-motion-mask | button2-motion-mask | button3-motion-mask | enter-notify-mask | exposure-mask | focus-change-mask | key-press-mask | key-release-mask | leave-notify-mask | pointer-motion-hint-mask | pointer-motion-mask | property-change-mask | proximity-in-mask | proximity-out-mask | scroll-mask | structure-mask | substructure-mask | visibility-notify-mask</property>
                         <property name="can_focus">True</property>
                         <property name="data_type">int</property>
                         <property name="visible">True</property>
@@ -31,9 +27,7 @@
                 </child>
                 <child>
                     <widget class="GtkLabel" id="label4">
-                        <property name="pattern" translatable="True"></property>
                         <property name="label" translatable="True">Size:</property>
-                        <property name="events">all-events-mask | button-motion-mask | button-press-mask | button-release-mask | button1-motion-mask | button2-motion-mask | button3-motion-mask | enter-notify-mask | exposure-mask | focus-change-mask | key-press-mask | key-release-mask | leave-notify-mask | pointer-motion-hint-mask | pointer-motion-mask | property-change-mask | proximity-in-mask | proximity-out-mask | scroll-mask | structure-mask | substructure-mask | visibility-notify-mask</property>
                         <property name="xalign">1.0</property>
                         <property name="visible">True</property>
                     </widget>
@@ -44,10 +38,8 @@
                 </child>
                 <child>
                     <widget class="GtkLabel" id="label3">
-                        <property name="pattern" context="True" translatable="True"></property>
                         <property name="label" context="True" translatable="True">_URL:</property>
                         <property name="use_underline">True</property>
-                        <property name="events">all-events-mask | button-motion-mask | button-press-mask | button-release-mask | button1-motion-mask | button2-motion-mask | button3-motion-mask | enter-notify-mask | exposure-mask | focus-change-mask | key-press-mask | key-release-mask | leave-notify-mask | pointer-motion-hint-mask | pointer-motion-mask | property-change-mask | proximity-in-mask | proximity-out-mask | scroll-mask | structure-mask | substructure-mask | visibility-notify-mask</property>
                         <property name="xalign">1.0</property>
                         <property name="visible">True</property>
                     </widget>
@@ -58,10 +50,8 @@
                 </child>
                 <child>
                     <widget class="GtkLabel" id="label2">
-                        <property name="pattern" context="True" translatable="True"></property>
                         <property name="label" context="True" translatable="True">_Author:</property>
                         <property name="use_underline">True</property>
-                        <property name="events">all-events-mask | button-motion-mask | button-press-mask | button-release-mask | button1-motion-mask | button2-motion-mask | button3-motion-mask | enter-notify-mask | exposure-mask | focus-change-mask | key-press-mask | key-release-mask | leave-notify-mask | pointer-motion-hint-mask | pointer-motion-mask | property-change-mask | proximity-in-mask | proximity-out-mask | scroll-mask | structure-mask | substructure-mask | visibility-notify-mask</property>
                         <property name="xalign">1.0</property>
                         <property name="visible">True</property>
                     </widget>
@@ -72,19 +62,16 @@
                 </child>
                 <child>
                     <widget class="GtkLabel" id="label1">
-                        <property name="pattern" context="True" translatable="True"></property>
                         <property name="label" context="True" translatable="True">_Title:</property>
                         <property name="use_underline">True</property>
-                        <property name="events">all-events-mask | button-motion-mask | button-press-mask | button-release-mask | button1-motion-mask | button2-motion-mask | button3-motion-mask | enter-notify-mask | exposure-mask | focus-change-mask | key-press-mask | key-release-mask | leave-notify-mask | pointer-motion-hint-mask | pointer-motion-mask | property-change-mask | proximity-in-mask | proximity-out-mask | scroll-mask | structure-mask | substructure-mask | visibility-notify-mask</property>
                         <property name="xalign">1.0</property>
                         <property name="visible">True</property>
                     </widget>
                     <packing/>
                 </child>
                 <child>
-                    <widget class="Kiwi2+Widgets+Entry+Entry" id="title">
+                    <widget class="kiwi+ui+widgets+entry+Entry" id="title">
                         <property name="model_attribute">title</property>
-                        <property name="events">all-events-mask | button-motion-mask | button-press-mask | button-release-mask | button1-motion-mask | button2-motion-mask | button3-motion-mask | enter-notify-mask | exposure-mask | focus-change-mask | key-press-mask | key-release-mask | leave-notify-mask | pointer-motion-hint-mask | pointer-motion-mask | property-change-mask | proximity-in-mask | proximity-out-mask | scroll-mask | structure-mask | substructure-mask | visibility-notify-mask</property>
                         <property name="can_focus">True</property>
                         <property name="data_type">str</property>
                         <property name="visible">True</property>
@@ -95,9 +82,8 @@
                     </packing>
                 </child>
                 <child>
-                    <widget class="Kiwi2+Widgets+Entry+Entry" id="author">
+                    <widget class="kiwi+ui+widgets+entry+Entry" id="author">
                         <property name="model_attribute">author</property>
-                        <property name="events">all-events-mask | button-motion-mask | button-press-mask | button-release-mask | button1-motion-mask | button2-motion-mask | button3-motion-mask | enter-notify-mask | exposure-mask | focus-change-mask | key-press-mask | key-release-mask | leave-notify-mask | pointer-motion-hint-mask | pointer-motion-mask | property-change-mask | proximity-in-mask | proximity-out-mask | scroll-mask | structure-mask | substructure-mask | visibility-notify-mask</property>
                         <property name="can_focus">True</property>
                         <property name="data_type">str</property>
                         <property name="visible">True</property>
@@ -110,9 +96,8 @@
                     </packing>
                 </child>
                 <child>
-                    <widget class="Kiwi2+Widgets+Entry+Entry" id="url">
+                    <widget class="kiwi+ui+widgets+entry+Entry" id="url">
                         <property name="model_attribute">url</property>
-                        <property name="events">all-events-mask | button-motion-mask | button-press-mask | button-release-mask | button1-motion-mask | button2-motion-mask | button3-motion-mask | enter-notify-mask | exposure-mask | focus-change-mask | key-press-mask | key-release-mask | leave-notify-mask | pointer-motion-hint-mask | pointer-motion-mask | property-change-mask | proximity-in-mask | proximity-out-mask | scroll-mask | structure-mask | substructure-mask | visibility-notify-mask</property>
                         <property name="can_focus">True</property>
                         <property name="data_type">str</property>
                         <property name="visible">True</property>

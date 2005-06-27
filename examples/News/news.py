@@ -1,6 +1,8 @@
 #!/usr/bin/env python
-from kiwi import Views
-from kiwi.initgtk import gtk, quit_if_last
+import gtk
+
+from kiwi.ui.views import BaseView, SlaveView
+from kiwi.ui.gadgets import quit_if_last
 
 news = [
     ("Smallpox Vaccinations for EVERYONE",
@@ -20,7 +22,7 @@ news = [
         "http://www.pigdog.org/auto/viva_la_musica/link/2678.html")
 ]
 
-class News(Views.SlaveView):
+class News(SlaveView):
     def __init__(self):
         model = gtk.ListStore(str, str)
         treeview = gtk.TreeView(model)
@@ -32,11 +34,11 @@ class News(Views.SlaveView):
         treeview.get_selection().set_mode(gtk.SELECTION_BROWSE)
         for item in news:
             model.append(item[:-1])
-        Views.SlaveView.__init__(self, treeview)
+        SlaveView.__init__(self, treeview)
 
 news = News()
 
-shell = Views.BaseView(gladefile="news_shell", delete_handler=quit_if_last)
+shell = BaseView(gladefile="news_shell", delete_handler=quit_if_last)
 shell.attach_slave("placeholder", news)
 
 news.show_all()

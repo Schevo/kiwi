@@ -5,8 +5,9 @@ import os
 import gtk
 
 from kiwi import utils
-from kiwi.Delegates import Delegate, SlaveDelegate
-from kiwi.initgtk import quit_if_last
+from kiwi.ui.delegates import Delegate, SlaveDelegate
+from kiwi.ui.gadgets import quit_if_last, set_background, set_foreground
+from kiwi.ui.widgets.list import List, Column
 
 class NewsItem:
     def __init__(self, title, author, url):
@@ -56,9 +57,9 @@ class Shell(Delegate):
 
         # paint header and footer; they are eventboxes that hold a
         # label and buttonbox respectively
-        utils.set_background(self.header, "white") 
-        utils.set_background(self.footer, "#A0A0A0")
-        utils.set_foreground(self.title,  "blue")
+        set_background(self.header, "white") 
+        set_background(self.footer, "#A0A0A0")
+        set_foreground(self.title,  "blue")
 
         self.slave = ListSlave(self) 
         self.attach_slave("placeholder", self.slave)
@@ -76,10 +77,9 @@ class Shell(Delegate):
 
 url = None
 
-#import pdb
-#pdb.run('Shell()')
 shell = Shell()
 shell.show()
+
 def get_url(view, result):
     global url
     url = result

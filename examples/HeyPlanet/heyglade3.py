@@ -1,12 +1,14 @@
 #!/usr/bin/env python
-from kiwi import Views
-from kiwi.initgtk import gtk, quit_if_last
+import gtk
 
-class MyView(Views.BaseView):
+from kiwi.ui.gadgets import quit_if_last
+from kiwi.ui.views import BaseView
+
+class MyView(BaseView):
     widgets = ["the_label"]   # widgets list
     gladefile = "hey"
     def __init__(self):
-        Views.BaseView.__init__(self, delete_handler=quit_if_last)
+        BaseView.__init__(self, delete_handler=quit_if_last)
         text = self.the_label.get_text() # attached by constructor
         self.the_label.set_markup('<b>%s</b>' % text)
         self.the_label.set_use_markup(True)        

@@ -1,11 +1,13 @@
 #!/usr/bin/env python
-from kiwi import Views
-from kiwi.initgtk import gtk, quit_if_last
+import gtk
+
+from kiwi.ui.gadgets import quit_if_last
+from kiwi.ui.views import BaseView
 
 widgets = ["the_label"]
-app = Views.BaseView(gladefile="hey", 
-                     delete_handler=quit_if_last, 
-                     widgets=widgets)
+app = BaseView(gladefile="hey", 
+               delete_handler=quit_if_last, 
+               widgets=widgets)
 
 # the_label, a widget defined in glade, is 
 text = app.the_label.get_text()

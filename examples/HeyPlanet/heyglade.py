@@ -1,7 +1,9 @@
 #!/usr/bin/env python
-from kiwi import Views
-from kiwi.initgtk import gtk, quit_if_last
+import gtk
 
-app = Views.BaseView(gladefile="hey", delete_handler=quit_if_last)
+from kiwi.ui.gadgets import quit_if_last
+from kiwi.ui.views import BaseView
+
+app = BaseView(gladefile="hey", delete_handler=quit_if_last)
 app.show()
 gtk.main()

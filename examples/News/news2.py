@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import gtk
 
-from kiwi.Widgets.List import List, Column
+from kiwi.ui.widgets.list import List, Column
 
 class NewsItem:
     """An instance that holds information about a news article."""
@@ -31,23 +31,13 @@ my_columns = [Column("title", sorted=True),
               Column("url", title="URL", visible=False)]
 
 kiwilist = List(my_columns)
+kiwilist.add_list(news)
+
 w = gtk.Window()
 w.connect('delete-event', gtk.main_quit)
 w.set_size_request(600, 250)
 
-vbox = gtk.VBox()
-w.add(vbox)
+w.add(kiwilist)
 
-def on_button__clicked(button):
-    if len(kiwilist):
-        return
-    
-    kiwilist.add_list(news)
-    
-b = gtk.Button('Add some items')
-b.connect('clicked', on_button__clicked)
-vbox.pack_start(b, False, False)
-
-vbox.pack_start(kiwilist)
 w.show_all()
 gtk.main()

@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <glade-interface>
-    <requires lib="Kiwi2.Widgets"/>
+    <requires lib="kiwi2"/>
     <widget class="GtkWindow" id="employment_status">
         <property name="title" context="True" translatable="True"></property>
         <property name="role"></property>
@@ -11,7 +11,7 @@
                 <property name="events">all-events-mask | button-motion-mask | button-press-mask | button-release-mask | button1-motion-mask | button2-motion-mask | button3-motion-mask | enter-notify-mask | exposure-mask | focus-change-mask | key-press-mask | key-release-mask | leave-notify-mask | pointer-motion-hint-mask | pointer-motion-mask | property-change-mask | proximity-in-mask | proximity-out-mask | scroll-mask | structure-mask | substructure-mask | visibility-notify-mask</property>
                 <property name="visible">True</property>
                 <child>
-                    <widget class="Kiwi2+Widgets+Label+Label" id="kiwilabel1">
+                    <widget class="kiwi+ui+widgets+label+Label" id="kiwilabel1">
                         <property name="pattern" translatable="True"></property>
                         <property name="label" translatable="True">Which of the following best describes your emplyment status in the software industry:</property>
                         <property name="use_markup">True</property>
@@ -27,7 +27,7 @@
                         <property name="events">all-events-mask | button-motion-mask | button-press-mask | button-release-mask | button1-motion-mask | button2-motion-mask | button3-motion-mask | enter-notify-mask | exposure-mask | focus-change-mask | key-press-mask | key-release-mask | leave-notify-mask | pointer-motion-hint-mask | pointer-motion-mask | property-change-mask | proximity-in-mask | proximity-out-mask | scroll-mask | structure-mask | substructure-mask | visibility-notify-mask</property>
                         <property name="visible">True</property>
                         <child>
-                            <widget class="Kiwi2+Widgets+RadioButton+RadioButton" id="rb_executive">
+                            <widget class="kiwi+ui+widgets+radiobutton+RadioButton" id="rb_executive">
                                 <property name="model_attribute">employment_status</property>
                                 <property name="data_value">executive</property>
                                 <property name="group">rb_executive</property>
@@ -42,7 +42,7 @@
                             <packing/>
                         </child>
                         <child>
-                            <widget class="Kiwi2+Widgets+RadioButton+RadioButton" id="rb_management">
+                            <widget class="kiwi+ui+widgets+radiobutton+RadioButton" id="rb_management">
                                 <property name="model_attribute">employment_status</property>
                                 <property name="data_value">management</property>
                                 <property name="group">rb_executive</property>
@@ -59,7 +59,7 @@
                             </packing>
                         </child>
                         <child>
-                            <widget class="Kiwi2+Widgets+RadioButton+RadioButton" id="rb_other">
+                            <widget class="kiwi+ui+widgets+radiobutton+RadioButton" id="rb_other">
                                 <property name="model_attribute">employment_status</property>
                                 <property name="data_value">other</property>
                                 <property name="group">rb_executive</property>

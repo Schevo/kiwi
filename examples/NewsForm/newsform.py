@@ -1,6 +1,8 @@
 #!/usr/bin/env python
-from kiwi import Views
-from kiwi.initgtk import gtk, quit_if_last
+import gtk
+
+from kiwi.ui.gadgets import quit_if_last
+from kiwi.ui.views import BaseView
 
 # Empty model; GladeProxy will use it to hold the attributes
 class NewsItem:
@@ -10,8 +12,8 @@ class NewsItem:
 
 item = NewsItem()
 my_widgets = ["title", "author", "url", "size"]
-view = Views.BaseView(gladefile="newsform", widgets=my_widgets,
-                      delete_handler=quit_if_last)
+view = BaseView(gladefile="newsform", widgets=my_widgets,
+                delete_handler=quit_if_last)
 view.add_proxy(item, my_widgets)
 view.focus_topmost()
 view.show()
