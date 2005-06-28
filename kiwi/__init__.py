@@ -80,3 +80,9 @@ def set_imagepath(path):
 def get_imagepath():
     global imagepath
     return imagepath
+
+require_gazpacho_loader = False
+
+def require_gazpacho():
+    global require_gazpacho_loader
+    require_gazpacho_loader = True

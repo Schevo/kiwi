@@ -13,10 +13,8 @@ offers extended widgets based upon the original PyGTK widgets.
 
   Optional
 
-    - libglade 2.x http://ftp.gnome.org/pub/GNOME/sources/libglade/XXX
-
-    It's developed on Linux. It should run on any Unix box that can
-    compile that dependencies.  I'm not sure it runs on Windows. 
+    - libglade 2.x     http://ftp.gnome.org/pub/GNOME/sources/libglade/XXX
+    - gazpacho 0.5.3   http://ftp.gnome.org/pub/GNOME/sources/gazpacho/XXX
 
 * Installation
 

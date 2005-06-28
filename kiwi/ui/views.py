@@ -30,18 +30,28 @@ Defines the View classes that are included in the Kiwi Framework, which
 are the base of Delegates and Proxies.
 """
 
-import os
 import string
 
 import gobject
 import gtk
 
-from kiwi import _warn, get_gladepath, get_imagepath
+from kiwi import _warn, require_gazpacho
 from kiwi.interfaces import MixinSupportValidation
 from kiwi.proxies import Proxy
 from kiwi.utils import gsignal
 from kiwi.ui.gadgets import quit_if_last
 
+try:
+    from kiwi.ui.gazpacholoader1 import GazpachoWidgetTree as WidgetTree
+except ImportError:
+    if require_gazpacho:
+        raise RuntimeError("Gazpacho is required, but could not be found")
+    else:
+        try:
+            from kiwi.ui.libgladeloader import LibgladeWidgetTree as WidgetTree
+        except ImportError:
+            raise RuntimeError("Could not find a glade parser library")
+        
 _non_interactive = [
     gtk.Label, 
     gtk.Alignment,
@@ -67,67 +77,6 @@ _non_interactive = [
 ]
 
 _non_interactive = tuple(_non_interactive)
-
-#
-# Gladepath handling
-#
-
-def find_in_gladepath(filename):
-    """Looks in gladepath for the file specified"""
-
-    gladepath = get_gladepath()
-    
-    # check to see if gladepath is a list or tuple
-    if not isinstance(gladepath, (tuple, list)):
-        msg ="gladepath should be a list or tuple, found %s"
-        raise ValueError(msg % type(gladepath))
-    if os.sep in filename or not gladepath:
-        if os.path.isfile(filename):
-            return filename
-        else:
-            raise IOError("%s not found" % filename)
-
-    for path in gladepath:
-        # append slash to dirname
-        if not path:
-            continue
-        # if absolute path
-        fname = os.path.join(path, filename)
-        if os.path.isfile(fname):
-            return fname
-
-    raise IOError("%s not found in path %s.  You probably need to "
-                  "Kiwi.set_gladepath() correctly" % (filename, gladepath))
-
-#
-# Image path resolver
-#
-
-def image_path_resolver(filename):
-    imagepath = get_imagepath()
-
-    # check to see if imagepath is a list or tuple
-    if not isinstance(imagepath, (list, tuple)):
-        msg ="imagepath should be a list or tuple, found %s"
-        raise ValueError(msg % type(imagepath))
-
-    if not imagepath:
-        if os.path.isfile(filename):
-            return filename
-        else:
-            raise IOError("%s not found" % filename)
-
-    basefilename = os.path.basename(filename)
-    
-    for path in imagepath:
-        if not path:
-            continue
-        fname = os.path.join(path, basefilename)
-        if os.path.isfile(fname):
-            return fname
-
-    raise IOError("%s not found in path %s. You probably need to "
-                  "Kiwi.set_imagepath() correctly" % (filename, imagepath))
 
 #
 # Signal brokers
@@ -200,8 +149,9 @@ class SignalBroker(object):
                 else:
                    signal_id = widget.connect(signal, methods[fname])
             except TypeError:
-                raise AttributeError("Widget %s doesn't provide a signal %s"
-                                     % (widget.__class__, signal))
+                _warn("Widget %s doesn't provide a signal %s"
+                     % (widget.__class__, signal))
+                continue
             if not self._autoconnected.has_key(widget):
                 self._autoconnected[widget] = []
             self._autoconnected[widget].append((signal, signal_id))
@@ -371,8 +321,8 @@ class SlaveView(gobject.GObject):
 
     def _init_glade_adaptor(self):
         """Special init code that subclasses may want to override."""
-        self.glade_adaptor = GazpachoWidgetTree(self, self.gladefile,
-                                                self.widgets, self.gladename)
+        self.glade_adaptor = WidgetTree(self, self.gladefile,
+                                        self.widgets, self.gladename)
 
         container_name = self.toplevel_name or self.gladename or self.gladefile
             
@@ -455,7 +405,7 @@ class SlaveView(gobject.GObject):
         """Shows all widgets attached to the toplevel widget"""
         if self.glade_adaptor is not None:
             raise AssertionError("You don't want to call show_all on a "
-                                 "GazpachoView. Use show() instead.")
+                                 "SlaveView. Use show() instead.")
         self.toplevel.show_all()
 
     def focus_toplevel(self):
@@ -767,8 +717,8 @@ class BaseView(SlaveView):
                     "Invalid delete handler provided: %s" % delete_handler)
 
     def _init_glade_adaptor(self):
-        self.glade_adaptor = GazpachoWidgetTree(self, self.gladefile,
-                                                self.widgets, self.gladename)
+        self.glade_adaptor = WidgetTree(self, self.gladefile,
+                                        self.widgets, self.gladename)
         name = self.toplevel_name or self.glade_adaptor.gladename
         self.toplevel = self.glade_adaptor.get_widget(name)
 
@@ -872,88 +822,3 @@ class BaseView(SlaveView):
         """
         self.toplevel.hide()
         self.quit_if_last()
-
-#
-#
-#
-
-
-class GladeAdaptor(object):
-    """Abstract class that define the functionality an class that handle
-    glade files should provide."""
-
-    def get_widget(self, widget_name):
-        """Return the widget in the glade file that has that name"""
-
-    def get_widgets(self):
-        """Return a tuple with all the widgets in the glade file"""
-
-    def attach_slave(self, name, slave):
-        """Attaches a slaveview to the view this adaptor belongs to,
-        substituting the widget specified by name.
-        The widget specified *must* be a eventbox; its child widget will be
-        removed and substituted for the specified slaveview's toplevel widget
-        """
-
-    def signal_autoconnect(self, dic):
-        """Connect the signals in the keys of dict with the objects in the
-        values of dic
-        """
-    
-from gazpacho.loader import widgettree
-
-class GazpachoWidgetTree(GladeAdaptor):
-    """Example class of GladeAdaptor that uses Gazpacho loader to load the
-    glade files
-    """
-    tree = None
-    def __init__(self, view, gladefile, widgets, gladename=None):
-        self.view = view
-        
-        widgets = (widgets or self.view.widgets or [])[:]
-        
-        if not gladefile:
-            raise ValueError("A gladefile wasn't provided.")
-        elif not isinstance(gladefile, basestring):
-            raise TypeError(
-                  "gladefile should be a string, found %s" % type(gladefile))
-        
-        # get base name of glade file
-        basename = os.path.basename(gladefile)
-        filename = os.path.splitext(basename)[0]
-        
-        gladefile = find_in_gladepath(filename + ".glade")
-        self.tree = widgettree.WidgetTree(gladefile,
-                                          path_resolver=image_path_resolver)
-        self.gladename = gladename or filename
-            
-        
-        # Attach widgets in the widgetlist to the view specified, so
-        # widgets = [label1, button1] -> view.label1, view.button1
-        for w in widgets:
-            widget = self.tree.get_widget(w)
-            if widget is not None:
-                setattr(self.view, w, widget)
-            else:
-                _warn("Widget %s was not found in glade widget tree." % w)
-        
-        self.widgets = widgets
-        self.gladefile = gladefile
-        
-    def get_widget(self, name):
-        """Retrieves the named widget from the View (or glade tree)"""
-        if self.tree is None:
-            raise TypeError(
-                  "No tree defined for %s, did you call the constructor?" % self.view)
-        name = name.replace('.', '_')
-        widget = self.tree.get_widget(name)
-        if widget is None:
-            raise AttributeError(
-                  "Widget %s not found in view %s" % (name, self.view))
-        return widget
-
-    def get_widgets(self):
-        return self.tree.get_widgets()
-
-    def signal_autoconnect(self, dic):
-        self.tree.signal_autoconnect(dic)        

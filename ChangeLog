@@ -1,3 +1,15 @@
+2005-06-28  Johan Dahlin  <jdahlin@async.com.br>
+
+	* README:
+	* kiwi/__init__.py:
+	* kiwi/ui/gazpacholoader.py:
+	* kiwi/ui/libgladeloader.py:
+	* kiwi/ui/loader.py:
+	* kiwi/ui/views.py:
+
+	How much I hate this, but: Write a libglade loader to use as fallback
+	when gazpacho cannot be found. Add a hook to require gazpacho.
+
 2005-06-27  Johan Dahlin  <jdahlin@async.com.br>
 
 	* kiwi/ui/views.py: Allow us to function without a broker.
