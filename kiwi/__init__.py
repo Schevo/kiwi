@@ -32,8 +32,6 @@ Kiwi includes a Framework and a set of enhanced widgets, including CList, Option
     - Organization: Async Open Source
 """            
 
-import os
-import string
 import sys
 
 class ValueUnset:
@@ -44,45 +42,5 @@ class ValueUnset:
 from kiwi.__version__ import version
 kiwi_version = version
 
-# Kiwi Combo, GtkRadioButton are non-standard and are handled specially
-# inside AbstractProxy
-
-
 def _warn(msg):
     sys.stderr.write("Kiwi warning: "+msg+"\n")
-
-gladepath = []
-
-if os.environ.has_key('KIWI_GLADE_PATH'):
-    gladepath = os.environ['KIWI_GLADE_PATH'].split(':')
-
-def set_gladepath(path):
-    """Sets a new path to be used to search for glade files when creating
-    GladeViews or it's subclasses
-    """
-    global gladepath
-    gladepath = path
-
-def get_gladepath():
-    global gladepath
-    return gladepath
-
-
-imagepath = ''
-
-if os.environ.has_key ('KIWI_IMAGE_PATH'):
-    imagepath = string.split(os.environ['KIWI_IMAGE_PATH'])
-
-def set_imagepath(path):
-    global imagepath
-    imagepath = path
-
-def get_imagepath():
-    global imagepath
-    return imagepath
-
-require_gazpacho_loader = False
-
-def require_gazpacho():
-    global require_gazpacho_loader
-    require_gazpacho_loader = True

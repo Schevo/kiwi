@@ -26,7 +26,7 @@ import os
 from gtk.glade import XML
 
 from kiwi import _warn
-from kiwi.ui.loader import find_in_gladepath
+from kiwi.environ import find_in_gladepath
 
 class LibgladeWidgetTree(XML):
     def __init__(self, view, gladefile, widgets, gladename=None):

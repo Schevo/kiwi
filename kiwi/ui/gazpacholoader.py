@@ -27,7 +27,7 @@ import os
 from gazpacho.loader.widgettree import WidgetTree
 
 from kiwi import _warn
-from kiwi.ui.loader import find_in_gladepath, image_path_resolver
+from kiwi.environ import find_in_gladepath, image_path_resolver
 
 class GazpachoWidgetTree:
     """Example class of GladeAdaptor that uses Gazpacho loader to load the

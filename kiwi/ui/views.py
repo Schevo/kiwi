@@ -35,17 +35,19 @@ import string
 import gobject
 import gtk
 
-from kiwi import _warn, require_gazpacho
+from kiwi import _warn
+from kiwi.environ import require_gazpacho_loader
 from kiwi.interfaces import MixinSupportValidation
 from kiwi.proxies import Proxy
 from kiwi.utils import gsignal
 from kiwi.ui.gadgets import quit_if_last
 
 try:
-    from kiwi.ui.gazpacholoader1 import GazpachoWidgetTree as WidgetTree
-except ImportError:
-    if require_gazpacho:
-        raise RuntimeError("Gazpacho is required, but could not be found")
+    from kiwi.ui.gazpacholoader import GazpachoWidgetTree as WidgetTree
+except ImportError, e:
+    if require_gazpacho_loader:
+        raise RuntimeError("Gazpacho is required, but could not be found: %s"
+                           % e)
     else:
         try:
             from kiwi.ui.libgladeloader import LibgladeWidgetTree as WidgetTree

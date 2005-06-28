@@ -32,6 +32,28 @@ class Mixin(object):
 class MixinSupportValidation(object):
     pass
 
+class AbstractGladeAdaptor(object):
+    """Abstract class that define the functionality an class that handle
+    glade files should provide."""
+
+    def get_widget(self, widget_name):
+        """Return the widget in the glade file that has that name"""
+
+    def get_widgets(self):
+        """Return a tuple with all the widgets in the glade file"""
+
+    def attach_slave(self, name, slave):
+        """Attaches a slaveview to the view this adaptor belongs to,
+        substituting the widget specified by name.
+        The widget specified *must* be a eventbox; its child widget will be
+        removed and substituted for the specified slaveview's toplevel widget
+        """
+
+    def signal_autoconnect(self, dic):
+        """Connect the signals in the keys of dict with the objects in the
+        values of dic
+        """
+
 def implementsIProxy():
     """Add a content-changed signal and a data-type, default-value, 
     model-attribute properties to the class where this 

@@ -1,5 +1,18 @@
 2005-06-28  Johan Dahlin  <jdahlin@async.com.br>
 
+	* kiwi/__init__.py:
+	* kiwi/environ.py:
+	* kiwi/interfaces.py:
+	* kiwi/ui/gazpacholoader.py:
+	* kiwi/ui/libgladeloader.py:
+	* kiwi/ui/loader.py:
+	* kiwi/ui/views.py:
+
+	Kill loader. Move glade/imagepath handling to kiwi.environ.
+	Move abstract adaptor to kiwi.interfaces
+
+2005-06-28  Johan Dahlin  <jdahlin@async.com.br>
+
 	* README:
 	* kiwi/__init__.py:
 	* kiwi/ui/gazpacholoader.py:

@@ -1,7 +1,7 @@
 #
 # Kiwi: a Framework and Enhanced Widgets for Python
 #
-# Copyright (C) 2001-2005 Async Open Source
+# Copyright (C) 2003-2005 Async Open Source
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -21,15 +21,30 @@
 # Author(s): Christian Reis <kiko@async.com.br>
 #            Lorenzo Gil Sanchez <lgs@sicem.biz>
 #            Johan Dahlin <jdahlin@async.com.br>
-#
+#         
 
 import os
-
-from kiwi import get_gladepath, get_imagepath
+import string
 
 #
 # Gladepath handling
 #
+
+gladepath = []
+
+if os.environ.has_key('KIWI_GLADE_PATH'):
+    gladepath = os.environ['KIWI_GLADE_PATH'].split(':')
+
+def set_gladepath(path):
+    """Sets a new path to be used to search for glade files when creating
+    GladeViews or it's subclasses
+    """
+    global gladepath
+    gladepath = path
+
+def get_gladepath():
+    global gladepath
+    return gladepath
 
 def find_in_gladepath(filename):
     """Looks in gladepath for the file specified"""
@@ -56,11 +71,25 @@ def find_in_gladepath(filename):
             return fname
 
     raise IOError("%s not found in path %s.  You probably need to "
-                  "Kiwi.set_gladepath() correctly" % (filename, gladepath))
+                  "kiwi.environ.set_gladepath() correctly" % (filename,
+                                                              gladepath))
 
 #
 # Image path resolver
 #
+
+imagepath = ''
+
+if os.environ.has_key ('KIWI_IMAGE_PATH'):
+    imagepath = string.split(os.environ['KIWI_IMAGE_PATH'])
+
+def set_imagepath(path):
+    global imagepath
+    imagepath = path
+
+def get_imagepath():
+    global imagepath
+    return imagepath
 
 def image_path_resolver(filename):
     imagepath = get_imagepath()
@@ -86,27 +115,13 @@ def image_path_resolver(filename):
             return fname
 
     raise IOError("%s not found in path %s. You probably need to "
-                  "Kiwi.set_imagepath() correctly" % (filename, imagepath))
+                  "kiwi.environ.set_imagepath() correctly" % (filename,
+                                                              imagepath))
 
-class AbstractGladeAdaptor(object):
-    """Abstract class that define the functionality an class that handle
-    glade files should provide."""
 
-    def get_widget(self, widget_name):
-        """Return the widget in the glade file that has that name"""
+require_gazpacho_loader = False
 
-    def get_widgets(self):
-        """Return a tuple with all the widgets in the glade file"""
-
-    def attach_slave(self, name, slave):
-        """Attaches a slaveview to the view this adaptor belongs to,
-        substituting the widget specified by name.
-        The widget specified *must* be a eventbox; its child widget will be
-        removed and substituted for the specified slaveview's toplevel widget
-        """
-
-    def signal_autoconnect(self, dic):
-        """Connect the signals in the keys of dict with the objects in the
-        values of dic
-        """
+def require_gazpacho():
+    global require_gazpacho_loader
+    require_gazpacho_loader = True
 
