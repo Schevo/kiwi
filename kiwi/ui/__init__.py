@@ -19,14 +19,3 @@
 # USA
 # 
 
-import sys
-
-# Before trying to import pygtk, check if gtk is already imported
-if not ('gtk._gtk' in sys.modules or
-        'gobject' in sys.modules):
-    try:
-        import pygtk
-        pygtk.require('2.0')
-        print 'Warning: pygtk.require() called, do this before importing kiwi'
-    except ImportError:
-        raise ImportError("Couldn't import required package PyGTK+ 2.x")

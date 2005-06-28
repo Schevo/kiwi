@@ -1,5 +1,9 @@
 2005-06-28  Johan Dahlin  <jdahlin@async.com.br>
 
+	* kiwi/ui/__init__.py: Kill pygtk.require() it won't be missed since 
+	all systems which we can run on has pygtk 2.x installed as default. 
+	Should also speed up imports.
+
 	* kiwi/__init__.py:
 	* kiwi/environ.py:
 	* kiwi/interfaces.py:
