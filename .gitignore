@@ -1,0 +1,7 @@
+*.pyc
+*.pyo
+MANIFEST
+build
+dist
+*.egg-info
+locale
