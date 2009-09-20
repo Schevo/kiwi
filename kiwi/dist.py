@@ -85,7 +85,14 @@ class KiwiInstallLib(install_lib):
         else:
             install = self.distribution.get_command_obj('install')
             # Use raw strings so UNC paths which has \\ works
-            prefix = 'prefix = r"%s"' % install.prefix or sys.prefix
+            try:
+                import setuptools
+            except ImportError:
+                prefix = 'prefix = r"%s"' % install.prefix or sys.prefix
+            else:
+                prefix = r"""
+prefix = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+"""
 
         filename = self._get_template()
         self.mkpath(os.path.dirname(filename))

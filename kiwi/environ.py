@@ -23,14 +23,6 @@
 
 """Environment helpers: path mangling and resource management"""
 
-try:
-    import setuptools
-except ImportError:
-    ROOT = '.'
-else:
-    import os
-    ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
-
 import gettext
 import imp
 import locale
@@ -62,7 +54,7 @@ class Environment:
 
     External libraries or applications are free to add extra directories"""
 
-    def __init__(self, root=ROOT):
+    def __init__(self, root='.'):
         self._resources = {}
         self._extensions = {}
         self._root = root
@@ -100,7 +92,6 @@ class Environment:
 
     def add_resource(self, resource, path):
         path = os.path.join(self._root, path)
-
         if not os.path.isdir(path):
             raise EnvironmentError("path %s must be a directory" % path)
 
